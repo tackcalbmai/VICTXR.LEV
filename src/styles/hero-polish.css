@@ -184,8 +184,9 @@
     height: 0.27rem;
   }
 
+  .disruption,
   .disruption__stage {
-    min-height: 168svh;
+    min-height: 100svh;
   }
 
   .disruption__line {
