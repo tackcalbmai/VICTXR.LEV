@@ -37,12 +37,12 @@
     align-self: end;
     justify-self: start;
     display: grid;
-    width: 4.35rem;
-    height: 10.8rem;
+    width: 4.15rem;
+    height: 9.3rem;
     grid-template-rows: auto 1fr auto;
     justify-items: center;
-    gap: 0.48rem;
-    padding: 0.15rem 0.25rem 0.2rem;
+    gap: 0.42rem;
+    padding: 0.15rem 0.2rem;
     border: 0;
     background: transparent;
     text-transform: uppercase;
@@ -53,7 +53,7 @@
 
   .hero__scroll::after {
     position: absolute;
-    inset: -0.5rem -0.35rem;
+    inset: -0.42rem -0.3rem;
     z-index: -1;
     border: 1px solid transparent;
     border-radius: 999px;
@@ -66,7 +66,7 @@
 
   .hero__scroll:hover::after,
   .hero__scroll:focus-visible::after {
-    border-color: var(--line);
+    border-color: rgb(10 10 10 / 22%);
     background: rgb(10 10 10 / 2.5%);
     transform: scale(1.025);
   }
@@ -80,10 +80,10 @@
 
   .hero__scroll-window {
     position: relative;
-    width: 2.1rem;
+    width: 2rem;
     min-height: 0;
     overflow: hidden;
-    border-inline: 1px solid var(--line);
+    border-inline: 1px solid rgb(10 10 10 / 22%);
     border-radius: 999px;
     color: var(--ink);
     transition: border-color 320ms var(--ease-out);
@@ -95,69 +95,64 @@
     right: 0;
     left: 0;
     z-index: 3;
-    height: 22%;
+    height: 23%;
     content: "";
     pointer-events: none;
   }
 
   .hero__scroll-window::before {
     top: 0;
-    background: linear-gradient(to bottom, var(--paper) 8%, rgb(241 240 235 / 0%));
+    background: linear-gradient(to bottom, var(--paper) 5%, rgb(241 240 235 / 0%));
   }
 
   .hero__scroll-window::after {
     bottom: 0;
-    background: linear-gradient(to top, var(--paper) 8%, rgb(241 240 235 / 0%));
+    background: linear-gradient(to top, var(--paper) 5%, rgb(241 240 235 / 0%));
   }
 
   .hero__scroll:hover .hero__scroll-window,
   .hero__scroll:focus-visible .hero__scroll-window {
-    border-color: rgb(10 10 10 / 42%);
+    border-color: rgb(10 10 10 / 48%);
   }
 
   .hero__scroll-track {
     position: absolute;
-    inset: 0;
+    inset: 0.35rem 0;
     z-index: 1;
-    display: block;
+    display: grid;
+    grid-template-rows: repeat(7, minmax(0, 1fr));
+    place-items: center;
   }
 
   .hero__scroll-track span {
-    position: absolute;
-    top: 0;
-    left: 50%;
     display: block;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: 800;
     line-height: 1;
-    opacity: 0;
+    opacity: 0.34;
+    transform: translateY(-2px);
     will-change: transform, opacity;
-    animation: victxr-x-drop 3.25s linear infinite;
+    animation: victxr-x-cascade 2.45s linear infinite;
   }
 
-  .hero__scroll-track span:nth-child(1) { animation-delay: -0.15s; }
-  .hero__scroll-track span:nth-child(2) { animation-delay: -0.42s; }
-  .hero__scroll-track span:nth-child(3) { animation-delay: -0.69s; }
-  .hero__scroll-track span:nth-child(4) { animation-delay: -0.96s; }
-  .hero__scroll-track span:nth-child(5) { animation-delay: -1.23s; }
-  .hero__scroll-track span:nth-child(6) { animation-delay: -1.5s; }
-  .hero__scroll-track span:nth-child(7) { animation-delay: -1.77s; }
-  .hero__scroll-track span:nth-child(8) { animation-delay: -2.04s; }
-  .hero__scroll-track span:nth-child(9) { animation-delay: -2.31s; }
-  .hero__scroll-track span:nth-child(10) { animation-delay: -2.58s; }
-  .hero__scroll-track span:nth-child(11) { animation-delay: -2.85s; }
-  .hero__scroll-track span:nth-child(12) { animation-delay: -3.12s; }
+  .hero__scroll-track span:nth-child(1) { animation-delay: -0.12s; }
+  .hero__scroll-track span:nth-child(2) { animation-delay: -0.47s; }
+  .hero__scroll-track span:nth-child(3) { animation-delay: -0.82s; }
+  .hero__scroll-track span:nth-child(4) { animation-delay: -1.17s; }
+  .hero__scroll-track span:nth-child(5) { animation-delay: -1.52s; }
+  .hero__scroll-track span:nth-child(6) { animation-delay: -1.87s; }
+  .hero__scroll-track span:nth-child(7) { animation-delay: -2.22s; }
 
   .hero__scroll:hover .hero__scroll-track span,
   .hero__scroll:focus-visible .hero__scroll-track span {
-    animation-duration: 2.75s;
+    animation-duration: 2.05s;
   }
 
   .hero__scroll-end {
     font-size: 0.78rem;
     font-weight: 800;
     line-height: 1;
-    opacity: 0.68;
+    opacity: 0.72;
   }
 
   .disruption__line {
@@ -169,58 +164,41 @@
   }
 }
 
-@keyframes victxr-x-drop {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -1.2rem) skewX(0deg) scaleX(1);
+@keyframes victxr-x-cascade {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translateY(-3px) skewX(0deg) scaleX(1);
   }
 
-  12% {
-    opacity: 0.78;
+  28% {
+    opacity: 0.46;
+    transform: translateY(0) skewX(0deg) scaleX(1);
   }
 
-  38% {
-    opacity: 0.78;
-    transform: translate(-50%, 2.6rem) skewX(0deg) scaleX(1);
+  43% {
+    opacity: 0.92;
+    transform: translateY(2px) skewX(0deg) scaleX(1);
   }
 
-  39% {
-    opacity: 0.28;
-    transform: translate(calc(-50% + 3px), 2.7rem) skewX(-16deg) scaleX(1.28);
+  44% {
+    opacity: 0.22;
+    transform: translate(3px, 2px) skewX(-18deg) scaleX(1.28);
   }
 
-  40% {
+  45% {
     opacity: 1;
-    transform: translate(calc(-50% - 2px), 2.8rem) skewX(12deg) scaleX(0.8);
+    transform: translate(-2px, 3px) skewX(13deg) scaleX(0.8);
   }
 
-  41% {
-    opacity: 0.78;
-    transform: translate(-50%, 2.9rem) skewX(0deg) scaleX(1);
+  46% {
+    opacity: 0.82;
+    transform: translateY(3px) skewX(0deg) scaleX(1);
   }
 
   70% {
-    opacity: 0.78;
-    transform: translate(-50%, 5.7rem) skewX(0deg) scaleX(1);
-  }
-
-  71% {
-    opacity: 0.35;
-    transform: translate(calc(-50% - 2px), 5.8rem) skewX(10deg) scaleX(1.22);
-  }
-
-  72% {
-    opacity: 0.88;
-    transform: translate(-50%, 5.9rem) skewX(0deg) scaleX(1);
-  }
-
-  88% {
-    opacity: 0.72;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, 8.2rem) skewX(0deg) scaleX(1);
+    opacity: 0.42;
+    transform: translateY(5px) skewX(0deg) scaleX(1);
   }
 }
 
@@ -232,19 +210,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero__scroll-track span {
-    position: static;
-    opacity: 0.8;
+    opacity: 0.55;
+    transform: none;
     animation: none !important;
-  }
-
-  .hero__scroll-track {
-    position: static;
-    display: grid;
-    height: 100%;
-    place-items: center;
-  }
-
-  .hero__scroll-track span:not(:first-child) {
-    display: none;
   }
 }
