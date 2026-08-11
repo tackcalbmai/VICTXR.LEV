@@ -25,11 +25,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </span>
       </h1>
 
+      <p class="hero__side-note" data-side-note>
+        <span><strong>No templates</strong> were harmed in the making of this website.</span>
+      </p>
+
       <div class="hero__footer">
         <p class="hero__intro">Websites for businesses that refuse to look ordinary.</p>
 
-        <a class="hero__scroll" href="#different-business" aria-label="Scroll to explore the site">
-          <span>Scroll to explore</span><span class="hero__scroll-arrow" aria-hidden="true">↓</span>
+        <a
+          class="hero__scroll"
+          href="#different-business"
+          data-scroll-journey
+          aria-label="Scroll to explore the site"
+        >
+          <span class="hero__scroll-label">Scroll</span>
+          <span class="hero__scroll-window" aria-hidden="true">
+            <span class="hero__scroll-track">
+              <span>X</span><span>X</span><span>X</span><span>X</span><span>X</span><span>X</span><span>X</span>
+            </span>
+          </span>
+          <span class="hero__scroll-end" aria-hidden="true">↓</span>
         </a>
 
         <nav class="hero__actions" aria-label="Primary">
