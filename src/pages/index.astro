@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <div class="home-shell" data-home-intro="pending">
     <header class="site-header" data-intro-header>
       <a class="site-header__brand" href="/" aria-label="VICTXR LEV home">
-        <span>VICTXR</span><span class="site-header__dot">.</span><span>LEV</span>
+        <span>VICT</span><span class="site-header__brand-letter" data-brand-letter>X</span><span>R</span><span class="site-header__dot">.</span><span>LEV</span>
       </a>
 
       <div class="site-header__meta" aria-label="Site information">
@@ -50,24 +50,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </a>
 
           <nav class="hero__actions" aria-label="Primary">
-            <a href="#work">View selected work ↘</a>
-            <a href="#contact">Start a project ↗</a>
+            <a href="#work">
+              <span>View selected work</span>
+              <span class="hero__action-arrow hero__action-arrow--down" aria-hidden="true"></span>
+            </a>
+            <a href="#contact">
+              <span>Start a project</span>
+              <span class="hero__action-arrow hero__action-arrow--up" aria-hidden="true"></span>
+            </a>
           </nav>
         </div>
       </section>
 
       <section class="disruption" data-disruption aria-labelledby="different-business">
         <div class="disruption__stage">
-          <h2 id="different-business" class="sr-only">Your business is not generic</h2>
+          <h2 id="different-business" class="sr-only">Your business isn’t generic</h2>
 
           <p class="disruption__line disruption__line--one" data-disruption-one>
-            Your business is not generic.
+            Your business isn<span class="type-apostrophe">’</span>t generic.
           </p>
 
           <span class="disruption__x" data-disruption-x aria-hidden="true">X</span>
 
           <p class="disruption__line disruption__line--two" data-disruption-two>
-            Your website should not be either.
+            Your website shouldn<span class="type-apostrophe">’</span>t be either.
           </p>
 
           <p class="disruption__caption" data-disruption-caption>
@@ -120,6 +126,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     display: inline;
   }
 
+  .type-apostrophe {
+    display: inline-block;
+    margin-inline: 0.025em 0.015em;
+    transform: translateY(-0.035em);
+  }
+
   @media (min-width: 761px) {
     .hero__intro,
     .hero__scroll,
@@ -144,16 +156,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   @media (max-width: 760px) {
     .hero__line--different .hero__line-inner {
-      font-size: 0.86em;
+      font-size: 0.69em;
+      letter-spacing: -0.055em;
       white-space: nowrap;
     }
 
     .hero__suffix {
-      display: inline-block;
-      margin-left: 0.08em;
-      font-size: 0.38em;
-      letter-spacing: 0;
-      transform: translateY(-1.1em);
+      display: inline;
+      margin-left: 0;
+      font-size: 1em;
+      letter-spacing: inherit;
+      transform: none;
     }
   }
 </style>
