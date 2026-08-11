@@ -42,7 +42,6 @@ export function initHomeMotion() {
 
       disruption
         .to('[data-disruption-one]', {
-          xPercent: -4,
           yPercent: -18,
           rotate: -1.2,
           scale: 0.95,
@@ -53,8 +52,8 @@ export function initHomeMotion() {
           '[data-disruption-two]',
           {
             autoAlpha: 1,
-            xPercent: 1.5,
-            yPercent: 6,
+            xPercent: 0.5,
+            yPercent: 4,
             rotate: 0.6,
             ease: 'none',
           },
