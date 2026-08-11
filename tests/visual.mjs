@@ -30,6 +30,25 @@ async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
   }
 }
 
+async function assertNoOverlap(page, firstSelector, secondSelector, name) {
+  const first = await page.locator(firstSelector).boundingBox();
+  const second = await page.locator(secondSelector).boundingBox();
+  if (!first || !second) return;
+
+  const overlapX = Math.max(
+    0,
+    Math.min(first.x + first.width, second.x + second.width) - Math.max(first.x, second.x),
+  );
+  const overlapY = Math.max(
+    0,
+    Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y),
+  );
+
+  if (overlapX > 0 && overlapY > 0) {
+    throw new Error(`${name} overlap detected (${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px)`);
+  }
+}
+
 async function capture(name, contextOptions) {
   const context = await browser.newContext({
     ...contextOptions,
@@ -83,6 +102,16 @@ async function capture(name, contextOptions) {
   );
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
+
+  if (!isMobile) {
+    await assertNoOverlap(
+      page,
+      '[data-disruption-caption]',
+      '[data-disruption-two]',
+      `${name} disruption caption/headline`,
+    );
+    await assertMostlyVisible(page, '[data-disruption-one]', `${name} first disruption statement`, 0.98);
+  }
 
   const catrinTop = await documentTop(page, '[data-catrin]');
   await page.evaluate(
