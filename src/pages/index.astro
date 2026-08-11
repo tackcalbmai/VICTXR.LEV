@@ -121,6 +121,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   @media (min-width: 761px) {
+    .hero__scroll {
+      position: absolute;
+      left: 50%;
+      bottom: var(--gutter);
+      width: 4.15rem;
+      margin-left: -2.075rem;
+      grid-column: auto;
+      grid-row: auto;
+      align-self: auto;
+      justify-self: auto;
+    }
+
     .disruption__caption {
       right: auto;
       left: var(--gutter);
