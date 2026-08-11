@@ -62,6 +62,17 @@ async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
   }
 }
 
+async function trackY(page) {
+  return page.locator('[data-x-track]').evaluate((element) => {
+    const transform = getComputedStyle(element).transform;
+    if (!transform || transform === 'none') return 0;
+    const match = transform.match(/matrix(?:3d)?\(([^)]+)\)/);
+    if (!match) return 0;
+    const values = match[1].split(',').map(Number);
+    return values.length === 6 ? values[5] : values[13];
+  });
+}
+
 async function capture(name, contextOptions) {
   const context = await browser.newContext({
     ...contextOptions,
@@ -75,8 +86,21 @@ async function capture(name, contextOptions) {
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
 
-  await page.goto(baseURL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1900);
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(220);
+
+  const introPending = await page.evaluate(() => document.documentElement.classList.contains('intro-pending'));
+  if (!introPending) {
+    throw new Error(`${name} opening choreography completed too early to be perceptible`);
+  }
+
+  await page.screenshot({ path: `${outDir}/${name}-intro.png`, fullPage: false });
+  await page.waitForTimeout(1750);
+
+  const introStillPending = await page.evaluate(() => document.documentElement.classList.contains('intro-pending'));
+  if (introStillPending) {
+    throw new Error(`${name} opening choreography did not settle`);
+  }
 
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
@@ -94,43 +118,57 @@ async function capture(name, contextOptions) {
   const viewport = page.viewportSize();
   const vh = viewport?.height ?? 900;
   const disruptionTop = await documentTop(page, '[data-disruption]');
+  const scrollCue = page.locator('.hero__scroll');
+  const sideNote = page.locator('.hero__side-note');
 
-  if (!isMobile) {
-    const scrollCue = page.locator('.hero__scroll');
-    const sideNote = page.locator('.hero__side-note');
-
-    if (!(await scrollCue.isVisible())) {
-      throw new Error(`${name} scroll cue is not visible on the opening screen`);
-    }
-
-    if (!(await sideNote.isVisible())) {
-      throw new Error(`${name} vertical side note is not visible on the opening screen`);
-    }
-
-    const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
-      spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.3).length,
-    );
-
-    if (visibleXs < 3) {
-      throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
-    }
-
-    await scrollCue.click();
-    await page.waitForTimeout(650);
-
-    const intermediateY = await page.evaluate(() => window.scrollY);
-    if (intermediateY < 24) {
-      throw new Error(`${name} scroll control did not start moving the page`);
-    }
-
-    if (intermediateY > disruptionTop + vh * 0.68) {
-      throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
-    }
-
-    await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForTimeout(250);
+  if (!(await scrollCue.isVisible())) {
+    throw new Error(`${name} scroll cue is not visible on the opening screen`);
   }
+
+  if (!(await sideNote.isVisible())) {
+    throw new Error(`${name} side note is not visible on the opening screen`);
+  }
+
+  const cueBox = await scrollCue.boundingBox();
+  if (cueBox && viewport) {
+    const cueCenter = cueBox.x + cueBox.width / 2;
+    const viewportCenter = viewport.width / 2;
+    if (Math.abs(cueCenter - viewportCenter) > 3) {
+      throw new Error(`${name} scroll cue is ${Math.abs(cueCenter - viewportCenter).toFixed(1)}px off center`);
+    }
+  }
+
+  const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
+    spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.3).length,
+  );
+
+  if (visibleXs < 5) {
+    throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
+  }
+
+  const firstTrackY = await trackY(page);
+  await page.waitForTimeout(180);
+  const secondTrackY = await trackY(page);
+  const wrappedDownward = firstTrackY > 35 && secondTrackY < firstTrackY - 25;
+  if (secondTrackY <= firstTrackY && !wrappedDownward) {
+    throw new Error(`${name} X stream is not moving continuously downward (${firstTrackY} -> ${secondTrackY})`);
+  }
+
+  await scrollCue.click();
+  await page.waitForTimeout(650);
+
+  const intermediateY = await page.evaluate(() => window.scrollY);
+  if (intermediateY < 24) {
+    throw new Error(`${name} scroll control did not start moving the page`);
+  }
+
+  if (intermediateY > disruptionTop + vh * 0.68) {
+    throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
+  }
+
+  await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(250);
 
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
