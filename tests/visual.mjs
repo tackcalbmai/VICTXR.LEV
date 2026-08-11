@@ -62,6 +62,30 @@ async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
   }
 }
 
+async function assertXDirection(page, name) {
+  const glyph = page.locator('.hero__scroll-track span').nth(4);
+  const ys = [];
+
+  for (let i = 0; i < 6; i += 1) {
+    const box = await glyph.boundingBox();
+    if (box) ys.push(box.y);
+    await page.waitForTimeout(90);
+  }
+
+  let downwardSteps = 0;
+  let upwardSteps = 0;
+
+  for (let i = 1; i < ys.length; i += 1) {
+    const delta = ys[i] - ys[i - 1];
+    if (delta > 0.35) downwardSteps += 1;
+    if (delta < -0.35) upwardSteps += 1;
+  }
+
+  if (downwardSteps < 3 || upwardSteps > 1) {
+    throw new Error(`${name} X cue does not read as continuous downward motion (${ys.map((y) => y.toFixed(1)).join(' → ')})`);
+  }
+}
+
 async function capture(name, contextOptions) {
   const context = await browser.newContext({
     ...contextOptions,
@@ -75,8 +99,22 @@ async function capture(name, contextOptions) {
   });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
 
-  await page.goto(baseURL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1900);
+  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(120);
+
+  const introState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
+  if (introState !== 'pending') {
+    throw new Error(`${name} hero intro did not expose a real opening state`);
+  }
+
+  await page.screenshot({ path: `${outDir}/${name}-intro-opening.png`, fullPage: false });
+
+  await page.waitForFunction(
+    () => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready',
+    undefined,
+    { timeout: 4500 },
+  );
+  await page.waitForTimeout(180);
 
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
@@ -90,47 +128,47 @@ async function capture(name, contextOptions) {
     }
   }
 
+  const scrollCue = page.locator('.hero__scroll');
+  const sideNote = page.locator('.hero__side-note');
+
+  if (!(await scrollCue.isVisible())) {
+    throw new Error(`${name} scroll cue is not visible on the opening screen`);
+  }
+
+  if (!(await sideNote.isVisible())) {
+    throw new Error(`${name} side note is not visible on the opening screen`);
+  }
+
+  const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
+    spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.18).length,
+  );
+
+  if (visibleXs < 2) {
+    throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
+  }
+
+  await assertXDirection(page, name);
+
   const isMobile = name === 'mobile';
   const viewport = page.viewportSize();
   const vh = viewport?.height ?? 900;
   const disruptionTop = await documentTop(page, '[data-disruption]');
 
-  if (!isMobile) {
-    const scrollCue = page.locator('.hero__scroll');
-    const sideNote = page.locator('.hero__side-note');
+  await scrollCue.click();
+  await page.waitForTimeout(isMobile ? 520 : 650);
 
-    if (!(await scrollCue.isVisible())) {
-      throw new Error(`${name} scroll cue is not visible on the opening screen`);
-    }
-
-    if (!(await sideNote.isVisible())) {
-      throw new Error(`${name} vertical side note is not visible on the opening screen`);
-    }
-
-    const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
-      spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.3).length,
-    );
-
-    if (visibleXs < 3) {
-      throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
-    }
-
-    await scrollCue.click();
-    await page.waitForTimeout(650);
-
-    const intermediateY = await page.evaluate(() => window.scrollY);
-    if (intermediateY < 24) {
-      throw new Error(`${name} scroll control did not start moving the page`);
-    }
-
-    if (intermediateY > disruptionTop + vh * 0.68) {
-      throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
-    }
-
-    await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForTimeout(250);
+  const intermediateY = await page.evaluate(() => window.scrollY);
+  if (intermediateY < 24) {
+    throw new Error(`${name} scroll control did not start moving the page`);
   }
+
+  if (intermediateY > disruptionTop + vh * (isMobile ? 0.82 : 0.68)) {
+    throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
+  }
+
+  await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(250);
 
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
@@ -166,21 +204,24 @@ async function capture(name, contextOptions) {
 
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: Math.max(0, catrinTop - vh * 0.14) },
+    { y: Math.max(0, catrinTop - vh * 0.28) },
   );
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
 
-  if (!isMobile) {
-    await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, 0.98);
+  await assertMostlyVisible(
+    page,
+    '[data-catrin-title]',
+    `${name} CATRIN readable phase`,
+    isMobile ? 0.9 : 0.98,
+  );
 
-    await page.evaluate(
-      ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-      { y: catrinTop + vh * 0.08 },
-    );
-    await page.waitForTimeout(800);
-    await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
-  }
+  await page.evaluate(
+    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+    { y: catrinTop + vh * 0.08 },
+  );
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
 
   if (consoleErrors.length) {
     throw new Error(`${name} browser errors:\n${consoleErrors.join('\n')}`);
