@@ -28,13 +28,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="hero__footer">
         <p class="hero__intro">Websites for businesses that refuse to look ordinary.</p>
 
+        <a class="hero__scroll" href="#different-business" aria-label="Scroll to explore the site">
+          <span>Scroll to explore</span><span class="hero__scroll-arrow" aria-hidden="true">↓</span>
+        </a>
+
         <nav class="hero__actions" aria-label="Primary">
           <a href="#work">View selected work ↘</a>
           <a href="#contact">Start a project ↗</a>
         </nav>
       </div>
-
-      <p class="micro-note">No templates were harmed in the making of this website.</p>
     </section>
 
     <section class="disruption" data-disruption aria-labelledby="different-business">
@@ -42,13 +44,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <h2 id="different-business" class="sr-only">Your business is not generic</h2>
 
         <p class="disruption__line disruption__line--one" data-disruption-one>
-          Your business isn't generic.
+          Your business is not generic.
         </p>
 
         <span class="disruption__x" data-disruption-x aria-hidden="true">X</span>
 
         <p class="disruption__line disruption__line--two" data-disruption-two>
-          Your website shouldn't be either.
+          Your website should not be either.
         </p>
 
         <p class="disruption__caption" data-disruption-caption>
@@ -65,17 +67,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <h2 class="project-entry__title" id="catrin-title" data-catrin-title>CATRIN</h2>
 
-      <div class="project-entry__footer">
-        <p class="project-entry__client">
-          From a local bridal salon to a digital experience that feels as premium as the product itself.
-        </p>
+      <div class="project-entry__details">
+        <div class="project-entry__detail project-entry__detail--about">
+          <span class="project-entry__label">Project</span>
+          <p class="project-entry__client">
+            From a local bridal salon to a digital experience that feels as premium as the product itself.
+          </p>
+        </div>
 
-        <p class="project-entry__services">
-          Web design<br />
-          Development<br />
-          UX<br />
-          Multilingual
-        </p>
+        <div class="project-entry__detail project-entry__detail--scope">
+          <span class="project-entry__label">Scope</span>
+          <p class="project-entry__services">
+            Web design<br />
+            Development<br />
+            UX<br />
+            Multilingual
+          </p>
+        </div>
       </div>
     </section>
 
@@ -92,6 +100,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <style>
   .hero__suffix {
     display: inline;
+  }
+
+  @media (min-width: 761px) {
+    .disruption__caption {
+      right: auto;
+      left: var(--gutter);
+      max-width: 24rem;
+      font-size: clamp(0.88rem, 0.9vw, 0.98rem);
+    }
   }
 
   @media (max-width: 760px) {

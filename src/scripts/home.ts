@@ -24,7 +24,7 @@ export function initHomeMotion() {
         0.06,
       )
       .from('.hero__footer', { autoAlpha: 0, y: 14, duration: 0.9 }, 0.42)
-      .from('.micro-note', { autoAlpha: 0, x: 8, duration: 0.8 }, 0.62);
+      .from('.hero__scroll', { autoAlpha: 0, y: 8, duration: 0.75 }, 0.58);
 
     const mm = gsap.matchMedia();
 
@@ -33,7 +33,7 @@ export function initHomeMotion() {
         scrollTrigger: {
           trigger: '[data-disruption]',
           start: 'top top',
-          end: '+=170%',
+          end: '+=160%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -42,10 +42,9 @@ export function initHomeMotion() {
 
       disruption
         .to('[data-disruption-one]', {
-          xPercent: -7,
-          yPercent: -25,
-          rotate: -2.2,
-          scale: 0.92,
+          yPercent: -18,
+          rotate: -1.2,
+          scale: 0.95,
           transformOrigin: 'left center',
           ease: 'none',
         })
@@ -53,43 +52,48 @@ export function initHomeMotion() {
           '[data-disruption-two]',
           {
             autoAlpha: 1,
-            xPercent: 3,
-            yPercent: 12,
-            rotate: 1.3,
+            xPercent: 0.5,
+            yPercent: 4,
+            rotate: 0.6,
             ease: 'none',
           },
-          '<20%',
+          '<22%',
         )
         .to(
           '[data-disruption-x]',
           {
-            autoAlpha: 0.08,
-            scale: 1,
-            rotate: 8,
+            autoAlpha: 0.075,
+            scale: 0.92,
+            rotate: 5,
             ease: 'none',
           },
-          '<10%',
+          '<12%',
         )
         .to(
           '[data-disruption-caption]',
           {
             autoAlpha: 1,
-            y: -10,
+            y: -6,
+            duration: 0.32,
             ease: 'none',
           },
-          '<45%',
+          '<5%',
         );
 
-      gsap.to('[data-catrin-title]', {
-        x: '-18vw',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '[data-catrin]',
-          start: 'top bottom',
-          end: 'center center',
-          scrub: 1,
+      gsap.fromTo(
+        '[data-catrin-title]',
+        { x: '9vw' },
+        {
+          x: '0vw',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '[data-catrin]',
+            start: 'top 92%',
+            end: 'top 38%',
+            scrub: 0.85,
+          },
         },
-      });
+      );
     });
 
     mm.add('(max-width: 760px)', () => {
