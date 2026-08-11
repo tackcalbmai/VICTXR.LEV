@@ -1,24 +1,54 @@
 .home-shell[data-home-intro='pending'] [data-intro-line] {
   opacity: 0;
   clip-path: inset(0 0 100% 0);
+  filter: blur(3px);
+}
+
+.home-shell[data-home-intro='pending'] [data-side-note] {
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
   filter: blur(2px);
 }
 
 .site-header__brand {
   gap: 0;
+  align-items: baseline;
+  font-size: clamp(1.1rem, 1.35vw, 1.25rem);
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 
 .site-header__brand-letter {
+  position: relative;
+  top: -0.005em;
   display: inline-block;
-  width: 0.72em;
+  width: 0.64em;
+  margin-inline: -0.025em -0.012em;
   text-align: center;
-  transform-origin: 50% 50%;
+  line-height: 0.94;
+  vertical-align: baseline;
+  transform-origin: 50% 52%;
   will-change: transform, opacity;
 }
 
 .site-header__dot {
-  margin-inline: 0.12em 0.15em;
+  margin-inline: 0.07em 0.1em;
 }
+
+.hero__scroll-track span {
+  animation-duration: 3.2s;
+}
+
+.hero__scroll-track span:nth-child(1) { animation-delay: -0.15s; }
+.hero__scroll-track span:nth-child(2) { animation-delay: -0.55s; }
+.hero__scroll-track span:nth-child(3) { animation-delay: -0.95s; }
+.hero__scroll-track span:nth-child(4) { animation-delay: -1.35s; }
+.hero__scroll-track span:nth-child(5) { animation-delay: -1.75s; }
+.hero__scroll-track span:nth-child(6) { animation-delay: -2.15s; }
+.hero__scroll-track span:nth-child(7) { animation-delay: -2.55s; }
+.hero__scroll-track span:nth-child(8) { animation-delay: -2.95s; }
+.hero__scroll-track span:nth-child(n + 9) { display: none; }
 
 .hero__action-arrow {
   position: relative;
@@ -76,6 +106,15 @@
 }
 
 @media (max-width: 760px) {
+  .site-header__brand {
+    font-size: 1rem;
+    letter-spacing: -0.04em;
+  }
+
+  .site-header__brand-letter {
+    width: 0.64em;
+  }
+
   .hero__title {
     padding-top: 4.35rem;
     padding-bottom: 1.2rem;
@@ -117,8 +156,8 @@
   }
 
   .hero__scroll-track span {
-    font-size: 0.56rem;
-    animation-duration: 2.45s;
+    font-size: 0.54rem;
+    animation-duration: 3s;
   }
 
   .hero__scroll-end {
@@ -145,17 +184,20 @@
     height: 0.27rem;
   }
 
+  .disruption,
   .disruption__stage {
-    min-height: 152svh;
+    min-height: 100svh;
   }
 
   .disruption__line {
     font-size: clamp(3.05rem, 14.7vw, 5.55rem);
     line-height: 0.88;
+    will-change: transform, opacity, color;
   }
 
   .disruption__line--two {
     margin-top: 15vh;
+    color: #98968f;
   }
 
   .disruption__caption {
@@ -178,7 +220,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-shell[data-home-intro='pending'] [data-intro-line] {
+  .home-shell[data-home-intro='pending'] [data-intro-line],
+  .home-shell[data-home-intro='pending'] [data-side-note] {
     opacity: 1;
     clip-path: none;
     filter: none;
