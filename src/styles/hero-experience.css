@@ -85,9 +85,29 @@
     overflow: hidden;
     border-inline: 1px solid var(--line);
     border-radius: 999px;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+    color: var(--ink);
     transition: border-color 320ms var(--ease-out);
+  }
+
+  .hero__scroll-window::before,
+  .hero__scroll-window::after {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 3;
+    height: 24%;
+    content: "";
+    pointer-events: none;
+  }
+
+  .hero__scroll-window::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--paper) 12%, rgb(241 240 235 / 0%));
+  }
+
+  .hero__scroll-window::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--paper) 12%, rgb(241 240 235 / 0%));
   }
 
   .hero__scroll:hover .hero__scroll-window,
@@ -98,6 +118,7 @@
   .hero__scroll-track {
     position: absolute;
     inset: -100% 0 auto;
+    z-index: 1;
     display: flex;
     height: 200%;
     flex-direction: column;
@@ -109,10 +130,10 @@
 
   .hero__scroll-track span {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 800;
     line-height: 1;
-    opacity: 0.68;
+    opacity: 0.82;
     will-change: transform, opacity;
   }
 
@@ -162,7 +183,7 @@
   51%,
   53%,
   100% {
-    opacity: 0.68;
+    opacity: 0.82;
     transform: translateX(0) skewX(0deg);
   }
 
@@ -172,7 +193,7 @@
   }
 
   52% {
-    opacity: 0.92;
+    opacity: 1;
     transform: translateX(-2px) skewX(12deg);
   }
 }
@@ -184,7 +205,7 @@
   76%,
   78%,
   100% {
-    opacity: 0.68;
+    opacity: 0.82;
     transform: translateX(0) scaleX(1);
   }
 
@@ -194,7 +215,7 @@
   }
 
   77% {
-    opacity: 0.96;
+    opacity: 1;
     transform: translateX(2px) scaleX(0.78);
   }
 }
