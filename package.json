@@ -1,0 +1,19 @@
+{
+  "name": "victxr-lev",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "astro": "^7.1.6",
+    "gsap": "^3.15.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.115.0"
+  }
+}
