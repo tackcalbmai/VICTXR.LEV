@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <header class="site-header">
+    <a class="site-header__brand" href="/" aria-label="VICTXR LEV home">
+      <span>VICTXR</span><span class="site-header__dot">.</span><span>LEV</span>
+    </a>
+
+    <div class="site-header__meta" aria-label="Site information">
+      <span>Independent web designer & developer</span>
+      <span>Latvia</span>
+      <span class="site-header__status">Available</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" data-hero>
+      <h1 class="hero__title" aria-label="I see things differently">
+        <span class="hero__line"><span class="hero__line-inner">I see</span></span>
+        <span class="hero__line"><span class="hero__line-inner">things</span></span>
+        <span class="hero__line"><span class="hero__line-inner">differently.</span></span>
+      </h1>
+
+      <div class="hero__footer">
+        <p class="hero__intro">Websites for businesses that refuse to look ordinary.</p>
+
+        <nav class="hero__actions" aria-label="Primary">
+          <a href="#work">View selected work ↘</a>
+          <a href="#contact">Start a project ↗</a>
+        </nav>
+      </div>
+
+      <p class="micro-note">No templates were harmed in the making of this website.</p>
+    </section>
+
+    <section class="disruption" data-disruption aria-labelledby="different-business">
+      <div class="disruption__stage">
+        <h2 id="different-business" class="sr-only">Your business is not generic</h2>
+
+        <p class="disruption__line disruption__line--one" data-disruption-one>
+          Your business isn't generic.
+        </p>
+
+        <span class="disruption__x" data-disruption-x aria-hidden="true">X</span>
+
+        <p class="disruption__line disruption__line--two" data-disruption-two>
+          Your website shouldn't be either.
+        </p>
+
+        <p class="disruption__caption" data-disruption-caption>
+          I design and build around the business — not around a template.
+        </p>
+      </div>
+    </section>
+
+    <section class="project-entry" id="work" data-catrin aria-labelledby="catrin-title">
+      <div class="project-entry__eyebrow">
+        <span>Selected work / 01</span>
+        <span>Jelgava, Latvia</span>
+      </div>
+
+      <h2 class="project-entry__title" id="catrin-title" data-catrin-title>CATRIN</h2>
+
+      <div class="project-entry__footer">
+        <p class="project-entry__client">
+          From a local bridal salon to a digital experience that feels as premium as the product itself.
+        </p>
+
+        <p class="project-entry__services">
+          Web design<br />
+          Development<br />
+          UX<br />
+          Multilingual
+        </p>
+      </div>
+    </section>
+
+    <div id="contact" class="sr-only">Contact section follows in a later sprint.</div>
+  </main>
+
+  <script>
+    import { initHomeMotion } from '../scripts/home';
+
+    initHomeMotion();
+  </script>
+</BaseLayout>
