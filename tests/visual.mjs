@@ -100,11 +100,22 @@ async function capture(name, contextOptions) {
   page.on('pageerror', (error) => consoleErrors.push(error.message));
 
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(90);
 
   const introState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
   if (introState !== 'pending') {
     throw new Error(`${name} hero intro did not expose a real opening state`);
+  }
+
+  const openingLines = await page.locator('[data-intro-line]').evaluateAll((lines) =>
+    lines.map((line) => ({
+      opacity: Number.parseFloat(getComputedStyle(line).opacity),
+      transform: getComputedStyle(line).transform,
+    })),
+  );
+
+  if (!openingLines.some((line) => line.opacity > 0.02) || !openingLines.some((line) => line.opacity < 0.95)) {
+    throw new Error(`${name} hero lines are not visibly sequencing during opening animation`);
   }
 
   await page.screenshot({ path: `${outDir}/${name}-intro-opening.png`, fullPage: false });
@@ -114,10 +125,16 @@ async function capture(name, contextOptions) {
     undefined,
     { timeout: 4500 },
   );
-  await page.waitForTimeout(180);
+  await page.waitForTimeout(160);
 
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
+
+  for (const line of await page.locator('[data-intro-line]').all()) {
+    if (!(await line.isVisible())) {
+      throw new Error(`${name} hero line is hidden after intro completes`);
+    }
+  }
 
   const suffix = page.locator('.hero__suffix');
   if (await suffix.count()) {
@@ -126,6 +143,38 @@ async function capture(name, contextOptions) {
     if (suffixBox && viewport && suffixBox.x + suffixBox.width > viewport.width - 6) {
       throw new Error(`${name} hero suffix is clipped outside the viewport`);
     }
+
+    if (name === 'mobile') {
+      const suffixSize = await suffix.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+      const wordSize = await page.locator('.hero__line--different .hero__line-inner').evaluate(
+        (element) => Number.parseFloat(getComputedStyle(element).fontSize),
+      );
+      if (suffixSize < wordSize * 0.9) {
+        throw new Error(`mobile LY. suffix is still visually undersized (${suffixSize}px vs ${wordSize}px)`);
+      }
+    }
+  }
+
+  const actionText = await page.locator('.hero__actions').innerText();
+  if (/[↗↘➡⬇]/u.test(actionText)) {
+    throw new Error(`${name} hero actions still contain Unicode/emoji arrows`);
+  }
+
+  const brandLetter = page.locator('[data-brand-letter]');
+  await page.waitForFunction(
+    () => document.querySelector('[data-brand-letter]')?.textContent === 'O',
+    undefined,
+    { timeout: 2600 },
+  );
+  await page.screenshot({ path: `${outDir}/${name}-brand-victor.png`, fullPage: false });
+  await page.waitForFunction(
+    () => document.querySelector('[data-brand-letter]')?.textContent === 'X',
+    undefined,
+    { timeout: 3200 },
+  );
+
+  if ((await brandLetter.textContent()) !== 'X') {
+    throw new Error(`${name} brand letter did not return to X`);
   }
 
   const scrollCue = page.locator('.hero__scroll');
@@ -139,6 +188,18 @@ async function capture(name, contextOptions) {
     throw new Error(`${name} side note is not visible on the opening screen`);
   }
 
+  const viewport = page.viewportSize();
+  const cueBox = await scrollCue.boundingBox();
+  if (cueBox && viewport) {
+    const offset = Math.abs(cueBox.x + cueBox.width / 2 - viewport.width / 2);
+    if (offset > 3) {
+      throw new Error(`${name} scroll cue is ${offset.toFixed(1)}px off center`);
+    }
+    if (name === 'mobile' && cueBox.height > 78) {
+      throw new Error(`mobile scroll cue is still too tall (${cueBox.height.toFixed(1)}px)`);
+    }
+  }
+
   const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
     spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.18).length,
   );
@@ -150,7 +211,6 @@ async function capture(name, contextOptions) {
   await assertXDirection(page, name);
 
   const isMobile = name === 'mobile';
-  const viewport = page.viewportSize();
   const vh = viewport?.height ?? 900;
   const disruptionTop = await documentTop(page, '[data-disruption]');
 
@@ -162,7 +222,7 @@ async function capture(name, contextOptions) {
     throw new Error(`${name} scroll control did not start moving the page`);
   }
 
-  if (intermediateY > disruptionTop + vh * (isMobile ? 0.82 : 0.68)) {
+  if (intermediateY > disruptionTop + vh * (isMobile ? 0.72 : 0.68)) {
     throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
   }
 
@@ -177,9 +237,20 @@ async function capture(name, contextOptions) {
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${outDir}/${name}-disruption-mid.png`, fullPage: false });
 
+  if (isMobile) {
+    await assertMostlyVisible(page, '[data-disruption-one]', 'mobile first disruption statement hold', 0.9);
+    await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.9);
+  }
+
+  const firstStatement = await page.locator('[data-disruption-one]').innerText();
+  const secondStatement = await page.locator('[data-disruption-two]').innerText();
+  if (!firstStatement.includes('isn’t') || !secondStatement.includes('shouldn’t')) {
+    throw new Error(`${name} disruption contractions are not using the intended typographic apostrophes`);
+  }
+
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: disruptionTop + vh * (isMobile ? 0.72 : 1.4) },
+    { y: disruptionTop + vh * (isMobile ? 0.92 : 1.4) },
   );
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
