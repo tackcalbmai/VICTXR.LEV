@@ -21,6 +21,9 @@ const {
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f1f0eb" />
     <meta name="color-scheme" content="light dark" />
+    <script is:inline>
+      document.documentElement.classList.add('js', 'intro-pending');
+    </script>
     <title>{title}</title>
   </head>
   <body>
