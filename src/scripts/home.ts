@@ -74,9 +74,10 @@ export function initHomeMotion() {
           {
             autoAlpha: 1,
             y: -6,
+            duration: 0.32,
             ease: 'none',
           },
-          '<28%',
+          '<5%',
         );
 
       gsap.fromTo(
