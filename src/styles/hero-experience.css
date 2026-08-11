@@ -38,8 +38,7 @@
     justify-self: start;
     display: grid;
     width: 4.15rem;
-    height: 9.3rem;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 6rem auto;
     justify-items: center;
     gap: 0.42rem;
     padding: 0.15rem 0.2rem;
@@ -80,8 +79,9 @@
 
   .hero__scroll-window {
     position: relative;
+    display: block;
     width: 2rem;
-    min-height: 0;
+    height: 6rem;
     overflow: hidden;
     border-inline: 1px solid rgb(10 10 10 / 22%);
     border-radius: 999px;
