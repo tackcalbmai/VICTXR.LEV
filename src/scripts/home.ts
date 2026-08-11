@@ -86,15 +86,15 @@ export function initHomeMotion() {
         scrollTrigger: {
           trigger: '[data-catrin]',
           start: 'top 92%',
-          end: 'center 18%',
+          end: 'bottom bottom',
           scrub: 0.9,
         },
       });
 
       catrin
-        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.22, ease: 'none' })
-        .to({}, { duration: 0.66 })
-        .to('[data-catrin-title]', { x: '-12vw', duration: 0.12, ease: 'none' });
+        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.18, ease: 'none' })
+        .to({}, { duration: 0.6 })
+        .to('[data-catrin-title]', { x: '-12vw', duration: 0.22, ease: 'none' });
 
       const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
       let journeyTween: gsap.core.Tween | undefined;
