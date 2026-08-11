@@ -23,6 +23,26 @@ const {
     <meta name="theme-color" content="#f1f0eb" />
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
+    <script is:inline>
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      const resetVictxrScroll = () => {
+        if (location.hash) {
+          history.replaceState(null, '', `${location.pathname}${location.search}`);
+        }
+        window.scrollTo(0, 0);
+      };
+
+      resetVictxrScroll();
+      window.addEventListener('pageshow', () => {
+        requestAnimationFrame(() => {
+          resetVictxrScroll();
+          requestAnimationFrame(resetVictxrScroll);
+        });
+      }, { once: true });
+    </script>
   </head>
   <body>
     <slot />
