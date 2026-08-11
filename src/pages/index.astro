@@ -102,6 +102,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     display: inline;
   }
 
+  @media (min-width: 761px) {
+    .disruption__caption {
+      right: auto;
+      left: var(--gutter);
+      max-width: 24rem;
+    }
+  }
+
   @media (max-width: 760px) {
     .hero__line--different .hero__line-inner {
       font-size: 0.86em;
