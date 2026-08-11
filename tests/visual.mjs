@@ -107,6 +107,25 @@ async function capture(name, contextOptions) {
       throw new Error(`${name} vertical side note is not visible on the opening screen`);
     }
 
+    const hasVisibleX = await page.locator('.hero__scroll-window').evaluate((windowElement) => {
+      const windowRect = windowElement.getBoundingClientRect();
+      return [...windowElement.querySelectorAll('.hero__scroll-track span')].some((span) => {
+        const rect = span.getBoundingClientRect();
+        const opacity = Number.parseFloat(getComputedStyle(span).opacity);
+        return (
+          opacity > 0.45 &&
+          rect.bottom > windowRect.top &&
+          rect.top < windowRect.bottom &&
+          rect.right > windowRect.left &&
+          rect.left < windowRect.right
+        );
+      });
+    });
+
+    if (!hasVisibleX) {
+      throw new Error(`${name} X stream has no visible glyph inside the scroll rail`);
+    }
+
     await scrollCue.click();
     await page.waitForTimeout(650);
 
@@ -164,7 +183,7 @@ async function capture(name, contextOptions) {
   await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
 
   if (!isMobile) {
-    await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, 0.9);
+    await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, 0.98);
 
     await page.evaluate(
       ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
