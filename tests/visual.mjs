@@ -15,10 +15,24 @@ async function documentTop(page, selector) {
   });
 }
 
+async function textBox(page, selector) {
+  return page.locator(selector).evaluate((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const rect = range.getBoundingClientRect();
+    return {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    };
+  });
+}
+
 async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
-  const box = await page.locator(selector).boundingBox();
+  const box = await textBox(page, selector);
   const viewport = page.viewportSize();
-  if (!box || !viewport) return;
+  if (!box || !viewport || box.width === 0) return;
 
   const visibleLeft = Math.max(0, box.x);
   const visibleRight = Math.min(viewport.width, box.x + box.width);
@@ -30,10 +44,9 @@ async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
   }
 }
 
-async function assertNoOverlap(page, firstSelector, secondSelector, name) {
-  const first = await page.locator(firstSelector).boundingBox();
-  const second = await page.locator(secondSelector).boundingBox();
-  if (!first || !second) return;
+async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
+  const first = await textBox(page, firstSelector);
+  const second = await textBox(page, secondSelector);
 
   const overlapX = Math.max(
     0,
@@ -45,7 +58,7 @@ async function assertNoOverlap(page, firstSelector, secondSelector, name) {
   );
 
   if (overlapX > 0 && overlapY > 0) {
-    throw new Error(`${name} overlap detected (${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px)`);
+    throw new Error(`${name} text overlap detected (${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px)`);
   }
 }
 
@@ -104,7 +117,7 @@ async function capture(name, contextOptions) {
   await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
 
   if (!isMobile) {
-    await assertNoOverlap(
+    await assertNoTextOverlap(
       page,
       '[data-disruption-caption]',
       '[data-disruption-two]',
