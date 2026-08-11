@@ -8,73 +8,23 @@ export function initHomeMotion() {
   const brandLetter = document.querySelector<HTMLElement>('[data-brand-letter]');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
   if (reducedMotion) {
     homeShell?.setAttribute('data-home-intro', 'ready');
     return;
   }
 
   const ctx = gsap.context(() => {
-    const finishIntro = () => {
-      homeShell?.setAttribute('data-home-intro', 'ready');
-      gsap.set(
-        '[data-intro-header], [data-intro-line], [data-intro-footer], [data-side-note], [data-scroll-journey]',
-        { clearProps: 'opacity,visibility,transform,clipPath,filter' },
-      );
-      ScrollTrigger.refresh();
-    };
-
-    const intro = gsap.timeline({
-      defaults: { ease: 'power4.out' },
-      onComplete: finishIntro,
-    });
-
-    intro
-      .to('[data-intro-header]', { autoAlpha: 1, y: 0, duration: 0.42 }, 0.01)
-      .to(
-        '[data-intro-line]',
-        {
-          autoAlpha: 1,
-          yPercent: 0,
-          rotate: 0,
-          clipPath: 'inset(0% 0% 0% 0%)',
-          filter: 'blur(0px)',
-          duration: 0.72,
-          stagger: 0.115,
-        },
-        0.035,
-      )
-      .to(
-        '[data-intro-line]',
-        {
-          keyframes: [
-            { x: 0, skewX: 0, duration: 0.01 },
-            { x: 5, skewX: -7, duration: 0.035, ease: 'steps(1)' },
-            { x: -3, skewX: 5, duration: 0.035, ease: 'steps(1)' },
-            { x: 1, skewX: -2, duration: 0.03, ease: 'steps(1)' },
-            { x: 0, skewX: 0, duration: 0.09, ease: 'power2.out' },
-          ],
-          stagger: 0.045,
-        },
-        0.76,
-      )
-      .to('[data-intro-footer]', { autoAlpha: 1, y: 0, duration: 0.52 }, 0.69)
-      .to('[data-side-note]', { autoAlpha: 1, duration: 0.48 }, 0.92)
-      .to('[data-scroll-journey]', { autoAlpha: 1, y: 0, duration: 0.48 }, 1.04)
-      .to(
-        '[data-intro-suffix]',
-        {
-          keyframes: [
-            { x: 0, skewX: 0, duration: 0.01 },
-            { x: 4, skewX: -10, duration: 0.04, ease: 'steps(1)' },
-            { x: -2, skewX: 7, duration: 0.04, ease: 'steps(1)' },
-            { x: 0, skewX: 0, duration: 0.075 },
-          ],
-        },
-        1.12,
-      );
-
     let brandIdle: gsap.core.Tween | undefined;
     let brandCycle: gsap.core.Timeline | undefined;
+    let brandIntroStart: gsap.core.Tween | undefined;
+
+    const scheduleBrandCycle = (delay = 7.5) => {
+      brandIdle?.kill();
+      brandIdle = gsap.delayedCall(delay, () => runBrandCycle());
+    };
 
     const glitchBrandLetter = (timeline: gsap.core.Timeline, position: number | string) => {
       if (!brandLetter) return;
@@ -92,11 +42,6 @@ export function initHomeMotion() {
       );
     };
 
-    const scheduleBrandCycle = (delay = 7.5) => {
-      brandIdle?.kill();
-      brandIdle = gsap.delayedCall(delay, () => runBrandCycle());
-    };
-
     const runBrandCycle = () => {
       if (!brandLetter || document.hidden) {
         scheduleBrandCycle(5);
@@ -111,7 +56,7 @@ export function initHomeMotion() {
           rotation: -105,
           duration: 0.48,
           ease: 'power1.in',
-          transformOrigin: '50% 50%',
+          transformOrigin: '50% 52%',
         })
         .to(brandLetter, { rotation: -360, duration: 0.25, ease: 'power4.in' });
 
@@ -128,7 +73,7 @@ export function initHomeMotion() {
           rotation: -120,
           duration: 0.42,
           ease: 'power1.in',
-          transformOrigin: '50% 50%',
+          transformOrigin: '50% 52%',
         })
         .to(brandLetter, { rotation: -360, duration: 0.23, ease: 'power4.in' });
 
@@ -142,7 +87,79 @@ export function initHomeMotion() {
         .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.16, ease: 'power2.out' });
     };
 
-    if (brandLetter) gsap.delayedCall(0.62, runBrandCycle);
+    const finishIntro = () => {
+      homeShell?.setAttribute('data-home-intro', 'ready');
+      gsap.set(
+        '[data-intro-header], [data-intro-line], [data-intro-footer], [data-side-note], [data-scroll-journey]',
+        { clearProps: 'opacity,visibility,transform,clipPath,filter' },
+      );
+      ScrollTrigger.refresh();
+      if (brandLetter) brandIntroStart = gsap.delayedCall(0.34, runBrandCycle);
+    };
+
+    const intro = gsap.timeline({
+      paused: true,
+      defaults: { ease: 'power4.out' },
+      onComplete: finishIntro,
+    });
+
+    intro
+      .to('[data-intro-header]', { autoAlpha: 1, y: 0, duration: 0.38 }, 0)
+      .to(
+        '[data-intro-line]',
+        {
+          autoAlpha: 1,
+          yPercent: 0,
+          rotate: 0,
+          clipPath: 'inset(0% 0% 0% 0%)',
+          filter: 'blur(0px)',
+          duration: 0.86,
+          stagger: 0.16,
+        },
+        0.02,
+      )
+      .to(
+        '[data-intro-line]',
+        {
+          keyframes: [
+            { x: 0, skewX: 0, duration: 0.01 },
+            { x: 6, skewX: -8, duration: 0.035, ease: 'steps(1)' },
+            { x: -4, skewX: 6, duration: 0.035, ease: 'steps(1)' },
+            { x: 2, skewX: -3, duration: 0.03, ease: 'steps(1)' },
+            { x: 0, skewX: 0, duration: 0.11, ease: 'power2.out' },
+          ],
+          stagger: 0.055,
+        },
+        0.78,
+      )
+      .to('[data-intro-footer]', { autoAlpha: 1, y: 0, duration: 0.5 }, 0.72)
+      .to(
+        '[data-side-note]',
+        {
+          autoAlpha: 1,
+          clipPath: 'inset(0% 0% 0% 0%)',
+          filter: 'blur(0px)',
+          duration: 0.7,
+        },
+        0.74,
+      )
+      .to('[data-scroll-journey]', { autoAlpha: 1, y: 0, duration: 0.48 }, 0.96)
+      .to(
+        '[data-intro-suffix]',
+        {
+          keyframes: [
+            { x: 0, skewX: 0, duration: 0.01 },
+            { x: 4, skewX: -10, duration: 0.04, ease: 'steps(1)' },
+            { x: -2, skewX: 7, duration: 0.04, ease: 'steps(1)' },
+            { x: 0, skewX: 0, duration: 0.075 },
+          ],
+        },
+        1.08,
+      );
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => intro.play(0));
+    });
 
     const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
     let journeyTween: gsap.core.Tween | undefined;
@@ -237,59 +254,74 @@ export function initHomeMotion() {
       const disruption = gsap.timeline({
         scrollTrigger: {
           trigger: '[data-disruption]',
-          start: 'top 90%',
-          end: 'bottom 14%',
-          scrub: 1,
+          start: 'top 86%',
+          end: 'bottom 8%',
+          scrub: 1.05,
         },
       });
 
       disruption
-        .to('[data-disruption-one]', {
-          xPercent: -2.5,
-          yPercent: -2.5,
-          rotate: -0.8,
-          scale: 0.99,
-          transformOrigin: 'left center',
-          duration: 0.18,
-          ease: 'none',
-        })
-        .to('[data-disruption-two]', {
-          autoAlpha: 1,
-          xPercent: 1.5,
-          yPercent: 1.5,
-          rotate: 0.55,
-          duration: 0.2,
-          ease: 'none',
-        }, '<35%')
+        .fromTo(
+          '[data-disruption-one]',
+          { xPercent: 0, yPercent: 0, rotate: 0, scale: 1 },
+          {
+            xPercent: -5,
+            yPercent: -6,
+            rotate: -1,
+            scale: 0.985,
+            transformOrigin: 'left center',
+            duration: 0.24,
+            ease: 'none',
+          },
+        )
+        .fromTo(
+          '[data-disruption-two]',
+          { autoAlpha: 0.16, color: '#98968f', xPercent: 4, yPercent: 4, rotate: 0.25 },
+          {
+            autoAlpha: 1,
+            color: '#0a0a0a',
+            xPercent: 0,
+            yPercent: 0,
+            rotate: 0,
+            duration: 0.3,
+            ease: 'none',
+          },
+          '<18%',
+        )
         .to('[data-disruption-x]', {
           autoAlpha: 0.08,
-          scale: 1.04,
+          scale: 1.05,
           rotate: 5,
-          duration: 0.2,
+          duration: 0.26,
           ease: 'none',
-        }, '<18%')
+        }, '<12%')
         .to('[data-disruption-caption]', {
           autoAlpha: 1,
           y: -3,
-          duration: 0.16,
-          ease: 'none',
-        }, '<18%')
-        .to({}, { duration: 0.62 })
-        .to('[data-disruption-one]', {
-          xPercent: -15,
-          yPercent: -10,
-          rotate: -2,
           duration: 0.2,
+          ease: 'none',
+        }, '<16%')
+        .to({}, { duration: 0.46 })
+        .to('[data-disruption-one]', {
+          xPercent: -19,
+          yPercent: -13,
+          rotate: -2.25,
+          duration: 0.3,
           ease: 'none',
         })
         .to('[data-disruption-two]', {
-          xPercent: 13,
-          yPercent: 7,
-          rotate: 1.4,
-          duration: 0.2,
+          xPercent: 17,
+          yPercent: 9,
+          rotate: 1.65,
+          duration: 0.3,
           ease: 'none',
         }, '<')
-        .to('[data-disruption-x]', { scale: 1.16, rotate: 9, duration: 0.2, ease: 'none' }, '<');
+        .to('[data-disruption-x]', {
+          scale: 1.18,
+          rotate: 10,
+          duration: 0.3,
+          ease: 'none',
+        }, '<');
 
       const catrin = gsap.timeline({
         scrollTrigger: {
@@ -308,6 +340,7 @@ export function initHomeMotion() {
 
     return () => {
       intro.kill();
+      brandIntroStart?.kill();
       brandIdle?.kill();
       brandCycle?.kill();
       journeyTween?.kill();
