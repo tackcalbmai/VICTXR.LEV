@@ -20,12 +20,7 @@ async function textBox(page, selector) {
     const range = document.createRange();
     range.selectNodeContents(element);
     const rect = range.getBoundingClientRect();
-    return {
-      x: rect.x,
-      y: rect.y,
-      width: rect.width,
-      height: rect.height,
-    };
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
   });
 }
 
@@ -47,16 +42,8 @@ async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
 async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
   const first = await textBox(page, firstSelector);
   const second = await textBox(page, secondSelector);
-
-  const overlapX = Math.max(
-    0,
-    Math.min(first.x + first.width, second.x + second.width) - Math.max(first.x, second.x),
-  );
-  const overlapY = Math.max(
-    0,
-    Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y),
-  );
-
+  const overlapX = Math.max(0, Math.min(first.x + first.width, second.x + second.width) - Math.max(first.x, second.x));
+  const overlapY = Math.max(0, Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y));
   if (overlapX > 0 && overlapY > 0) {
     throw new Error(`${name} text overlap detected (${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px)`);
   }
@@ -65,59 +52,52 @@ async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
 async function assertXDirection(page, name) {
   const glyph = page.locator('.hero__scroll-track span').nth(4);
   const ys = [];
-
   for (let i = 0; i < 6; i += 1) {
     const box = await glyph.boundingBox();
     if (box) ys.push(box.y);
     await page.waitForTimeout(90);
   }
-
   let downwardSteps = 0;
   let upwardSteps = 0;
-
   for (let i = 1; i < ys.length; i += 1) {
     const delta = ys[i] - ys[i - 1];
     if (delta > 0.35) downwardSteps += 1;
     if (delta < -0.35) upwardSteps += 1;
   }
-
   if (downwardSteps < 3 || upwardSteps > 1) {
     throw new Error(`${name} X cue does not read as continuous downward motion (${ys.map((y) => y.toFixed(1)).join(' → ')})`);
   }
 }
 
 async function capture(name, contextOptions) {
-  const context = await browser.newContext({
-    ...contextOptions,
-    reducedMotion: 'no-preference',
-  });
+  const context = await browser.newContext({ ...contextOptions, reducedMotion: 'no-preference' });
   const page = await context.newPage();
-
   const consoleErrors = [];
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
-  });
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => consoleErrors.push(error.message));
 
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(90);
 
   const introState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
-  if (introState !== 'pending') {
-    throw new Error(`${name} hero intro did not expose a real opening state`);
-  }
+  if (introState !== 'pending') throw new Error(`${name} hero intro did not expose a real opening state`);
 
+  const openingLines = await page.locator('[data-intro-line]').evaluateAll((lines) =>
+    lines.map((line) => ({ opacity: Number.parseFloat(getComputedStyle(line).opacity), transform: getComputedStyle(line).transform })),
+  );
+  if (!openingLines.some((line) => line.opacity > 0.02) || !openingLines.some((line) => line.opacity < 0.95)) {
+    throw new Error(`${name} hero lines are not visibly sequencing during opening animation`);
+  }
   await page.screenshot({ path: `${outDir}/${name}-intro-opening.png`, fullPage: false });
 
-  await page.waitForFunction(
-    () => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready',
-    undefined,
-    { timeout: 4500 },
-  );
-  await page.waitForTimeout(180);
-
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 4500 });
+  await page.waitForTimeout(160);
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
+
+  for (const line of await page.locator('[data-intro-line]').all()) {
+    if (!(await line.isVisible())) throw new Error(`${name} hero line is hidden after intro completes`);
+  }
 
   const suffix = page.locator('.hero__suffix');
   if (await suffix.count()) {
@@ -126,43 +106,64 @@ async function capture(name, contextOptions) {
     if (suffixBox && viewport && suffixBox.x + suffixBox.width > viewport.width - 6) {
       throw new Error(`${name} hero suffix is clipped outside the viewport`);
     }
+    if (name === 'mobile') {
+      const suffixSize = await suffix.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+      const wordSize = await page.locator('.hero__line--different .hero__line-inner').evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+      if (suffixSize < wordSize * 0.9) throw new Error(`mobile LY. suffix is still visually undersized (${suffixSize}px vs ${wordSize}px)`);
+    }
   }
+
+  const actionText = await page.locator('.hero__actions').innerText();
+  if (/[↗↘➡⬇]/u.test(actionText)) throw new Error(`${name} hero actions still contain Unicode/emoji arrows`);
+
+  const brandLetter = page.locator('[data-brand-letter]');
+  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'O', undefined, { timeout: 2600 });
+  await page.screenshot({ path: `${outDir}/${name}-brand-victor.png`, fullPage: false });
+  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 3200 });
+  if ((await brandLetter.textContent()) !== 'X') throw new Error(`${name} brand letter did not return to X`);
 
   const scrollCue = page.locator('.hero__scroll');
   const sideNote = page.locator('.hero__side-note');
+  if (!(await scrollCue.isVisible())) throw new Error(`${name} scroll cue is not visible on the opening screen`);
+  if (!(await sideNote.isVisible())) throw new Error(`${name} side note is not visible on the opening screen`);
 
-  if (!(await scrollCue.isVisible())) {
-    throw new Error(`${name} scroll cue is not visible on the opening screen`);
+  const viewport = page.viewportSize();
+  const cueBox = await scrollCue.boundingBox();
+  if (cueBox && viewport) {
+    const offset = Math.abs(cueBox.x + cueBox.width / 2 - viewport.width / 2);
+    if (offset > 3) throw new Error(`${name} scroll cue is ${offset.toFixed(1)}px off center`);
+    if (name === 'mobile' && cueBox.height > 78) throw new Error(`mobile scroll cue is still too tall (${cueBox.height.toFixed(1)}px)`);
   }
 
-  if (!(await sideNote.isVisible())) {
-    throw new Error(`${name} side note is not visible on the opening screen`);
-  }
-
-  const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
-    spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.18).length,
-  );
-
-  if (visibleXs < 2) {
-    throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
-  }
-
+  const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) => spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.18).length);
+  if (visibleXs < 2) throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
   await assertXDirection(page, name);
 
   const isMobile = name === 'mobile';
-  const viewport = page.viewportSize();
   const vh = viewport?.height ?? 900;
   const disruptionTop = await documentTop(page, '[data-disruption]');
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.waitForTimeout(100);
+  const beforeY = await page.evaluate(() => window.scrollY);
 
-  await scrollCue.click();
+  await scrollCue.evaluate((element) => {
+    element.dataset.qaClick = 'waiting';
+    element.addEventListener('click', (event) => {
+      element.dataset.qaClick = event.defaultPrevented ? 'handled' : 'unhandled';
+    }, { once: true });
+  });
+
+  if (isMobile) await scrollCue.tap();
+  else await scrollCue.click();
   await page.waitForTimeout(isMobile ? 520 : 650);
 
   const intermediateY = await page.evaluate(() => window.scrollY);
-  if (intermediateY < 24) {
-    throw new Error(`${name} scroll control did not start moving the page`);
+  const clickState = await scrollCue.getAttribute('data-qa-click');
+  if (intermediateY < beforeY + 24) {
+    await page.screenshot({ path: `${outDir}/${name}-scroll-failure.png`, fullPage: false });
+    throw new Error(`${name} scroll control did not start moving the page (tap=${clickState}, y=${beforeY.toFixed(1)}→${intermediateY.toFixed(1)}, disruptionTop=${disruptionTop.toFixed(1)})`);
   }
-
-  if (intermediateY > disruptionTop + vh * (isMobile ? 0.82 : 0.68)) {
+  if (intermediateY > disruptionTop + vh * (isMobile ? 0.72 : 0.68)) {
     throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
   }
 
@@ -170,63 +171,39 @@ async function capture(name, contextOptions) {
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForTimeout(250);
 
-  await page.evaluate(
-    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: disruptionTop + vh * (isMobile ? 0.35 : 0.85) },
-  );
+  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: disruptionTop + vh * (isMobile ? 0.35 : 0.85) });
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${outDir}/${name}-disruption-mid.png`, fullPage: false });
+  if (isMobile) {
+    await assertMostlyVisible(page, '[data-disruption-one]', 'mobile first disruption statement hold', 0.9);
+    await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.9);
+  }
 
-  await page.evaluate(
-    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: disruptionTop + vh * (isMobile ? 0.72 : 1.4) },
-  );
+  const firstStatement = (await page.locator('[data-disruption-one]').innerText()).toLowerCase();
+  const secondStatement = (await page.locator('[data-disruption-two]').innerText()).toLowerCase();
+  if (!firstStatement.includes('isn’t') || !secondStatement.includes('shouldn’t')) throw new Error(`${name} disruption contractions are not using the intended typographic apostrophes`);
+
+  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: disruptionTop + vh * (isMobile ? 0.92 : 1.4) });
   await page.waitForTimeout(900);
   await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
-
   if (!isMobile) {
-    await assertNoTextOverlap(
-      page,
-      '[data-disruption-caption]',
-      '[data-disruption-two]',
-      `${name} disruption caption/headline`,
-    );
+    await assertNoTextOverlap(page, '[data-disruption-caption]', '[data-disruption-two]', `${name} disruption caption/headline`);
     await assertMostlyVisible(page, '[data-disruption-one]', `${name} first disruption statement`, 0.88);
   }
 
   const catrinTop = await documentTop(page, '[data-catrin]');
-  await page.evaluate(
-    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: Math.max(0, catrinTop - vh * 0.32) },
-  );
+  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: Math.max(0, catrinTop - vh * 0.32) });
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${outDir}/${name}-catrin-entry.png`, fullPage: false });
-
-  await page.evaluate(
-    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: Math.max(0, catrinTop - vh * 0.28) },
-  );
+  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: Math.max(0, catrinTop - vh * 0.28) });
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
-
-  await assertMostlyVisible(
-    page,
-    '[data-catrin-title]',
-    `${name} CATRIN readable phase`,
-    isMobile ? 0.9 : 0.98,
-  );
-
-  await page.evaluate(
-    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: catrinTop + vh * 0.08 },
-  );
+  await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, isMobile ? 0.9 : 0.98);
+  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: catrinTop + vh * 0.08 });
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
 
-  if (consoleErrors.length) {
-    throw new Error(`${name} browser errors:\n${consoleErrors.join('\n')}`);
-  }
-
+  if (consoleErrors.length) throw new Error(`${name} browser errors:\n${consoleErrors.join('\n')}`);
   await context.close();
 }
 
