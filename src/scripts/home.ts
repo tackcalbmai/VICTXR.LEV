@@ -92,9 +92,9 @@ export function initHomeMotion() {
       });
 
       catrin
-        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.34, ease: 'none' })
-        .to({}, { duration: 0.2 })
-        .to('[data-catrin-title]', { x: '-12vw', duration: 0.46, ease: 'none' });
+        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.22, ease: 'none' })
+        .to({}, { duration: 0.66 })
+        .to('[data-catrin-title]', { x: '-12vw', duration: 0.12, ease: 'none' });
 
       const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
       let journeyTween: gsap.core.Tween | undefined;
