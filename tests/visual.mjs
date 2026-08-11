@@ -242,8 +242,8 @@ async function capture(name, contextOptions) {
     await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.9);
   }
 
-  const firstStatement = await page.locator('[data-disruption-one]').innerText();
-  const secondStatement = await page.locator('[data-disruption-two]').innerText();
+  const firstStatement = (await page.locator('[data-disruption-one]').innerText()).toLowerCase();
+  const secondStatement = (await page.locator('[data-disruption-two]').innerText()).toLowerCase();
   if (!firstStatement.includes('isn’t') || !secondStatement.includes('shouldn’t')) {
     throw new Error(`${name} disruption contractions are not using the intended typographic apostrophes`);
   }
