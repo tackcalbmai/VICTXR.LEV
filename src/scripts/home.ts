@@ -265,34 +265,34 @@ export function initHomeMotion() {
           '[data-disruption-one]',
           { xPercent: 0, yPercent: 0, rotate: 0, scale: 1 },
           {
-            xPercent: -5,
-            yPercent: -6,
-            rotate: -1,
-            scale: 0.985,
+            xPercent: -6,
+            yPercent: -5,
+            rotate: -0.9,
+            scale: 0.99,
             transformOrigin: 'left center',
-            duration: 0.24,
+            duration: 0.28,
             ease: 'none',
           },
         )
         .fromTo(
           '[data-disruption-two]',
-          { autoAlpha: 0.16, color: '#98968f', xPercent: 4, yPercent: 4, rotate: 0.25 },
+          { autoAlpha: 0.12, color: '#98968f', xPercent: 5, yPercent: 4, rotate: 0.25 },
           {
             autoAlpha: 1,
             color: '#0a0a0a',
             xPercent: 0,
             yPercent: 0,
             rotate: 0,
-            duration: 0.3,
+            duration: 0.32,
             ease: 'none',
           },
-          '<18%',
+          '<16%',
         )
         .to('[data-disruption-x]', {
           autoAlpha: 0.08,
           scale: 1.05,
           rotate: 5,
-          duration: 0.26,
+          duration: 0.28,
           ease: 'none',
         }, '<12%')
         .to('[data-disruption-caption]', {
@@ -300,26 +300,45 @@ export function initHomeMotion() {
           y: -3,
           duration: 0.2,
           ease: 'none',
-        }, '<16%')
-        .to({}, { duration: 0.46 })
+        }, '<18%')
         .to('[data-disruption-one]', {
-          xPercent: -19,
-          yPercent: -13,
-          rotate: -2.25,
-          duration: 0.3,
+          xPercent: -12,
+          yPercent: -9,
+          rotate: -1.45,
+          duration: 0.44,
           ease: 'none',
         })
         .to('[data-disruption-two]', {
-          xPercent: 17,
-          yPercent: 9,
-          rotate: 1.65,
-          duration: 0.3,
+          xPercent: 9,
+          yPercent: 5,
+          rotate: 0.9,
+          duration: 0.44,
           ease: 'none',
         }, '<')
         .to('[data-disruption-x]', {
-          scale: 1.18,
-          rotate: 10,
-          duration: 0.3,
+          scale: 1.11,
+          rotate: 7,
+          duration: 0.44,
+          ease: 'none',
+        }, '<')
+        .to('[data-disruption-one]', {
+          xPercent: -24,
+          yPercent: -15,
+          rotate: -2.5,
+          duration: 0.34,
+          ease: 'none',
+        })
+        .to('[data-disruption-two]', {
+          xPercent: 22,
+          yPercent: 12,
+          rotate: 1.8,
+          duration: 0.34,
+          ease: 'none',
+        }, '<')
+        .to('[data-disruption-x]', {
+          scale: 1.2,
+          rotate: 11,
+          duration: 0.34,
           ease: 'none',
         }, '<');
 
