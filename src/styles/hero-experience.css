@@ -1,3 +1,57 @@
+.home-shell[data-home-intro='pending'] [data-intro-header] {
+  opacity: 0;
+  transform: translateY(-18px);
+}
+
+.home-shell[data-home-intro='pending'] [data-intro-line] {
+  transform: translateY(118%) rotate(1.6deg);
+}
+
+.home-shell[data-home-intro='pending'] [data-intro-footer] {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.home-shell[data-home-intro='pending'] [data-side-note] {
+  opacity: 0;
+}
+
+.home-shell[data-home-intro='pending'] [data-scroll-journey] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.home-shell[data-home-intro='pending'] .hero__scroll-track span {
+  animation-play-state: paused;
+}
+
+.hero__scroll-track {
+  pointer-events: none;
+}
+
+.hero__scroll-track span {
+  position: absolute;
+  top: -0.8rem;
+  left: 50%;
+  display: block;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: victxr-x-fall 3s linear infinite;
+}
+
+.hero__scroll-track span:nth-child(1) { animation-delay: -0.12s; }
+.hero__scroll-track span:nth-child(2) { animation-delay: -0.42s; }
+.hero__scroll-track span:nth-child(3) { animation-delay: -0.72s; }
+.hero__scroll-track span:nth-child(4) { animation-delay: -1.02s; }
+.hero__scroll-track span:nth-child(5) { animation-delay: -1.32s; }
+.hero__scroll-track span:nth-child(6) { animation-delay: -1.62s; }
+.hero__scroll-track span:nth-child(7) { animation-delay: -1.92s; }
+.hero__scroll-track span:nth-child(8) { animation-delay: -2.22s; }
+.hero__scroll-track span:nth-child(9) { animation-delay: -2.52s; }
+.hero__scroll-track span:nth-child(10) { animation-delay: -2.82s; }
+
 @media (min-width: 761px) {
   .hero__side-note {
     position: absolute;
@@ -22,7 +76,7 @@
     width: 1px;
     height: clamp(2.6rem, 7vh, 4.2rem);
     background: currentColor;
-    content: "";
+    content: '';
     opacity: 0.42;
   }
 
@@ -56,7 +110,7 @@
     z-index: -1;
     border: 1px solid transparent;
     border-radius: 999px;
-    content: "";
+    content: '';
     transition:
       border-color 360ms var(--ease-out),
       background 360ms var(--ease-out),
@@ -96,7 +150,7 @@
     left: 0;
     z-index: 3;
     height: 23%;
-    content: "";
+    content: '';
     pointer-events: none;
   }
 
@@ -117,35 +171,18 @@
 
   .hero__scroll-track {
     position: absolute;
-    inset: 0.35rem 0;
+    inset: 0;
     z-index: 1;
-    display: grid;
-    grid-template-rows: repeat(7, minmax(0, 1fr));
-    place-items: center;
+    overflow: hidden;
   }
 
   .hero__scroll-track span {
-    display: block;
     font-size: 0.72rem;
-    font-weight: 800;
-    line-height: 1;
-    opacity: 0.34;
-    transform: translateY(-2px);
-    will-change: transform, opacity;
-    animation: victxr-x-cascade 2.45s linear infinite;
   }
-
-  .hero__scroll-track span:nth-child(1) { animation-delay: -0.12s; }
-  .hero__scroll-track span:nth-child(2) { animation-delay: -0.47s; }
-  .hero__scroll-track span:nth-child(3) { animation-delay: -0.82s; }
-  .hero__scroll-track span:nth-child(4) { animation-delay: -1.17s; }
-  .hero__scroll-track span:nth-child(5) { animation-delay: -1.52s; }
-  .hero__scroll-track span:nth-child(6) { animation-delay: -1.87s; }
-  .hero__scroll-track span:nth-child(7) { animation-delay: -2.22s; }
 
   .hero__scroll:hover .hero__scroll-track span,
   .hero__scroll:focus-visible .hero__scroll-track span {
-    animation-duration: 2.05s;
+    animation-duration: 2.35s;
   }
 
   .hero__scroll-end {
@@ -164,54 +201,216 @@
   }
 }
 
-@keyframes victxr-x-cascade {
-  0%,
-  100% {
-    opacity: 0.24;
-    transform: translateY(-3px) skewX(0deg) scaleX(1);
+@keyframes victxr-x-fall {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -0.8rem) skewX(0deg) scaleX(1);
   }
 
-  28% {
-    opacity: 0.46;
-    transform: translateY(0) skewX(0deg) scaleX(1);
+  9% {
+    opacity: 0.28;
+    transform: translate(-50%, 0.05rem) skewX(0deg) scaleX(1);
   }
 
-  43% {
-    opacity: 0.92;
-    transform: translateY(2px) skewX(0deg) scaleX(1);
-  }
-
-  44% {
-    opacity: 0.22;
-    transform: translate(3px, 2px) skewX(-18deg) scaleX(1.28);
-  }
-
-  45% {
-    opacity: 1;
-    transform: translate(-2px, 3px) skewX(13deg) scaleX(0.8);
+  30% {
+    opacity: 0.52;
+    transform: translate(-50%, 1.8rem) skewX(0deg) scaleX(1);
   }
 
   46% {
-    opacity: 0.82;
-    transform: translateY(3px) skewX(0deg) scaleX(1);
+    opacity: 0.92;
+    transform: translate(-50%, 3.05rem) skewX(0deg) scaleX(1);
   }
 
-  70% {
-    opacity: 0.42;
-    transform: translateY(5px) skewX(0deg) scaleX(1);
+  47% {
+    opacity: 0.22;
+    transform: translate(calc(-50% + 3px), 3.13rem) skewX(-18deg) scaleX(1.25);
+  }
+
+  48% {
+    opacity: 1;
+    transform: translate(calc(-50% - 2px), 3.21rem) skewX(12deg) scaleX(0.82);
+  }
+
+  49% {
+    opacity: 0.82;
+    transform: translate(-50%, 3.29rem) skewX(0deg) scaleX(1);
+  }
+
+  76% {
+    opacity: 0.4;
+    transform: translate(-50%, 5.35rem) skewX(0deg) scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 7.1rem) skewX(0deg) scaleX(1);
   }
 }
 
 @media (max-width: 760px) {
+  .hero {
+    min-height: 100svh;
+  }
+
+  .hero__title {
+    padding-top: 4.6rem;
+    padding-bottom: 1.45rem;
+    font-size: clamp(3.75rem, 19vw, 6.8rem);
+  }
+
+  .hero__footer {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    row-gap: 0.9rem;
+    padding-top: 0.85rem;
+  }
+
   .hero__side-note {
-    display: none;
+    position: static;
+    grid-column: 1 / -1;
+    display: block;
+    max-width: 19rem;
+    padding-left: 0.65rem;
+    border-left: 1px solid var(--line);
+    text-transform: uppercase;
+    font-size: 0.56rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.1em;
+    opacity: 0.62;
+    writing-mode: horizontal-tb;
+  }
+
+  .hero__side-note strong {
+    font-weight: 850;
+  }
+
+  .hero__intro {
+    grid-column: 1 / -1;
+    max-width: 21rem;
+    font-size: 0.94rem;
+  }
+
+  .hero__scroll {
+    position: relative;
+    grid-column: 1 / -1;
+    justify-self: center;
+    display: grid;
+    width: 3.7rem;
+    grid-template-rows: auto 4.7rem auto;
+    justify-items: center;
+    gap: 0.28rem;
+    margin: 0.15rem 0 0.05rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  .hero__scroll-label {
+    font-size: 0.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.15em;
+  }
+
+  .hero__scroll-window {
+    position: relative;
+    display: block;
+    width: 1.65rem;
+    height: 4.7rem;
+    overflow: hidden;
+    border-inline: 1px solid rgb(10 10 10 / 20%);
+    border-radius: 999px;
+  }
+
+  .hero__scroll-window::before,
+  .hero__scroll-window::after {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 3;
+    height: 25%;
+    content: '';
+    pointer-events: none;
+  }
+
+  .hero__scroll-window::before {
+    top: 0;
+    background: linear-gradient(to bottom, var(--paper) 8%, rgb(241 240 235 / 0%));
+  }
+
+  .hero__scroll-window::after {
+    bottom: 0;
+    background: linear-gradient(to top, var(--paper) 8%, rgb(241 240 235 / 0%));
+  }
+
+  .hero__scroll-track {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hero__scroll-track span {
+    font-size: 0.62rem;
+    animation-duration: 2.65s;
+  }
+
+  .hero__scroll-end {
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0.72;
+  }
+
+  .hero__actions {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.64rem;
+  }
+
+  .disruption__stage {
+    min-height: 118svh;
+  }
+
+  .disruption__line {
+    font-size: clamp(3.15rem, 15.4vw, 5.8rem);
+  }
+
+  .disruption__caption {
+    right: auto;
+    bottom: 1rem;
+    left: 1rem;
+    max-width: calc(100% - 2rem);
+    font-size: 0.65rem;
+    opacity: 0;
+  }
+
+  .project-entry {
+    min-height: 108svh;
+  }
+
+  .project-entry__title {
+    transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__scroll-track span {
-    opacity: 0.55;
+  .home-shell[data-home-intro='pending'] [data-intro-header],
+  .home-shell[data-home-intro='pending'] [data-intro-line],
+  .home-shell[data-home-intro='pending'] [data-intro-footer],
+  .home-shell[data-home-intro='pending'] [data-side-note],
+  .home-shell[data-home-intro='pending'] [data-scroll-journey] {
+    opacity: 1;
     transform: none;
+  }
+
+  .hero__scroll-track span {
+    opacity: 0.5;
+    transform: translate(-50%, 2.4rem);
     animation: none !important;
   }
 }
