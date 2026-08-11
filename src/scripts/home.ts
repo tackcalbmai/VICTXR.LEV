@@ -19,16 +19,23 @@ export function initHomeMotion() {
     gsap.set('[data-side-note]', { autoAlpha: 0, filter: 'blur(4px)' });
     gsap.set('.hero__scroll', { autoAlpha: 0, y: 14 });
 
+    const settleIntro = () => {
+      root.classList.remove('intro-pending');
+      gsap.set('.site-header', { clearProps: 'opacity,visibility,transform' });
+      gsap.set('.hero__line-inner', { clearProps: 'opacity,visibility,transform' });
+      gsap.set('.hero__intro, .hero__actions', { clearProps: 'opacity,visibility,transform' });
+      gsap.set('[data-side-note]', { clearProps: 'opacity,visibility,filter' });
+      gsap.set('.hero__scroll', { clearProps: 'opacity,visibility,transform' });
+      ScrollTrigger.refresh();
+    };
+
     const intro = gsap.timeline({
       defaults: { ease: 'power4.out' },
-      onComplete: () => {
-        root.classList.remove('intro-pending');
-        ScrollTrigger.refresh();
-      },
+      onComplete: settleIntro,
     });
 
     intro
-      .to('.site-header', { autoAlpha: 1, y: 0, duration: 0.62 })
+      .to('.site-header', { autoAlpha: 1, y: 0, duration: 0.62 }, 0)
       .to(
         '.hero__line-inner',
         {
@@ -38,13 +45,13 @@ export function initHomeMotion() {
           duration: 1.05,
           stagger: 0.11,
         },
-        0.08,
+        0.02,
       )
-      .to('.hero__intro', { autoAlpha: 1, y: 0, duration: 0.66 }, 0.66)
-      .to('.hero__actions', { autoAlpha: 1, y: 0, duration: 0.66 }, 0.78)
-      .to('[data-side-note]', { autoAlpha: 1, filter: 'blur(0px)', duration: 0.72 }, 0.93)
-      .to('.hero__scroll', { autoAlpha: 1, y: 0, duration: 0.72 }, 1.08)
-      .to('.site-header__dot', { opacity: 1, duration: 0.055, repeat: 3, yoyo: true, ease: 'none' }, 1.04);
+      .to('.hero__intro', { autoAlpha: 1, y: 0, duration: 0.66 }, 0.58)
+      .to('.hero__actions', { autoAlpha: 1, y: 0, duration: 0.66 }, 0.7)
+      .to('[data-side-note]', { autoAlpha: 1, filter: 'blur(0px)', duration: 0.72 }, 0.84)
+      .to('.hero__scroll', { autoAlpha: 1, y: 0, duration: 0.72 }, 0.98)
+      .to('.site-header__dot', { opacity: 1, duration: 0.055, repeat: 3, yoyo: true, ease: 'none' }, 0.96);
 
     const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
     let journeyTween: gsap.core.Tween | undefined;
