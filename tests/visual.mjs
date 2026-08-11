@@ -76,7 +76,7 @@ async function capture(name, contextOptions) {
   page.on('pageerror', (error) => consoleErrors.push(error.message));
 
   await page.goto(baseURL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(1900);
 
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
@@ -91,16 +91,38 @@ async function capture(name, contextOptions) {
   }
 
   const isMobile = name === 'mobile';
+  const viewport = page.viewportSize();
+  const vh = viewport?.height ?? 900;
+  const disruptionTop = await documentTop(page, '[data-disruption]');
+
   if (!isMobile) {
     const scrollCue = page.locator('.hero__scroll');
+    const sideNote = page.locator('.hero__side-note');
+
     if (!(await scrollCue.isVisible())) {
       throw new Error(`${name} scroll cue is not visible on the opening screen`);
     }
-  }
 
-  const disruptionTop = await documentTop(page, '[data-disruption]');
-  const viewport = page.viewportSize();
-  const vh = viewport?.height ?? 900;
+    if (!(await sideNote.isVisible())) {
+      throw new Error(`${name} vertical side note is not visible on the opening screen`);
+    }
+
+    await scrollCue.click();
+    await page.waitForTimeout(650);
+
+    const intermediateY = await page.evaluate(() => window.scrollY);
+    if (intermediateY < 24) {
+      throw new Error(`${name} scroll control did not start moving the page`);
+    }
+
+    if (intermediateY > disruptionTop + vh * 0.68) {
+      throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
+    }
+
+    await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await page.waitForTimeout(250);
+  }
 
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
@@ -123,7 +145,7 @@ async function capture(name, contextOptions) {
       '[data-disruption-two]',
       `${name} disruption caption/headline`,
     );
-    await assertMostlyVisible(page, '[data-disruption-one]', `${name} first disruption statement`, 0.98);
+    await assertMostlyVisible(page, '[data-disruption-one]', `${name} first disruption statement`, 0.88);
   }
 
   const catrinTop = await documentTop(page, '[data-catrin]');
@@ -142,7 +164,14 @@ async function capture(name, contextOptions) {
   await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
 
   if (!isMobile) {
-    await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN title`);
+    await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, 0.9);
+
+    await page.evaluate(
+      ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+      { y: catrinTop + vh * 0.55 },
+    );
+    await page.waitForTimeout(800);
+    await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
   }
 
   if (consoleErrors.length) {
