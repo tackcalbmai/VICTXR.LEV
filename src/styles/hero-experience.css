@@ -1,0 +1,214 @@
+@media (min-width: 761px) {
+  .hero__side-note {
+    position: absolute;
+    z-index: 6;
+    top: 50%;
+    right: max(0.45rem, calc(var(--gutter) * 0.32));
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    font-size: clamp(0.64rem, 0.65vw, 0.74rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.13em;
+    opacity: 0.72;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .hero__side-note::before {
+    width: 1px;
+    height: clamp(2.6rem, 7vh, 4.2rem);
+    background: currentColor;
+    content: "";
+    opacity: 0.42;
+  }
+
+  .hero__side-note strong {
+    font-weight: 800;
+    opacity: 1;
+  }
+
+  .hero__scroll {
+    position: relative;
+    grid-column: 5 / span 2;
+    align-self: end;
+    justify-self: start;
+    display: grid;
+    width: 4.35rem;
+    height: 10.8rem;
+    grid-template-rows: auto 1fr auto;
+    justify-items: center;
+    gap: 0.48rem;
+    padding: 0.15rem 0.25rem 0.2rem;
+    border: 0;
+    background: transparent;
+    text-transform: uppercase;
+    color: inherit;
+    cursor: pointer;
+    isolation: isolate;
+  }
+
+  .hero__scroll::after {
+    position: absolute;
+    inset: -0.5rem -0.35rem;
+    z-index: -1;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    content: "";
+    transition:
+      border-color 360ms var(--ease-out),
+      background 360ms var(--ease-out),
+      transform 360ms var(--ease-out);
+  }
+
+  .hero__scroll:hover::after,
+  .hero__scroll:focus-visible::after {
+    border-color: var(--line);
+    background: rgb(10 10 10 / 2.5%);
+    transform: scale(1.025);
+  }
+
+  .hero__scroll-label {
+    font-size: 0.59rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.14em;
+  }
+
+  .hero__scroll-window {
+    position: relative;
+    width: 2.1rem;
+    min-height: 0;
+    overflow: hidden;
+    border-inline: 1px solid var(--line);
+    border-radius: 999px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+    transition: border-color 320ms var(--ease-out);
+  }
+
+  .hero__scroll:hover .hero__scroll-window,
+  .hero__scroll:focus-visible .hero__scroll-window {
+    border-color: rgb(10 10 10 / 42%);
+  }
+
+  .hero__scroll-track {
+    position: absolute;
+    inset: -100% 0 auto;
+    display: flex;
+    height: 200%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    will-change: transform;
+    animation: victxr-x-stream 3.15s linear infinite;
+  }
+
+  .hero__scroll-track span {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0.68;
+    will-change: transform, opacity;
+  }
+
+  .hero__scroll-track span:nth-child(4n + 2) {
+    animation: victxr-x-glitch-a 3.4s steps(1, end) infinite;
+  }
+
+  .hero__scroll-track span:nth-child(4n) {
+    animation: victxr-x-glitch-b 4.1s steps(1, end) infinite;
+  }
+
+  .hero__scroll:hover .hero__scroll-track,
+  .hero__scroll:focus-visible .hero__scroll-track {
+    animation-duration: 2.55s;
+  }
+
+  .hero__scroll-end {
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    opacity: 0.68;
+  }
+
+  .disruption__line {
+    font-size: clamp(3.4rem, 9.45vw, 9.9rem);
+  }
+}
+
+@keyframes victxr-x-stream {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(50%);
+  }
+}
+
+@keyframes victxr-x-glitch-a {
+  0%,
+  14%,
+  16%,
+  51%,
+  53%,
+  100% {
+    opacity: 0.68;
+    transform: translateX(0) skewX(0deg);
+  }
+
+  15% {
+    opacity: 0.24;
+    transform: translateX(3px) skewX(-15deg);
+  }
+
+  52% {
+    opacity: 0.92;
+    transform: translateX(-2px) skewX(12deg);
+  }
+}
+
+@keyframes victxr-x-glitch-b {
+  0%,
+  32%,
+  34%,
+  76%,
+  78%,
+  100% {
+    opacity: 0.68;
+    transform: translateX(0) scaleX(1);
+  }
+
+  33% {
+    opacity: 0.18;
+    transform: translateX(-3px) scaleX(1.35);
+  }
+
+  77% {
+    opacity: 0.96;
+    transform: translateX(2px) scaleX(0.78);
+  }
+}
+
+@media (max-width: 760px) {
+  .hero__side-note {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll-track,
+  .hero__scroll-track span {
+    animation: none !important;
+  }
+
+  .hero__scroll-track {
+    inset: 0;
+    height: 100%;
+  }
+}
