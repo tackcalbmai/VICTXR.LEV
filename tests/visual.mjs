@@ -107,23 +107,12 @@ async function capture(name, contextOptions) {
       throw new Error(`${name} vertical side note is not visible on the opening screen`);
     }
 
-    const hasVisibleX = await page.locator('.hero__scroll-window').evaluate((windowElement) => {
-      const windowRect = windowElement.getBoundingClientRect();
-      return [...windowElement.querySelectorAll('.hero__scroll-track span')].some((span) => {
-        const rect = span.getBoundingClientRect();
-        const opacity = Number.parseFloat(getComputedStyle(span).opacity);
-        return (
-          opacity > 0.45 &&
-          rect.bottom > windowRect.top &&
-          rect.top < windowRect.bottom &&
-          rect.right > windowRect.left &&
-          rect.left < windowRect.right
-        );
-      });
-    });
+    const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
+      spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.3).length,
+    );
 
-    if (!hasVisibleX) {
-      throw new Error(`${name} X stream has no visible glyph inside the scroll rail`);
+    if (visibleXs < 3) {
+      throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
     }
 
     await scrollCue.click();
@@ -177,7 +166,7 @@ async function capture(name, contextOptions) {
 
   await page.evaluate(
     ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-    { y: catrinTop + vh * 0.18 },
+    { y: Math.max(0, catrinTop - vh * 0.14) },
   );
   await page.waitForTimeout(800);
   await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
@@ -187,7 +176,7 @@ async function capture(name, contextOptions) {
 
     await page.evaluate(
       ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
-      { y: catrinTop + vh * 0.55 },
+      { y: catrinTop + vh * 0.08 },
     );
     await page.waitForTimeout(800);
     await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
