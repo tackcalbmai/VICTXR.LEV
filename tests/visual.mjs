@@ -177,7 +177,7 @@ async function capture(name, contextOptions) {
 
   const isMobile = name === 'mobile';
   const vh = viewport?.height ?? 900;
-  const disruptionTop = await documentTop(page, '[data-disruption]');
+  let disruptionTop = await documentTop(page, '[data-disruption]');
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForTimeout(100);
   const beforeY = await page.evaluate(() => window.scrollY);
@@ -191,8 +191,12 @@ async function capture(name, contextOptions) {
   if (intermediateY > disruptionTop + vh * (isMobile ? 0.72 : 0.68)) throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
 
   await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
+
+  await page.evaluate(() => window.dispatchEvent(new WheelEvent('wheel', { deltaY: 1 })));
+  await page.waitForTimeout(80);
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.waitForTimeout(250);
+  disruptionTop = await documentTop(page, '[data-disruption]');
 
   await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: disruptionTop + vh * (isMobile ? 0.35 : 0.85) });
   await page.waitForTimeout(900);
