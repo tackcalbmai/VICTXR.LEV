@@ -102,6 +102,23 @@ async function capture(name, contextOptions) {
     throw new Error(`${name} opening choreography did not settle`);
   }
 
+  const heroLinesSettled = await page.locator('.hero__line-inner').evaluateAll((lines) =>
+    lines.every((line) => {
+      const style = getComputedStyle(line);
+      const rect = line.getBoundingClientRect();
+      return (
+        Number.parseFloat(style.opacity) > 0.95 &&
+        style.visibility !== 'hidden' &&
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight
+      );
+    }),
+  );
+
+  if (!heroLinesSettled) {
+    throw new Error(`${name} hero title is not fully visible after the opening choreography`);
+  }
+
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
 
