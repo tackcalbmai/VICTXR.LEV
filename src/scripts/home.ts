@@ -29,11 +29,7 @@ export function initHomeMotion() {
     });
 
     intro
-      .to('[data-intro-header]', {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.42,
-      }, 0.01)
+      .to('[data-intro-header]', { autoAlpha: 1, y: 0, duration: 0.42 }, 0.01)
       .to(
         '[data-intro-line]',
         {
@@ -61,32 +57,9 @@ export function initHomeMotion() {
         },
         0.76,
       )
-      .to(
-        '[data-intro-footer]',
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.52,
-        },
-        0.69,
-      )
-      .to(
-        '[data-side-note]',
-        {
-          autoAlpha: 1,
-          duration: 0.48,
-        },
-        0.92,
-      )
-      .to(
-        '[data-scroll-journey]',
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.48,
-        },
-        1.04,
-      )
+      .to('[data-intro-footer]', { autoAlpha: 1, y: 0, duration: 0.52 }, 0.69)
+      .to('[data-side-note]', { autoAlpha: 1, duration: 0.48 }, 0.92)
+      .to('[data-scroll-journey]', { autoAlpha: 1, y: 0, duration: 0.48 }, 1.04)
       .to(
         '[data-intro-suffix]',
         {
@@ -104,6 +77,7 @@ export function initHomeMotion() {
     let brandCycle: gsap.core.Timeline | undefined;
 
     const glitchBrandLetter = (timeline: gsap.core.Timeline, position: number | string) => {
+      if (!brandLetter) return;
       timeline.to(
         brandLetter,
         {
@@ -130,9 +104,7 @@ export function initHomeMotion() {
       }
 
       brandCycle?.kill();
-      brandCycle = gsap.timeline({
-        onComplete: () => scheduleBrandCycle(9.5),
-      });
+      brandCycle = gsap.timeline({ onComplete: () => scheduleBrandCycle(9.5) });
 
       brandCycle
         .to(brandLetter, {
@@ -141,11 +113,7 @@ export function initHomeMotion() {
           ease: 'power1.in',
           transformOrigin: '50% 50%',
         })
-        .to(brandLetter, {
-          rotation: -360,
-          duration: 0.25,
-          ease: 'power4.in',
-        });
+        .to(brandLetter, { rotation: -360, duration: 0.25, ease: 'power4.in' });
 
       glitchBrandLetter(brandCycle, '<-0.11');
 
@@ -162,11 +130,7 @@ export function initHomeMotion() {
           ease: 'power1.in',
           transformOrigin: '50% 50%',
         })
-        .to(brandLetter, {
-          rotation: -360,
-          duration: 0.23,
-          ease: 'power4.in',
-        });
+        .to(brandLetter, { rotation: -360, duration: 0.23, ease: 'power4.in' });
 
       glitchBrandLetter(brandCycle, '<-0.11');
 
@@ -178,9 +142,7 @@ export function initHomeMotion() {
         .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.16, ease: 'power2.out' });
     };
 
-    if (brandLetter) {
-      gsap.delayedCall(0.62, runBrandCycle);
-    }
+    if (brandLetter) gsap.delayedCall(0.62, runBrandCycle);
 
     const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
     let journeyTween: gsap.core.Tween | undefined;
@@ -194,18 +156,20 @@ export function initHomeMotion() {
 
     const onScrollJourney = (event: MouseEvent) => {
       event.preventDefault();
-
       const targetSection = document.querySelector<HTMLElement>('[data-disruption]');
       if (!targetSection) return;
 
       journeyTween?.kill();
-
       const mobile = window.matchMedia('(max-width: 760px)').matches;
       const startY = window.scrollY;
       const disruptionTop = targetSection.getBoundingClientRect().top + window.scrollY;
       const targetY = disruptionTop + window.innerHeight * (mobile ? 0.29 : 0.78);
       const distance = Math.abs(targetY - startY);
-      const duration = gsap.utils.clamp(mobile ? 1.9 : 1.95, mobile ? 2.9 : 3.15, distance / (mobile ? 470 : 620));
+      const duration = gsap.utils.clamp(
+        mobile ? 1.9 : 1.95,
+        mobile ? 2.9 : 3.15,
+        distance / (mobile ? 470 : 620),
+      );
       const state = { y: startY };
 
       journeyTween = gsap.to(state, {
@@ -224,7 +188,7 @@ export function initHomeMotion() {
 
     scrollControl?.addEventListener('click', onScrollJourney);
     window.addEventListener('wheel', stopJourney, { passive: true });
-    window.addEventListener('touchstart', stopJourney, { passive: true });
+    window.addEventListener('touchmove', stopJourney, { passive: true });
     window.addEventListener('keydown', stopJourney);
 
     const mm = gsap.matchMedia();
@@ -250,37 +214,9 @@ export function initHomeMotion() {
           transformOrigin: 'left center',
           ease: 'none',
         })
-        .to(
-          '[data-disruption-two]',
-          {
-            autoAlpha: 1,
-            xPercent: 2.2,
-            yPercent: 8,
-            rotate: 0.9,
-            ease: 'none',
-          },
-          '<22%',
-        )
-        .to(
-          '[data-disruption-x]',
-          {
-            autoAlpha: 0.085,
-            scale: 1.04,
-            rotate: 7,
-            ease: 'none',
-          },
-          '<10%',
-        )
-        .to(
-          '[data-disruption-caption]',
-          {
-            autoAlpha: 1,
-            y: -6,
-            duration: 0.34,
-            ease: 'none',
-          },
-          '<4%',
-        );
+        .to('[data-disruption-two]', { autoAlpha: 1, xPercent: 2.2, yPercent: 8, rotate: 0.9, ease: 'none' }, '<22%')
+        .to('[data-disruption-x]', { autoAlpha: 0.085, scale: 1.04, rotate: 7, ease: 'none' }, '<10%')
+        .to('[data-disruption-caption]', { autoAlpha: 1, y: -6, duration: 0.34, ease: 'none' }, '<4%');
 
       const catrin = gsap.timeline({
         scrollTrigger: {
@@ -317,39 +253,27 @@ export function initHomeMotion() {
           duration: 0.18,
           ease: 'none',
         })
-        .to(
-          '[data-disruption-two]',
-          {
-            autoAlpha: 1,
-            xPercent: 1.5,
-            yPercent: 1.5,
-            rotate: 0.55,
-            duration: 0.2,
-            ease: 'none',
-          },
-          '<35%',
-        )
-        .to(
-          '[data-disruption-x]',
-          {
-            autoAlpha: 0.08,
-            scale: 1.04,
-            rotate: 5,
-            duration: 0.2,
-            ease: 'none',
-          },
-          '<18%',
-        )
-        .to(
-          '[data-disruption-caption]',
-          {
-            autoAlpha: 1,
-            y: -3,
-            duration: 0.16,
-            ease: 'none',
-          },
-          '<18%',
-        )
+        .to('[data-disruption-two]', {
+          autoAlpha: 1,
+          xPercent: 1.5,
+          yPercent: 1.5,
+          rotate: 0.55,
+          duration: 0.2,
+          ease: 'none',
+        }, '<35%')
+        .to('[data-disruption-x]', {
+          autoAlpha: 0.08,
+          scale: 1.04,
+          rotate: 5,
+          duration: 0.2,
+          ease: 'none',
+        }, '<18%')
+        .to('[data-disruption-caption]', {
+          autoAlpha: 1,
+          y: -3,
+          duration: 0.16,
+          ease: 'none',
+        }, '<18%')
         .to({}, { duration: 0.62 })
         .to('[data-disruption-one]', {
           xPercent: -15,
@@ -365,12 +289,7 @@ export function initHomeMotion() {
           duration: 0.2,
           ease: 'none',
         }, '<')
-        .to('[data-disruption-x]', {
-          scale: 1.16,
-          rotate: 9,
-          duration: 0.2,
-          ease: 'none',
-        }, '<');
+        .to('[data-disruption-x]', { scale: 1.16, rotate: 9, duration: 0.2, ease: 'none' }, '<');
 
       const catrin = gsap.timeline({
         scrollTrigger: {
@@ -394,7 +313,7 @@ export function initHomeMotion() {
       journeyTween?.kill();
       scrollControl?.removeEventListener('click', onScrollJourney);
       window.removeEventListener('wheel', stopJourney);
-      window.removeEventListener('touchstart', stopJourney);
+      window.removeEventListener('touchmove', stopJourney);
       window.removeEventListener('keydown', stopJourney);
       mm.revert();
     };
