@@ -121,16 +121,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   @media (min-width: 761px) {
+    .hero__intro,
+    .hero__scroll,
+    .hero__actions {
+      grid-row: 1;
+    }
+
     .hero__scroll {
-      position: absolute;
-      left: 50%;
-      bottom: var(--gutter);
-      width: 4.15rem;
-      margin-left: -2.075rem;
-      grid-column: auto;
-      grid-row: auto;
-      align-self: auto;
-      justify-self: auto;
+      position: relative;
+      grid-column: 1 / -1;
+      align-self: end;
+      justify-self: center;
     }
 
     .disruption__caption {
