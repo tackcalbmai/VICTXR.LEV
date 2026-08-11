@@ -24,7 +24,8 @@ export function initHomeMotion() {
         0.06,
       )
       .from('.hero__footer', { autoAlpha: 0, y: 14, duration: 0.9 }, 0.42)
-      .from('.hero__scroll', { autoAlpha: 0, y: 8, duration: 0.75 }, 0.58);
+      .from('[data-side-note]', { autoAlpha: 0, x: 12, duration: 0.9 }, 0.68)
+      .from('.hero__scroll', { autoAlpha: 0, y: 10, duration: 0.82 }, 0.84);
 
     const mm = gsap.matchMedia();
 
@@ -33,7 +34,7 @@ export function initHomeMotion() {
         scrollTrigger: {
           trigger: '[data-disruption]',
           start: 'top top',
-          end: '+=160%',
+          end: '+=165%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -42,9 +43,10 @@ export function initHomeMotion() {
 
       disruption
         .to('[data-disruption-one]', {
-          yPercent: -18,
-          rotate: -1.2,
-          scale: 0.95,
+          xPercent: -4.5,
+          yPercent: -23,
+          rotate: -1.8,
+          scale: 0.94,
           transformOrigin: 'left center',
           ease: 'none',
         })
@@ -52,9 +54,9 @@ export function initHomeMotion() {
           '[data-disruption-two]',
           {
             autoAlpha: 1,
-            xPercent: 0.5,
-            yPercent: 4,
-            rotate: 0.6,
+            xPercent: 2.2,
+            yPercent: 8,
+            rotate: 0.9,
             ease: 'none',
           },
           '<22%',
@@ -62,38 +64,86 @@ export function initHomeMotion() {
         .to(
           '[data-disruption-x]',
           {
-            autoAlpha: 0.075,
-            scale: 0.92,
-            rotate: 5,
+            autoAlpha: 0.085,
+            scale: 1.04,
+            rotate: 7,
             ease: 'none',
           },
-          '<12%',
+          '<10%',
         )
         .to(
           '[data-disruption-caption]',
           {
             autoAlpha: 1,
             y: -6,
-            duration: 0.32,
+            duration: 0.34,
             ease: 'none',
           },
-          '<5%',
+          '<4%',
         );
 
-      gsap.fromTo(
-        '[data-catrin-title]',
-        { x: '9vw' },
-        {
-          x: '0vw',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: '[data-catrin]',
-            start: 'top 92%',
-            end: 'top 38%',
-            scrub: 0.85,
-          },
+      const catrin = gsap.timeline({
+        scrollTrigger: {
+          trigger: '[data-catrin]',
+          start: 'top 92%',
+          end: 'center 18%',
+          scrub: 0.9,
         },
-      );
+      });
+
+      catrin
+        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.34, ease: 'none' })
+        .to({}, { duration: 0.2 })
+        .to('[data-catrin-title]', { x: '-12vw', duration: 0.46, ease: 'none' });
+
+      const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
+      let journeyTween: gsap.core.Tween | undefined;
+
+      const stopJourney = () => {
+        if (journeyTween?.isActive()) journeyTween.kill();
+      };
+
+      const onScrollJourney = (event: MouseEvent) => {
+        event.preventDefault();
+
+        const targetSection = document.querySelector<HTMLElement>('[data-disruption]');
+        if (!targetSection) return;
+
+        journeyTween?.kill();
+
+        const startY = window.scrollY;
+        const disruptionTop = targetSection.getBoundingClientRect().top + window.scrollY;
+        const targetY = disruptionTop + window.innerHeight * 0.78;
+        const distance = Math.abs(targetY - startY);
+        const duration = gsap.utils.clamp(1.9, 3.15, distance / 620);
+        const state = { y: startY };
+
+        journeyTween = gsap.to(state, {
+          y: targetY,
+          duration,
+          ease: 'power3.inOut',
+          onUpdate: () => {
+            window.scrollTo(0, state.y);
+            ScrollTrigger.update();
+          },
+          onComplete: () => {
+            journeyTween = undefined;
+          },
+        });
+      };
+
+      scrollControl?.addEventListener('click', onScrollJourney);
+      window.addEventListener('wheel', stopJourney, { passive: true });
+      window.addEventListener('touchstart', stopJourney, { passive: true });
+      window.addEventListener('keydown', stopJourney);
+
+      return () => {
+        journeyTween?.kill();
+        scrollControl?.removeEventListener('click', onScrollJourney);
+        window.removeEventListener('wheel', stopJourney);
+        window.removeEventListener('touchstart', stopJourney);
+        window.removeEventListener('keydown', stopJourney);
+      };
     });
 
     mm.add('(max-width: 760px)', () => {
