@@ -8,6 +8,13 @@ await mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 
+async function documentTop(page, selector) {
+  return page.locator(selector).evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.top + window.scrollY;
+  });
+}
+
 async function capture(name, contextOptions) {
   const context = await browser.newContext({
     ...contextOptions,
@@ -27,13 +34,48 @@ async function capture(name, contextOptions) {
   await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
   await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
 
-  await page.locator('[data-disruption]').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1000);
-  await page.screenshot({ path: `${outDir}/${name}-disruption.png`, fullPage: false });
+  const suffix = page.locator('.hero__suffix');
+  if (await suffix.count()) {
+    const suffixBox = await suffix.boundingBox();
+    const viewport = page.viewportSize();
+    if (suffixBox && viewport && suffixBox.x + suffixBox.width > viewport.width - 6) {
+      throw new Error(`${name} hero suffix is clipped outside the viewport`);
+    }
+  }
 
-  await page.locator('[data-catrin]').scrollIntoViewIfNeeded();
+  const disruptionTop = await documentTop(page, '[data-disruption]');
+  const viewport = page.viewportSize();
+  const vh = viewport?.height ?? 900;
+  const isMobile = name === 'mobile';
+
+  await page.evaluate(
+    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+    { y: disruptionTop + vh * (isMobile ? 0.35 : 0.85) },
+  );
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: `${outDir}/${name}-disruption-mid.png`, fullPage: false });
+
+  await page.evaluate(
+    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+    { y: disruptionTop + vh * (isMobile ? 0.72 : 1.45) },
+  );
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
+
+  const catrinTop = await documentTop(page, '[data-catrin]');
+  await page.evaluate(
+    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+    { y: Math.max(0, catrinTop - vh * 0.32) },
+  );
   await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outDir}/${name}-catrin.png`, fullPage: false });
+  await page.screenshot({ path: `${outDir}/${name}-catrin-entry.png`, fullPage: false });
+
+  await page.evaluate(
+    ({ y }) => window.scrollTo({ top: y, behavior: 'instant' }),
+    { y: catrinTop + vh * 0.18 },
+  );
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
 
   if (consoleErrors.length) {
     throw new Error(`${name} browser errors:\n${consoleErrors.join('\n')}`);
