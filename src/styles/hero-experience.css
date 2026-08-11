@@ -139,6 +139,10 @@
   .disruption__line {
     font-size: clamp(3.4rem, 9.45vw, 9.9rem);
   }
+
+  .disruption .disruption__stage .disruption__caption {
+    max-width: 21rem;
+  }
 }
 
 @keyframes victxr-x-stream {
