@@ -254,9 +254,11 @@ export function initHomeMotion() {
       const disruption = gsap.timeline({
         scrollTrigger: {
           trigger: '[data-disruption]',
-          start: 'top 86%',
-          end: 'bottom 8%',
-          scrub: 1.05,
+          start: 'top top',
+          end: '+=185%',
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
         },
       });
 
@@ -265,28 +267,28 @@ export function initHomeMotion() {
           '[data-disruption-one]',
           { xPercent: 0, yPercent: 0, rotate: 0, scale: 1 },
           {
-            xPercent: -6,
-            yPercent: -5,
-            rotate: -0.9,
-            scale: 0.99,
+            xPercent: -4,
+            yPercent: -4,
+            rotate: -0.7,
+            scale: 0.992,
             transformOrigin: 'left center',
-            duration: 0.28,
+            duration: 0.26,
             ease: 'none',
           },
         )
         .fromTo(
           '[data-disruption-two]',
-          { autoAlpha: 0.12, color: '#98968f', xPercent: 5, yPercent: 4, rotate: 0.25 },
+          { autoAlpha: 0.08, color: '#98968f', xPercent: 5, yPercent: 4, rotate: 0.25 },
           {
             autoAlpha: 1,
             color: '#0a0a0a',
             xPercent: 0,
             yPercent: 0,
             rotate: 0,
-            duration: 0.32,
+            duration: 0.3,
             ease: 'none',
           },
-          '<16%',
+          '<14%',
         )
         .to('[data-disruption-x]', {
           autoAlpha: 0.08,
@@ -294,50 +296,50 @@ export function initHomeMotion() {
           rotate: 5,
           duration: 0.28,
           ease: 'none',
-        }, '<12%')
+        }, '<10%')
         .to('[data-disruption-caption]', {
           autoAlpha: 1,
           y: -3,
           duration: 0.2,
           ease: 'none',
-        }, '<18%')
+        }, '<20%')
         .to('[data-disruption-one]', {
           xPercent: -12,
           yPercent: -9,
           rotate: -1.45,
-          duration: 0.44,
+          duration: 0.46,
           ease: 'none',
         })
         .to('[data-disruption-two]', {
-          xPercent: 9,
-          yPercent: 5,
-          rotate: 0.9,
-          duration: 0.44,
+          xPercent: 10,
+          yPercent: 6,
+          rotate: 0.95,
+          duration: 0.46,
           ease: 'none',
         }, '<')
         .to('[data-disruption-x]', {
-          scale: 1.11,
-          rotate: 7,
-          duration: 0.44,
+          scale: 1.12,
+          rotate: 8,
+          duration: 0.46,
           ease: 'none',
         }, '<')
         .to('[data-disruption-one]', {
-          xPercent: -24,
-          yPercent: -15,
-          rotate: -2.5,
+          xPercent: -25,
+          yPercent: -16,
+          rotate: -2.6,
           duration: 0.34,
           ease: 'none',
         })
         .to('[data-disruption-two]', {
-          xPercent: 22,
-          yPercent: 12,
-          rotate: 1.8,
+          xPercent: 23,
+          yPercent: 13,
+          rotate: 1.9,
           duration: 0.34,
           ease: 'none',
         }, '<')
         .to('[data-disruption-x]', {
-          scale: 1.2,
-          rotate: 11,
+          scale: 1.21,
+          rotate: 12,
           duration: 0.34,
           ease: 'none',
         }, '<');
