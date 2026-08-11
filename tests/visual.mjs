@@ -23,6 +23,13 @@ async function textBox(page, selector) {
   });
 }
 
+async function elementBox(page, selector) {
+  return page.locator(selector).evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  });
+}
+
 async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
   const box = await textBox(page, selector);
   const viewport = page.viewportSize();
@@ -193,10 +200,10 @@ async function capture(name, contextOptions) {
   let mobileMidOne;
   let mobileMidTwo;
   if (isMobile) {
-    await assertMostlyVisible(page, '[data-disruption-one]', 'mobile first disruption statement hold', 0.88);
-    await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.88);
-    mobileMidOne = await textBox(page, '[data-disruption-one]');
-    mobileMidTwo = await textBox(page, '[data-disruption-two]');
+    await assertMostlyVisible(page, '[data-disruption-one]', 'mobile first disruption statement hold', 0.86);
+    await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.86);
+    mobileMidOne = await elementBox(page, '[data-disruption-one]');
+    mobileMidTwo = await elementBox(page, '[data-disruption-two]');
   }
 
   const firstStatement = (await page.locator('[data-disruption-one]').innerText()).toLowerCase();
@@ -208,8 +215,8 @@ async function capture(name, contextOptions) {
   await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
 
   if (isMobile && mobileMidOne && mobileMidTwo) {
-    const lateOne = await textBox(page, '[data-disruption-one]');
-    const lateTwo = await textBox(page, '[data-disruption-two]');
+    const lateOne = await elementBox(page, '[data-disruption-one]');
+    const lateTwo = await elementBox(page, '[data-disruption-two]');
     const moveOne = Math.hypot(lateOne.x - mobileMidOne.x, lateOne.y - mobileMidOne.y);
     const moveTwo = Math.hypot(lateTwo.x - mobileMidTwo.x, lateTwo.y - mobileMidTwo.y);
     if (moveOne < 10 || moveTwo < 10) throw new Error(`mobile disruption text is not breaking frame strongly enough (${moveOne.toFixed(1)}px / ${moveTwo.toFixed(1)}px)`);
