@@ -166,16 +166,16 @@ export function initHomeMotion() {
       const targetY = disruptionTop + window.innerHeight * (mobile ? 0.29 : 0.78);
       const distance = Math.abs(targetY - startY);
       const duration = gsap.utils.clamp(
-        mobile ? 1.9 : 1.95,
-        mobile ? 2.9 : 3.15,
-        distance / (mobile ? 470 : 620),
+        mobile ? 1.65 : 1.95,
+        mobile ? 2.25 : 3.15,
+        distance / (mobile ? 560 : 620),
       );
       const state = { y: startY };
 
       journeyTween = gsap.to(state, {
         y: targetY,
         duration,
-        ease: 'power3.inOut',
+        ease: mobile ? 'power2.inOut' : 'power3.inOut',
         onUpdate: () => {
           window.scrollTo(0, state.y);
           ScrollTrigger.update();
