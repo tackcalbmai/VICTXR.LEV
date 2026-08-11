@@ -88,3 +88,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     initHomeMotion();
   </script>
 </BaseLayout>
+
+<style>
+  .hero__suffix {
+    display: inline;
+  }
+
+  @media (max-width: 760px) {
+    .hero__line--different .hero__line-inner {
+      font-size: 0.86em;
+      white-space: nowrap;
+    }
+
+    .hero__suffix {
+      display: inline-block;
+      margin-left: 0.08em;
+      font-size: 0.38em;
+      letter-spacing: 0;
+      transform: translateY(-1.1em);
+    }
+  }
+</style>
