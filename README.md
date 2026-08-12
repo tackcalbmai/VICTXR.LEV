@@ -26,6 +26,8 @@ The website itself is the primary case study: premium editorial minimalism, deli
 - Responsive navigation, keyboard focus handling and copy-email interaction
 - Canonical and alternate-language metadata, social cards, sitemap, robots and structured data
 - Custom 404 served by Cloudflare Static Assets
+- Centralized contact configuration with dormant Instagram and WhatsApp channels
+- Production security headers and immutable caching for hashed assets
 
 ## Routes
 
@@ -39,8 +41,21 @@ The website itself is the primary case study: premium editorial minimalism, deli
 npm ci
 npm run check
 npm run build
+npm run audit:static
 npm run visual  # run after starting the local preview
 npm run deploy
 ```
 
-Visual QA covers six home viewport/language combinations and desktop/mobile case-study views. GitHub Actions runs type checks, a production build and Playwright screenshots on every change to `main`.
+Production is connected to GitHub and deploys through Cloudflare automatically. The deploy command is a manual fallback, not part of the normal release flow.
+
+Visual QA covers the animated opening at desktop/mobile sizes, a 16-viewport responsive matrix from 320 to 1920 pixels, mobile landscape, low-height desktop, bilingual case studies, navigation history, menu states and reduced motion. GitHub Actions runs type checks, a production build, the static production audit and Playwright screenshots on every pull request.
+
+## Contacts
+
+All public contact values live in `src/data/contacts.ts`:
+
+- `email`: the current public mailbox;
+- `whatsapp`: an international number, preferably in E.164 form;
+- `instagram`: the full HTTPS profile URL.
+
+Keep a channel empty until the real account exists. Empty channels render no link, icon or placeholder. Adding a real value activates the shared contact UI and metadata without editing page components. See `docs/contact-setup.md` before connecting a domain mailbox.

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { contacts, getSocialContactLinks } from '../data/contacts';
 
 interface Props {
   title: string;
@@ -8,6 +9,7 @@ interface Props {
   canonicalPath?: string;
   alternatePath?: string;
   robots?: string;
+  preloadSerif?: boolean;
 }
 
 const {
@@ -17,34 +19,41 @@ const {
   canonicalPath = '/',
   alternatePath = lang === 'en' ? '/lv/' : '/',
   robots = 'index,follow,max-image-preview:large',
+  preloadSerif = false,
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL('https://victxr-lev.viktors-levdanskis.workers.dev');
 const canonical = new URL(canonicalPath, siteUrl);
 const alternate = new URL(alternatePath, siteUrl);
+const xDefault = new URL(lang === 'en' ? canonicalPath : alternatePath, siteUrl);
 const socialImage = new URL('/social-preview.png', siteUrl);
 const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
 const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
 const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
 const socialAlt = lang === 'lv' ? 'VICTXR.LEV — mājaslapu dizains un izstrāde' : 'VICTXR.LEV — web design and development';
+const socialProfiles = getSocialContactLinks(lang)
+  .filter((contact) => contact.channel === 'instagram')
+  .map((contact) => contact.href);
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Viktors Levdanskis',
   alternateName: 'Victxr Lev',
   url: siteUrl.toString(),
-  jobTitle: 'Web designer and developer',
-  email: 'mailto:viktors.levdanskis@inbox.lv',
+  jobTitle: lang === 'lv' ? 'Tīmekļa dizainers un izstrādātājs' : 'Web designer and developer',
+  email: contacts.email ? `mailto:${contacts.email}` : undefined,
+  sameAs: socialProfiles.length ? socialProfiles : undefined,
   address: { '@type': 'PostalAddress', addressCountry: 'LV' },
   knowsAbout: ['Web design', 'Web development', 'User experience', 'Technical SEO', 'Multilingual websites'],
 };
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} class="no-js">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>document.documentElement.classList.remove('no-js');</script>
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
     <meta name="author" content="Viktors Levdanskis" />
@@ -53,9 +62,11 @@ const schema = {
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang={lang} href={canonical} />
     <link rel="alternate" hreflang={lang === 'en' ? 'lv' : 'en'} href={alternate} />
-    <link rel="alternate" hreflang="x-default" href={new URL('/', siteUrl)} />
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preload" href={lang === 'lv' ? '/fonts/onest-latin-ext.woff2' : '/fonts/onest-latin.woff2'} as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="/fonts/onest-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    {lang === 'lv' && <link rel="preload" href="/fonts/onest-latin-ext.woff2" as="font" type="font/woff2" crossorigin="anonymous" />}
+    {preloadSerif && <link rel="preload" href="/fonts/noto-serif-display-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="VICTXR.LEV" />
     <meta property="og:title" content={title} />
@@ -75,11 +86,12 @@ const schema = {
     <title>{title}</title>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     <script is:inline>
-      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
       const navigation = performance.getEntriesByType?.('navigation')?.[0];
-      if (navigation?.type === 'reload') {
-        if (location.hash) history.replaceState(null, '', `${location.pathname}${location.search}`);
+      if (navigation?.type === 'reload' && !location.hash) {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
+      } else if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'auto';
       }
     </script>
   </head>

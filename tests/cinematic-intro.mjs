@@ -30,6 +30,14 @@ function rectDelta(a, b) {
 
 async function assertCinematicIntro(name, viewport) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
+  await context.addInitScript(() => {
+    window.__victxrHeroAnimationStarts = [];
+    document.addEventListener('animationstart', (event) => {
+      if (event.target instanceof Element && event.target.matches('[data-intro-line]')) {
+        window.__victxrHeroAnimationStarts.push(event.animationName);
+      }
+    });
+  });
   const page = await context.newPage();
   const errors = [];
   const phases = {};
@@ -41,6 +49,7 @@ async function assertCinematicIntro(name, viewport) {
 
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('[data-cinematic-intro]', { state: 'attached', timeout: 1500 });
+  if (await page.locator('[data-cinematic-intro]').count() !== 1) throw new Error(`${name} mounted duplicate cinematic layers`);
 
   const shellState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
   if (shellState !== 'pending') throw new Error(`${name} hero started before the logo intro (${shellState})`);
@@ -166,6 +175,13 @@ async function assertCinematicIntro(name, viewport) {
   const heroLine = page.locator('[data-intro-line]').first();
   const heroOpacity = Number(await heroLine.evaluate((element) => getComputedStyle(element).opacity));
   if (heroOpacity < 0.7) throw new Error(`${name} hero did not progressively take over after the logo handoff (${heroOpacity})`);
+  const heroAnimationStarts = await page.evaluate(() => window.__victxrHeroAnimationStarts);
+  if (heroAnimationStarts.filter((animation) => animation === 'intro-line').length !== 3) {
+    throw new Error(`${name} replayed the hero line reveal (${heroAnimationStarts.join(', ')})`);
+  }
+  if (heroAnimationStarts.filter((animation) => animation === 'intro-lock').length !== 1) {
+    throw new Error(`${name} did not run exactly one controlled hero lock (${heroAnimationStarts.join(', ')})`);
+  }
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed.png`, fullPage: false });
 
   if (errors.length) throw new Error(`${name} runtime errors:\n${errors.join('\n')}`);

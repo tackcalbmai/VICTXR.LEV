@@ -11,6 +11,7 @@ export function initSiteUI() {
   const main = document.querySelector<HTMLElement>('main');
   let menuWasOpened = false;
   let frame = 0;
+  const usesCompactNavigation = () => window.matchMedia('(max-width: 760px), (max-width: 900px) and (max-height: 500px)').matches;
 
   const updateHeader = () => {
     frame = 0;
@@ -35,6 +36,7 @@ export function initSiteUI() {
 
   const setMenu = (open: boolean) => {
     if (!menu || !menuToggle) return;
+    document.documentElement.classList.toggle('menu-is-open', open);
     document.body.classList.toggle('menu-is-open', open);
     menuToggle.setAttribute('aria-expanded', String(open));
     menu.setAttribute('aria-hidden', String(!open));
@@ -48,7 +50,12 @@ export function initSiteUI() {
   };
 
   menuToggle?.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
-  menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenu(false)));
+  menu?.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => link.addEventListener('click', () => {
+    const target = new URL(link.href, location.href);
+    const staysOnPage = target.origin === location.origin && target.pathname === location.pathname;
+    setMenu(false);
+    if (staysOnPage) window.requestAnimationFrame(() => menuToggle?.focus({ preventScroll: true }));
+  }));
   window.addEventListener('keydown', (event) => {
     const open = menuToggle?.getAttribute('aria-expanded') === 'true';
     if (event.key === 'Escape' && open) {
@@ -69,7 +76,7 @@ export function initSiteUI() {
   });
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 760 && menuWasOpened) setMenu(false);
+    if (!usesCompactNavigation() && menuWasOpened) setMenu(false);
   }, { passive: true });
 
   document.querySelectorAll<HTMLElement>('[data-current-year]').forEach((element) => {
