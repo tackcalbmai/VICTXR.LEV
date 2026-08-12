@@ -76,6 +76,11 @@ async function assertCinematicIntro(name, viewport) {
 
   await waitPhase(page, 'reveal');
   await page.waitForTimeout(170);
+  const handoffOpacity = Number(await page.locator('[data-cinematic-differently]').evaluate((element) => getComputedStyle(element).opacity));
+  const handoffVisibility = await page.locator('[data-cinematic-differently]').evaluate((element) => getComputedStyle(element).visibility);
+  if (handoffOpacity < 0.25 || handoffVisibility === 'hidden') {
+    throw new Error(`${name} reveal fell into a blank paper frame (DIFFERENTLY opacity ${handoffOpacity}, visibility ${handoffVisibility})`);
+  }
   await page.screenshot({ path: `${outDir}/${name}-cinematic-reveal.png`, fullPage: false });
 
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
