@@ -23,6 +23,15 @@ function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+async function glyphRect(locator) {
+  return locator.evaluate((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const rect = range.getBoundingClientRect();
+    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+  });
+}
+
 async function assertBrandMotion(name, viewport) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
   const page = await context.newPage();
@@ -36,9 +45,20 @@ async function assertBrandMotion(name, viewport) {
 
   const slot = page.locator('.site-brand__letter-wrap');
   const glyph = page.locator('[data-brand-letter]');
+  const reference = page.locator('.site-brand > span').first();
   const baselineBox = await slot.boundingBox();
   if (!baselineBox) throw new Error(`${name} brand slot has no geometry`);
   const baselineCenter = center(baselineBox);
+  const referenceGlyph = await glyphRect(reference);
+  const referenceColor = await reference.evaluate((element) => getComputedStyle(element).color);
+  const accentColor = await page.evaluate(() => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--accent)';
+    document.body.append(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
 
   let maxFlight = 0;
   let sawO = false;
@@ -64,6 +84,11 @@ async function assertBrandMotion(name, viewport) {
   if (oOffset > 1.5) throw new Error(`${name} O landed ${oOffset.toFixed(1)}px away from its brand slot`);
   const oGlyphOffset = distance(center(oGlyphBox), center(oBox));
   if (oGlyphOffset > 1.5) throw new Error(`${name} O is not centered inside its slot (${oGlyphOffset.toFixed(1)}px)`);
+  const oInk = await glyphRect(glyph);
+  const oBaselineDelta = Math.abs(center(oInk).y - center(referenceGlyph).y);
+  if (oBaselineDelta > 1.5) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the wordmark line`);
+  const oColor = await glyph.evaluate((element) => getComputedStyle(element).color);
+  if (oColor !== referenceColor) throw new Error(`${name} O should inherit the wordmark color (${oColor} vs ${referenceColor})`);
   await page.screenshot({ path: `${outDir}/${name}-brand-o-landed.png`, fullPage: false });
 
   await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4200 });
@@ -75,6 +100,11 @@ async function assertBrandMotion(name, viewport) {
   if (xOffset > 1.5) throw new Error(`${name} X returned ${xOffset.toFixed(1)}px away from its brand slot`);
   const xGlyphOffset = distance(center(xGlyphBox), center(xBox));
   if (xGlyphOffset > 1.5) throw new Error(`${name} X is not centered inside its slot (${xGlyphOffset.toFixed(1)}px)`);
+  const xInk = await glyphRect(glyph);
+  const xBaselineDelta = Math.abs(center(xInk).y - center(referenceGlyph).y);
+  if (xBaselineDelta > 1.5) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the wordmark line`);
+  const xColor = await glyph.evaluate((element) => getComputedStyle(element).color);
+  if (xColor !== accentColor) throw new Error(`${name} X does not use the site accent (${xColor} vs ${accentColor})`);
   await page.screenshot({ path: `${outDir}/${name}-brand-x-restored.png`, fullPage: false });
 
   const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
@@ -88,4 +118,4 @@ await assertBrandMotion('desktop-1366', { width: 1366, height: 768 });
 await assertBrandMotion('mobile-393', { width: 393, height: 852 });
 
 await browser.close();
-console.log('Brand X/O flight returns cleanly to its fixed slot on desktop and mobile.');
+console.log('Brand X/O flight lands on the wordmark baseline with the correct X accent on desktop and mobile.');
