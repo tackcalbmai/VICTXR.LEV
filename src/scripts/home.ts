@@ -159,7 +159,7 @@ export function initHomeMotion() {
     cinematicNode?.remove();
     cinematicNode = undefined;
     ScrollTrigger.refresh();
-    if (!reducedMotion) brandIdle = gsap.delayedCall(0.55, runBrandCycle);
+    if (!reducedMotion) brandIdle = gsap.delayedCall(0.7, runBrandCycle);
   };
 
   const startCinematic = () => {
@@ -176,49 +176,71 @@ export function initHomeMotion() {
     cinematicNode.innerHTML = `
       <div class="cinematic-intro__panel cinematic-intro__panel--top" data-cinematic-panel-top></div>
       <div class="cinematic-intro__panel cinematic-intro__panel--bottom" data-cinematic-panel-bottom></div>
+      <div class="cinematic-intro__grid" data-cinematic-grid>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--v"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--v"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--v"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--v"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--v"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--h"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--h"></span>
+        <span class="cinematic-intro__grid-line cinematic-intro__grid-line--h"></span>
+      </div>
       <div class="cinematic-intro__hud cinematic-intro__hud--top" data-cinematic-hud>
-        <span>VICTXR.LEV</span><span>X / O</span>
+        <span>STANDARD / EXPECTED / SAFE</span><span>01 / NORMAL</span>
       </div>
       <div class="cinematic-intro__hud cinematic-intro__hud--bottom" data-cinematic-hud>
-        <span>00—01</span><span>LV / WORLDWIDE</span>
-      </div>
-      <span class="cinematic-intro__axis cinematic-intro__axis--x" data-cinematic-axis-x></span>
-      <span class="cinematic-intro__axis cinematic-intro__axis--y" data-cinematic-axis-y></span>
-      <div class="cinematic-intro__symbol" data-cinematic-symbol>
-        <span class="cinematic-intro__glyph cinematic-intro__glyph--x" data-cinematic-x>X</span>
-        <span class="cinematic-intro__glyph cinematic-intro__glyph--o" data-cinematic-o>O</span>
+        <span>VICTOR.LEV</span><span>EVERYTHING IN ITS PLACE</span>
       </div>
       <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
-        <span>VICT</span><span class="cinematic-intro__wordmark-x" data-cinematic-wordmark-x>X</span><span>R</span><i>.</i><span>LEV</span>
+        <span>VICT</span><span class="cinematic-intro__letter-slot"><span data-cinematic-o>O</span><span class="cinematic-intro__letter-x" data-cinematic-x>X</span></span><span>R</span><i>.</i><span>LEV</span>
       </div>
+      <p class="cinematic-intro__wrong" data-cinematic-wrong>SOMETHING LOOKS WRONG.</p>
+      <p class="cinematic-intro__good" data-cinematic-good>GOOD.</p>
+      <span class="cinematic-intro__intruder" data-cinematic-intruder>X</span>
+      <p class="cinematic-intro__differently" data-cinematic-differently>DIFFERENTLY.</p>
     `;
     shell.prepend(cinematicNode);
     document.documentElement.classList.add('is-cinematic-intro');
     window.scrollTo(0, 0);
 
-    const x = cinematicNode.querySelector<HTMLElement>('[data-cinematic-x]');
-    const o = cinematicNode.querySelector<HTMLElement>('[data-cinematic-o]');
-    const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
-    const wordmarkX = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark-x]');
+    const grid = cinematicNode.querySelector<HTMLElement>('[data-cinematic-grid]');
+    const gridLines = cinematicNode.querySelectorAll<HTMLElement>('.cinematic-intro__grid-line');
     const hud = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-hud]');
-    const axisX = cinematicNode.querySelector<HTMLElement>('[data-cinematic-axis-x]');
-    const axisY = cinematicNode.querySelector<HTMLElement>('[data-cinematic-axis-y]');
+    const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
+    const o = cinematicNode.querySelector<HTMLElement>('[data-cinematic-o]');
+    const x = cinematicNode.querySelector<HTMLElement>('[data-cinematic-x]');
+    const wrong = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wrong]');
+    const good = cinematicNode.querySelector<HTMLElement>('[data-cinematic-good]');
+    const intruder = cinematicNode.querySelector<HTMLElement>('[data-cinematic-intruder]');
+    const differently = cinematicNode.querySelector<HTMLElement>('[data-cinematic-differently]');
     const panelTop = cinematicNode.querySelector<HTMLElement>('[data-cinematic-panel-top]');
     const panelBottom = cinematicNode.querySelector<HTMLElement>('[data-cinematic-panel-bottom]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!x || !o || !wordmark || !wordmarkX || !axisX || !axisY || !panelTop || !panelBottom) {
+    if (!grid || !wordmark || !o || !x || !wrong || !good || !intruder || !differently || !panelTop || !panelBottom) {
       shell.setAttribute('data-home-intro', 'ready');
       releaseCinematic();
       return;
     }
 
-    gsap.set(hud, { autoAlpha: 0, y: 8 });
-    gsap.set(axisX, { scaleX: 0, transformOrigin: '50% 50%' });
-    gsap.set(axisY, { scaleY: 0, transformOrigin: '50% 50%' });
-    gsap.set(x, { autoAlpha: 0, scale: 0.28, rotation: -18, filter: 'blur(7px)' });
-    gsap.set(o, { autoAlpha: 0, scale: 0.62, rotation: 26, filter: 'blur(5px)' });
-    gsap.set(wordmark, { autoAlpha: 0, yPercent: 90, clipPath: 'inset(0 0 100% 0)' });
+    gsap.set(grid, { autoAlpha: 0 });
+    gsap.set(gridLines, { scale: 0, transformOrigin: '50% 50%' });
+    gsap.set(hud, { autoAlpha: 0, y: 7 });
+    gsap.set(wordmark, { autoAlpha: 0, yPercent: 28, clipPath: 'inset(0 0 100% 0)' });
+    gsap.set(o, { autoAlpha: 1, x: 0, y: 0, rotation: 0 });
+    gsap.set(x, { autoAlpha: 0, x: 0, y: 0, rotation: -12, scale: 0.9 });
+    gsap.set(wrong, { autoAlpha: 0, y: 10, clipPath: 'inset(0 0 100% 0)' });
+    gsap.set(good, { autoAlpha: 0, y: 8 });
+    gsap.set(intruder, {
+      autoAlpha: 0,
+      x: compact ? '42vw' : '46vw',
+      y: compact ? '-38vh' : '-42vh',
+      rotation: -26,
+      scale: 0.52,
+      filter: 'blur(3px)',
+    });
+    gsap.set(differently, { autoAlpha: 0, xPercent: 7, clipPath: 'inset(0 100% 0 0)' });
 
     introTimeline = gsap.timeline({
       defaults: { ease: 'power4.out' },
@@ -226,50 +248,54 @@ export function initHomeMotion() {
     });
 
     introTimeline
-      .to(hud, { autoAlpha: 0.62, y: 0, duration: 0.36, stagger: 0.04 }, 0.04)
-      .to(axisX, { scaleX: 1, duration: 0.42 }, 0.08)
-      .to(axisY, { scaleY: 1, duration: 0.42 }, 0.11)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x'; }, [], 0.16)
-      .to(x, { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px)', duration: 0.42, ease: 'back.out(1.7)' }, 0.18)
+      .to(grid, { autoAlpha: 1, duration: 0.28 }, 0.04)
+      .to(gridLines, { scale: 1, duration: 0.42, stagger: 0.018, ease: 'power3.out' }, 0.04)
+      .to(hud, { autoAlpha: 0.58, y: 0, duration: 0.34, stagger: 0.04 }, 0.12)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'normal'; }, [], 0.24)
+      .to(wordmark, { autoAlpha: 1, yPercent: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.58 }, 0.26)
+      .to({}, { duration: 0.38 })
+      .to(o, { x: compact ? 1.5 : 2.5, y: compact ? -2 : -3, rotation: -2.2, duration: 0.26, ease: 'power2.inOut' }, 1.04)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'wrong'; }, [], 1.2)
+      .to(wrong, { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.38 }, 1.22)
+      .to({}, { duration: 0.32 })
+      .to(wrong, { autoAlpha: 0.54, y: -3, duration: 0.22, ease: 'power2.out' }, 1.9)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'good'; }, [], 1.98)
+      .to(good, { autoAlpha: 1, y: 0, duration: 0.28, ease: 'back.out(1.8)' }, 1.99)
+      .to({}, { duration: 0.22 })
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x'; }, [], 2.27)
+      .to(intruder, { autoAlpha: 0.16, x: 0, y: 0, rotation: 0, scale: 1, filter: 'blur(0px)', duration: 0.36, ease: 'power4.inOut' }, 2.24)
+      .to(gridLines, {
+        keyframes: [
+          { x: compact ? 2 : 4, y: compact ? -1 : -2, opacity: 0.55, duration: 0.045, ease: 'steps(1)' },
+          { x: compact ? -2 : -5, y: compact ? 1 : 2, opacity: 1, duration: 0.045, ease: 'steps(1)' },
+          { x: 0, y: 0, opacity: 1, duration: 0.08 },
+        ],
+      }, 2.46)
+      .to(o, { x: compact ? 26 : 42, y: compact ? -15 : -24, rotation: -25, scale: 0.82, autoAlpha: 0, filter: 'blur(3px)', duration: 0.22, ease: 'power4.in' }, 2.49)
+      .to(x, { autoAlpha: 1, rotation: 0, scale: 1, duration: 0.22, ease: 'back.out(2.3)' }, 2.55)
       .to(x, {
         keyframes: [
-          { x: 0, skewX: 0, scaleX: 1, duration: 0.02 },
-          { x: compact ? 4 : 8, skewX: -13, scaleX: 1.08, autoAlpha: 0.42, duration: 0.045, ease: 'steps(1)' },
-          { x: compact ? -3 : -6, skewX: 9, scaleX: 0.92, autoAlpha: 1, duration: 0.045, ease: 'steps(1)' },
-          { x: 0, skewX: 0, scaleX: 1, autoAlpha: 1, duration: 0.065 },
-        ],
-      }, 0.59)
-      .to(x, { rotation: -118, scale: 1.32, autoAlpha: 0.08, filter: 'blur(4px)', duration: 0.2, ease: 'power4.in' }, 0.77)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o'; }, [], 0.82)
-      .to(o, { autoAlpha: 1, scale: 1, rotation: 0, filter: 'blur(0px)', duration: 0.3, ease: 'back.out(2)' }, 0.82)
-      .to(o, {
-        keyframes: [
-          { x: compact ? -2 : -4, skewX: 8, autoAlpha: 0.55, duration: 0.045, ease: 'steps(1)' },
-          { x: compact ? 2 : 5, skewX: -10, autoAlpha: 1, duration: 0.045, ease: 'steps(1)' },
+          { x: compact ? 2 : 4, skewX: -12, autoAlpha: 0.45, duration: 0.04, ease: 'steps(1)' },
+          { x: compact ? -1 : -3, skewX: 8, autoAlpha: 1, duration: 0.04, ease: 'steps(1)' },
           { x: 0, skewX: 0, autoAlpha: 1, duration: 0.07 },
         ],
-      }, 1.05)
-      .to([x, o], { autoAlpha: 0, scale: 0.84, filter: 'blur(3px)', duration: 0.16, ease: 'power3.in' }, 1.22)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'wordmark'; }, [], 1.24)
-      .to(wordmark, { autoAlpha: 1, yPercent: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.5, ease: 'power4.out' }, 1.24)
-      .to(wordmarkX, {
-        keyframes: [
-          { x: 0, skewX: 0, duration: 0.02 },
-          { x: compact ? 3 : 6, skewX: -12, autoAlpha: 0.35, duration: 0.04, ease: 'steps(1)' },
-          { x: compact ? -2 : -4, skewX: 8, autoAlpha: 1, duration: 0.04, ease: 'steps(1)' },
-          { x: 0, skewX: 0, autoAlpha: 1, duration: 0.07 },
-        ],
-      }, 1.63)
-      .to({}, { duration: 0.22 })
+      }, 2.7)
+      .to([wrong, good], { autoAlpha: 0, y: -7, duration: 0.2, ease: 'power2.in' }, 2.62)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'victxr'; }, [], 2.8)
+      .to(intruder, { autoAlpha: 0.055, scale: 1.08, rotation: 4, duration: 0.28, ease: 'power2.out' }, 2.72)
+      .to({}, { duration: 0.18 })
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'differently'; }, [], 3.08)
+      .to(wordmark, { yPercent: -34, scale: 0.92, autoAlpha: 0.24, duration: 0.36, ease: 'power3.inOut' }, 3.08)
+      .to(intruder, { autoAlpha: 0, scale: 1.18, duration: 0.24, ease: 'power2.in' }, 3.08)
+      .to(differently, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', duration: 0.44, ease: 'power4.out' }, 3.1)
+      .to({}, { duration: 0.18 })
       .call(() => {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'reveal';
         shell.setAttribute('data-home-intro', 'ready');
-      }, [], 1.92)
-      .to([hud, axisX, axisY, wordmark], { autoAlpha: 0, duration: 0.16, ease: 'power2.in' }, 1.93)
-      .to(panelTop, { yPercent: -102, duration: 0.62, ease: 'power4.inOut' }, 1.96)
-      .to(panelBottom, { yPercent: 102, duration: 0.62, ease: 'power4.inOut' }, 1.96);
-
-    if (compact) introTimeline.timeScale(1.12);
+      }, [], 3.52)
+      .to([hud, grid, wordmark, differently], { autoAlpha: 0, duration: 0.18, ease: 'power2.in' }, 3.52)
+      .to(panelTop, { yPercent: -102, duration: 0.62, ease: 'power4.inOut' }, 3.58)
+      .to(panelBottom, { yPercent: 102, duration: 0.62, ease: 'power4.inOut' }, 3.58);
   };
 
   startCinematic();
