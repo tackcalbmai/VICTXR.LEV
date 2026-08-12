@@ -7,7 +7,8 @@ const context = await browser.newContext({ viewport: { width: 393, height: 852 }
 const page = await context.newPage();
 
 for (const route of routes) {
-  const response = await page.goto(new URL(route, baseURL).toString(), { waitUntil: 'domcontentloaded' });
+  const targetURL = new URL(route, baseURL).toString();
+  const response = await page.goto(targetURL, { waitUntil: 'domcontentloaded' });
   if (!response?.ok()) throw new Error(`${route} returned ${response?.status()}`);
   await page.evaluate(() => document.fonts.ready);
 
