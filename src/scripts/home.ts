@@ -1,16 +1,27 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import '../styles/cinematic.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export function initHomeMotion() {
   const shell = document.querySelector<HTMLElement>('[data-home-intro]');
   if (!shell) return;
+  if (shell.dataset.motionInitialized === 'true') return;
+  shell.dataset.motionInitialized = 'true';
 
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  const returningFromHistory = navigation?.type === 'back_forward';
+  const introWasBypassed = shell.dataset.introBypassed === 'true';
+  let initialHashTarget: HTMLElement | null = null;
+  if (!returningFromHistory && location.hash.length > 1) {
+    try {
+      initialHashTarget = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    } catch {
+      initialHashTarget = null;
+    }
+  }
   const resetToTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  resetToTop();
+  if (!returningFromHistory && !initialHashTarget) resetToTop();
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const siteHeader = document.querySelector<HTMLElement>('[data-site-header]');
@@ -24,6 +35,7 @@ export function initHomeMotion() {
   let brandIdle: gsap.core.Tween | undefined;
   let brandCycle: gsap.core.Timeline | undefined;
   let journeyTween: gsap.core.Tween | undefined;
+  const pointerCleanups: Array<() => void> = [];
 
   const scheduleBrandCycle = (delay = 7.8) => {
     brandIdle?.kill();
@@ -172,8 +184,9 @@ export function initHomeMotion() {
   };
 
   const startCinematic = () => {
-    if (reducedMotion) {
+    if (reducedMotion || returningFromHistory || initialHashTarget || introWasBypassed) {
       shell.setAttribute('data-home-intro', 'ready');
+      if (!reducedMotion) scheduleBrandCycle(8.5);
       return;
     }
 
@@ -429,7 +442,20 @@ export function initHomeMotion() {
 
   startCinematic();
 
-  if (reducedMotion) return;
+  const landOnInitialHash = () => {
+    if (!initialHashTarget) return;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+      const previousBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      initialHashTarget?.scrollIntoView({ block: 'start', behavior: 'auto' });
+      document.documentElement.style.scrollBehavior = previousBehavior;
+    }));
+  };
+
+  if (reducedMotion) {
+    landOnInitialHash();
+    return;
+  }
 
   const stopJourney = () => {
     if (!journeyTween?.isActive()) return;
@@ -588,11 +614,20 @@ export function initHomeMotion() {
         };
         card.addEventListener('pointermove', onMove);
         card.addEventListener('pointerleave', reset);
+        pointerCleanups.push(() => {
+          card.removeEventListener('pointermove', onMove);
+          card.removeEventListener('pointerleave', reset);
+        });
       });
     }
 
     return () => mm.revert();
   }, shell);
+
+  if (initialHashTarget) {
+    ScrollTrigger.refresh();
+    landOnInitialHash();
+  }
 
   return () => {
     introTimeline?.kill();
@@ -606,6 +641,8 @@ export function initHomeMotion() {
     window.removeEventListener('wheel', stopJourney);
     window.removeEventListener('touchmove', stopJourney);
     window.removeEventListener('keydown', stopJourney);
+    pointerCleanups.forEach((cleanup) => cleanup());
+    delete shell.dataset.motionInitialized;
     ctx.revert();
   };
 }

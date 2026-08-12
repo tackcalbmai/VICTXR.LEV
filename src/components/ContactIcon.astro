@@ -1,0 +1,22 @@
+---
+import type { SocialContactLink } from '../data/contacts';
+
+interface Props {
+  channel: SocialContactLink['channel'];
+}
+
+const { channel } = Astro.props;
+---
+
+{channel === 'instagram' ? (
+  <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" />
+    <circle cx="12" cy="12" r="4.1" />
+    <circle class="contact-icon__dot" cx="17.35" cy="6.75" r="1" />
+  </svg>
+) : (
+  <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M20.2 11.6a8.2 8.2 0 0 1-12.1 7.2L3.8 20l1.3-4.1a8.2 8.2 0 1 1 15.1-4.3Z" />
+    <path d="M9 7.8c.2-.4.4-.4.8-.4h.4c.2 0 .4.1.5.4l.9 2c.1.3.1.5-.1.7l-.7.8c-.2.2-.1.4 0 .6.5 1 1.3 1.8 2.3 2.3.2.1.4.2.6 0l.9-1c.2-.2.4-.2.7-.1l1.9.9c.3.1.4.3.4.5 0 .4-.2 1.3-.8 1.8-.5.5-1.3.8-2.1.6-1.1-.2-2.8-.8-4.7-2.5-1.5-1.4-2.5-3.1-2.8-4.3-.3-.9 0-1.8.4-2.3.3-.3.6-.6.9-.7" />
+  </svg>
+)}

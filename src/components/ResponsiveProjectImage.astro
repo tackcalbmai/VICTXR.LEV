@@ -1,0 +1,55 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  desktop: ImageMetadata;
+  mobile: ImageMetadata;
+  alt: string;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  quality?: number;
+  sizes?: string;
+}
+
+const {
+  desktop,
+  mobile,
+  alt,
+  class: className,
+  loading = 'lazy',
+  fetchpriority = 'auto',
+  quality = 86,
+  sizes = '(max-width: 760px) calc(100vw - 2rem), 76vw',
+} = Astro.props;
+
+const desktopWidths = [...new Set([640, 960, 1200, desktop.width].filter((width) => width <= desktop.width))].sort((a, b) => a - b);
+const mobileWidths = [...new Set([320, mobile.width].filter((width) => width <= mobile.width))].sort((a, b) => a - b);
+const [desktopImage, mobileImage] = await Promise.all([
+  getImage({ src: desktop, widths: desktopWidths, sizes, quality, format: 'webp' }),
+  getImage({ src: mobile, widths: mobileWidths, sizes: 'calc(100vw - 2rem)', quality, format: 'webp' }),
+]);
+---
+
+<picture class="responsive-project-image">
+  <source
+    media="(max-width: 760px)"
+    srcset={mobileImage.srcSet.attribute || mobileImage.src}
+    sizes="calc(100vw - 2rem)"
+    width={mobile.width}
+    height={mobile.height}
+  />
+  <img
+    class={className}
+    src={desktopImage.src}
+    srcset={desktopImage.srcSet.attribute || undefined}
+    sizes={sizes}
+    width={desktop.width}
+    height={desktop.height}
+    alt={alt}
+    loading={loading}
+    decoding="async"
+    fetchpriority={fetchpriority}
+  />
+</picture>

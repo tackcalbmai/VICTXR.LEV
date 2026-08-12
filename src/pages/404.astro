@@ -4,12 +4,23 @@ import Arrow from '../components/Arrow.astro';
 ---
 
 <BaseLayout title="404 — VICTXR.LEV" description="This page does not exist." lang="en" canonicalPath="/404/" alternatePath="/404/" robots="noindex,nofollow">
-  <main class="not-found" id="main-content" tabindex="-1">
-    <a class="not-found__brand" href="/">VICTXR.LEV</a>
-    <p>Something looks wrong.</p>
-    <h1><span>Good.</span><strong>404</strong></h1>
-    <a class="not-found__back" href="/">Back to the working part <Arrow direction="right" /></a>
+  <main class="not-found" id="main-content" tabindex="-1" data-not-found>
+    <a class="not-found__brand" href="/" data-home-link>VICTXR.LEV</a>
+    <p data-not-found-lead>Something looks wrong.</p>
+    <h1><span data-not-found-reply>Good.</span><strong>404</strong></h1>
+    <a class="not-found__back" href="/" data-home-link><span data-not-found-back>Back to the working part</span> <Arrow direction="right" /></a>
   </main>
+  <script is:inline>
+    (() => {
+      const root = document.querySelector('[data-not-found]');
+      if (!root || !location.pathname.startsWith('/lv/')) return;
+      document.documentElement.lang = 'lv';
+      root.querySelector('[data-not-found-lead]').textContent = 'Kaut kas nav pareizi.';
+      root.querySelector('[data-not-found-reply]').textContent = 'Labi.';
+      root.querySelector('[data-not-found-back]').textContent = 'Atpakaļ pie tā, kas strādā';
+      root.querySelectorAll('[data-home-link]').forEach((link) => link.setAttribute('href', '/lv/'));
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -17,7 +28,7 @@ import Arrow from '../components/Arrow.astro';
     display: grid;
     min-height: 100svh;
     grid-template-rows: auto 1fr auto;
-    padding: var(--gutter);
+    padding: calc(var(--gutter) + var(--safe-top)) var(--gutter) calc(var(--gutter) + var(--safe-bottom));
     overflow: hidden;
   }
   .not-found__brand { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.05em; }

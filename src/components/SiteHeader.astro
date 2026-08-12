@@ -1,20 +1,25 @@
 ---
 import type { Locale } from '../data/site';
 import { getSiteCopy } from '../data/site';
+import ContactChannels from './ContactChannels.astro';
 import '../styles/brand.css';
 
 interface Props {
   locale: Locale;
+  alternateHref?: string;
 }
 
-const { locale } = Astro.props;
+const { locale, alternateHref } = Astro.props;
 const copy = getSiteCopy(locale);
 const home = copy.homeHref;
 const available = locale === 'lv' ? 'Pieejams' : 'Available';
+const alternateLanguage = locale === 'lv' ? 'en' : 'lv';
+const languageLabel = locale === 'lv' ? 'Pārslēgt uz angļu valodu' : 'Switch to Latvian';
+const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — home';
 ---
 
 <header class="site-header" data-site-header>
-  <a class="site-brand" href={home}>
+  <a class="site-brand" href={home} aria-label={homeLabel}>
     <span>VICT</span><span class="site-brand__letter-wrap"><span data-brand-letter>X</span></span><span>R</span><span class="site-brand__dot">.</span><span>LEV</span>
   </a>
 
@@ -27,7 +32,14 @@ const available = locale === 'lv' ? 'Pieejams' : 'Available';
 
   <div class="site-header__utility">
     <span class="site-status"><span aria-hidden="true"></span>{available}</span>
-    <a class="site-language" href={copy.alternateHref} hreflang={copy.alternateLabel.toLowerCase()}>{copy.alternateLabel}</a>
+    <a
+      class="site-language"
+      href={alternateHref ?? copy.alternateHref}
+      hreflang={alternateLanguage}
+      lang={alternateLanguage}
+      aria-label={languageLabel}
+      data-analytics-event="language_switch"
+    >{copy.alternateLabel}</a>
     <button class="site-menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
       <span class="sr-only" data-menu-label data-open-label={copy.nav.menu} data-close-label={copy.nav.close}>{copy.nav.menu}</span>
       <span class="site-menu-button__lines" aria-hidden="true"><i></i><i></i></span>
@@ -35,6 +47,15 @@ const available = locale === 'lv' ? 'Pieejams' : 'Available';
   </div>
 
 </header>
+
+<noscript>
+  <nav class="no-js-nav" aria-label={copy.nav.menu}>
+    <a href={`${home}#work`}>{copy.nav.work}</a>
+    <a href={`${home}#about`}>{copy.nav.about}</a>
+    <a href={`${home}#services`}>{copy.nav.services}</a>
+    <a href={`${home}#contact`}>{copy.nav.contact}</a>
+  </nav>
+</noscript>
 
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" inert>
   <div class="mobile-menu__meta">
@@ -47,5 +68,8 @@ const available = locale === 'lv' ? 'Pieejams' : 'Available';
     <a href={`${home}#services`}><span>03</span>{copy.nav.services}</a>
     <a href={`${home}#contact`}><span>04</span>{copy.nav.contact}</a>
   </nav>
-  <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
+  <div class="mobile-menu__bottom">
+    <ContactChannels locale={locale} variant="menu" />
+    <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
+  </div>
 </div>

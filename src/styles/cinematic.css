@@ -6,6 +6,18 @@
   content: '';
 }
 
+html.no-js .home-shell[data-home-intro='pending']::before {
+  display: none;
+}
+
+html.no-js .home-shell[data-home-intro='pending'] .site-header,
+html.no-js .home-shell[data-home-intro='pending'] .hero__meta,
+html.no-js .home-shell[data-home-intro='pending'] .hero__line-inner,
+html.no-js .home-shell[data-home-intro='pending'] .hero__side-note,
+html.no-js .home-shell[data-home-intro='pending'] .hero__footer {
+  animation-play-state: running !important;
+}
+
 .home-shell[data-home-intro='pending'] .site-header,
 .home-shell[data-home-intro='pending'] .hero__meta,
 .home-shell[data-home-intro='pending'] .hero__line-inner,

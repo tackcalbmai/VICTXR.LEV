@@ -154,13 +154,10 @@
   letter-spacing: 0.04em;
 }
 
-.case-browser > img {
+.case-browser > .responsive-project-image,
+.case-browser img {
   width: 100%;
   height: auto;
-}
-
-.case-screen--mobile {
-  display: none;
 }
 
 .case-narrative {
@@ -383,11 +380,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 5rem;
+  margin-bottom: 1rem;
   padding-block: 1.1rem;
   border-block: 1px solid var(--inverse-line);
   font-size: clamp(1.1rem, 2.5vw, 2.5rem);
   letter-spacing: -0.035em;
+}
+
+.case-contact > a + .site-footer {
+  margin-top: 4rem;
 }
 
 @keyframes case-reveal {
@@ -450,9 +451,6 @@
   .case-browser__bar {
     height: 2rem;
   }
-
-  .case-screen--desktop { display: none; }
-  .case-screen--mobile { display: block; }
 
   .case-narrative__row {
     grid-template-columns: 1fr;

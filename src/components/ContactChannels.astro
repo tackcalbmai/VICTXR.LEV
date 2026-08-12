@@ -1,0 +1,34 @@
+---
+import Arrow from './Arrow.astro';
+import ContactIcon from './ContactIcon.astro';
+import { getSocialContactLabel, getSocialContactLinks } from '../data/contacts';
+import type { Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  variant?: 'contact' | 'menu';
+}
+
+const { locale, variant = 'contact' } = Astro.props;
+const links = getSocialContactLinks(locale);
+---
+
+{links.length > 0 && (
+  <nav class:list={['contact-channels', `contact-channels--${variant}`]} aria-label={getSocialContactLabel(locale)}>
+    {links.map((link) => (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-contact-channel={link.channel}
+        data-analytics-event="contact_click"
+        data-analytics-channel={link.channel}
+      >
+        <span class="contact-channels__icon"><ContactIcon channel={link.channel} /></span>
+        <span class="contact-channels__label">{link.label}</span>
+        <span class="contact-channels__display">{link.display}</span>
+        <Arrow direction="up" />
+      </a>
+    ))}
+  </nav>
+)}

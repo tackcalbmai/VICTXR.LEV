@@ -1,7 +1,5 @@
 export type Locale = 'en' | 'lv';
 
-export const contactEmail = 'viktors.levdanskis@inbox.lv';
-
 export const siteCopy = {
   en: {
     lang: 'en',
@@ -146,7 +144,7 @@ export const siteCopy = {
       oneAfter: ' kā visi.',
       twoBefore: 'Arī mājaslapai ',
       twoWord: 'nav',
-      twoAfter: ' tādai jābūt.',
+      twoAfter: ' jābūt kā visām.',
       caption: 'Es veidoju mājaslapu ap biznesu — nevis biznesu ap veidni.',
     },
     work: {
@@ -160,8 +158,8 @@ export const siteCopy = {
           index: '01',
           name: 'CATRIN',
           sector: 'Kāzu salons — Jelgava, Latvija',
-          summary: 'Daudzvalodu redakcionāla pieredze, kas ir tikpat pārdomāta kā tajā parādītās kleitas.',
-          scope: ['Stratēģija', 'Web dizains', 'Izstrāde', 'Daudzvalodu UX'],
+          summary: 'Daudzvalodu redakcionāla mājaslapa, kas ir tikpat pārdomāta kā tajā parādītās kleitas.',
+          scope: ['Stratēģija', 'Tīmekļa dizains', 'Izstrāde', 'Daudzvalodu UX'],
           href: '/lv/darbi/catrin/',
         },
         anelika: {
@@ -169,7 +167,7 @@ export const siteCopy = {
           name: 'ANELIKA',
           sector: 'Īpašumu serviss — Latvija',
           summary: 'Plašs pakalpojumu klāsts pārvērsts skaidrā ceļā no vajadzības līdz pieprasījumam.',
-          scope: ['Informācijas arhitektūra', 'Web dizains', 'Pieteikumu plūsma', 'Tehniskais SEO'],
+          scope: ['Informācijas arhitektūra', 'Tīmekļa dizains', 'Pieteikumu plūsma', 'Tehniskais SEO'],
           href: '/lv/darbi/anelika/',
         },
       },
@@ -179,7 +177,7 @@ export const siteCopy = {
       title: ['Kā es te', 'nonācu?'],
       aside: 'Labs jautājums.',
       paragraphs: [
-        'Es nesāku kā web izstrādātājs. Es sāku ar problēmu risināšanu. Kādā brīdī šīs problēmas pārvērtās mājaslapās.',
+        'Es nesāku kā tīmekļa izstrādātājs. Es sāku ar problēmu risināšanu. Kādā brīdī šīs problēmas pārvērtās mājaslapās.',
         'Man joprojām nav svarīgi, kā lietas “parasti dara”. Man ir svarīgi, lai tās strādā, izskatās pareizi un ir loģiskas.',
       ],
       statement: ['Izrādās,', 'man tas sanāk', 'diezgan labi.'],
@@ -193,12 +191,12 @@ export const siteCopy = {
       label: 'Ko es daru / 05',
       title: 'Noderīgas lietas. Pabeigtas līdz galam.',
       items: [
-        ['01', 'Mājaslapas no nulles', 'Stratēģija, struktūra, vizuālā sistēma un gatavs produkcijas kods.'],
+        ['01', 'Mājaslapas no nulles', 'Stratēģija, struktūra, vizuālā sistēma un palaišanai gatavs kods.'],
         ['02', 'Mājaslapu pārveide', 'Atstāt to, kas strādā. Izmest to, kas nestrādā. Pārbūvēt pārējo.'],
         ['03', 'Pārdošanas lapas', 'Viens skaidrs piedāvājums, viens skaidrs ceļš, nekā lieka.'],
         ['04', 'Daudzvalodu mājaslapas', 'Pilnvērtīga lokalizācija — nevis tulkošanas logrīks, kas pielīmēts augšpusē.'],
         ['05', 'SEO un tehniskā bāze', 'Indeksējamas lapas, metadati, ātrums, piekļūstamība un analītikas pamati.'],
-        ['06', 'Tālāka attīstība', 'Izmērāmi uzlabojumi pēc palaišanas, nevis svinīga mājaslapas pamešana.'],
+        ['06', 'Turpmāka attīstība', 'Izmērāmi uzlabojumi pēc palaišanas, nevis svinīga mājaslapas pamešana.'],
       ],
     },
     xo: {
@@ -221,7 +219,7 @@ export const siteCopy = {
       subject: 'Jauns projekts VICTXR.LEV',
     },
     footer: {
-      note: 'Dizainēts un izstrādāts Latvijā.',
+      note: 'Veidots un izstrādāts Latvijā.',
       backToTop: 'Uz augšu',
     },
   },

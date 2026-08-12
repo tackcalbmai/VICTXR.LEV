@@ -1,8 +1,10 @@
 ---
-import { Image } from 'astro:assets';
 import Arrow from './Arrow.astro';
+import ContactChannels from './ContactChannels.astro';
+import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
-import { contactEmail, getSiteCopy, type Locale } from '../data/site';
+import { contacts } from '../data/contacts';
+import { getSiteCopy, type Locale } from '../data/site';
 import { projects } from '../data/projects';
 import '../styles/home.css';
 import '../styles/cinematic.css';
@@ -15,11 +17,34 @@ const { locale } = Astro.props;
 const copy = getSiteCopy(locale);
 const catrin = projects.catrin;
 const anelika = projects.anelika;
+const contactEmail = contacts.email;
 const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(copy.contact.subject)}`;
 const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
 ---
 
 <div class="home-shell" data-home-intro="pending" id="top">
+  <script is:inline>
+    (() => {
+      const releaseFallback = (force = false) => {
+        const shell = document.querySelector('[data-home-intro]');
+        const cinematic = document.querySelector('[data-cinematic-intro]');
+        if (!shell || (shell.getAttribute('data-home-intro') !== 'pending' && !(force && cinematic))) return;
+        shell.setAttribute('data-intro-bypassed', 'true');
+        shell.setAttribute('data-home-intro', 'ready');
+        document.documentElement.classList.remove('is-cinematic-intro');
+        cinematic?.remove();
+        const header = document.querySelector('[data-site-header]');
+        header?.removeAttribute('style');
+        header?.querySelectorAll('.site-nav--desktop, .site-header__utility').forEach((element) => {
+          element.removeAttribute('style');
+        });
+      };
+      window.setTimeout(() => {
+        if (!document.querySelector('[data-cinematic-intro]')) releaseFallback();
+      }, 2000);
+      window.setTimeout(() => releaseFallback(true), 8500);
+    })();
+  </script>
   <SiteHeader locale={locale} />
 
   <main id="main-content" tabindex="-1">
@@ -50,8 +75,8 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
         </a>
 
         <nav class="hero__actions" aria-label={locale === 'lv' ? 'Galvenā navigācija' : 'Primary navigation'}>
-          <a href="#work"><span>{copy.hero.work}</span><Arrow direction="down" /></a>
-          <a href="#contact"><span>{copy.hero.start}</span><Arrow direction="up" /></a>
+          <a href="#work" data-analytics-event="view_work_click"><span>{copy.hero.work}</span><Arrow direction="down" /></a>
+          <a href="#contact" data-analytics-event="start_project_click"><span>{copy.hero.start}</span><Arrow direction="up" /></a>
         </nav>
       </div>
     </section>
@@ -79,12 +104,19 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
     </section>
 
     <article class="project-feature project-feature--catrin" data-project data-theme="dark">
-      <a class="project-feature__link" href={copy.work.projects.catrin.href}>
+      <a class="project-feature__link" href={copy.work.projects.catrin.href} data-analytics-event="case_study_click" data-project-id="catrin">
         <div class="project-feature__topline"><span>{copy.work.projects.catrin.index} / {copy.work.label}</span><span>{copy.work.projects.catrin.sector}</span></div>
         <h3 class="project-feature__title" data-project-title>CATRIN</h3>
         <div class="project-feature__media project-feature__media--catrin" data-project-media data-perspective-card>
-          <Image class="project-screen project-screen--desktop" src={catrin.hero} alt={locale === 'lv' ? 'CATRIN kāzu salona mājaslapas datora skats' : 'CATRIN bridal salon website desktop view'} loading="lazy" quality={86} />
-          <Image class="project-screen project-screen--mobile" src={catrin.mobile} alt={locale === 'lv' ? 'CATRIN kāzu salona mājaslapas mobilais skats' : 'CATRIN bridal salon website mobile view'} loading="lazy" quality={86} />
+          <ResponsiveProjectImage
+            class="project-screen"
+            desktop={catrin.hero}
+            mobile={catrin.mobile}
+            alt={locale === 'lv' ? 'CATRIN kāzu salona mājaslapas responsīvie skati' : 'Responsive views of the CATRIN bridal salon website'}
+            loading="lazy"
+            quality={86}
+            sizes="(max-width: 760px) calc(100vw - 2rem), 66vw"
+          />
         </div>
         <div class="project-feature__bottom">
           <p>{copy.work.projects.catrin.summary}</p>
@@ -95,12 +127,19 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
     </article>
 
     <article class="project-feature project-feature--anelika" data-project data-theme="anelika">
-      <a class="project-feature__link" href={copy.work.projects.anelika.href}>
+      <a class="project-feature__link" href={copy.work.projects.anelika.href} data-analytics-event="case_study_click" data-project-id="anelika">
         <div class="project-feature__topline"><span>{copy.work.projects.anelika.index} / {copy.work.label}</span><span>{copy.work.projects.anelika.sector}</span></div>
         <h3 class="project-feature__title" data-project-title>ANELIKA</h3>
         <div class="project-feature__media project-feature__media--anelika" data-project-media data-perspective-card>
-          <Image class="project-screen project-screen--desktop" src={anelika.hero} alt={locale === 'lv' ? 'ANELIKA pakalpojumu mājaslapas datora skats' : 'ANELIKA property services website desktop view'} loading="lazy" quality={86} />
-          <Image class="project-screen project-screen--mobile" src={anelika.mobile} alt={locale === 'lv' ? 'ANELIKA pakalpojumu mājaslapas mobilais skats' : 'ANELIKA property services website mobile view'} loading="lazy" quality={86} />
+          <ResponsiveProjectImage
+            class="project-screen"
+            desktop={anelika.hero}
+            mobile={anelika.mobile}
+            alt={locale === 'lv' ? 'ANELIKA pakalpojumu mājaslapas responsīvie skati' : 'Responsive views of the ANELIKA property services website'}
+            loading="lazy"
+            quality={86}
+            sizes="(max-width: 760px) calc(100vw - 2rem), 82vw"
+          />
         </div>
         <div class="project-feature__bottom">
           <p>{copy.work.projects.anelika.summary}</p>
@@ -165,13 +204,16 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
       <div class="section-kicker"><span>06</span><span>{copy.contact.label}</span></div>
       <p class="contact__availability">{copy.contact.availability}</p>
       <h2 class="contact__title" id="contact-title">{copy.contact.title.map((line) => <span>{line}</span>)}</h2>
-      <div class="contact__actions">
-        <a class="contact__email" href={mailto}><span>{copy.contact.emailLabel}</span><strong>{contactEmail}</strong><Arrow direction="up" /></a>
-        <button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied}>
-          <span data-copy-text>{copy.contact.copy}</span><span class="copy-mark" aria-hidden="true"></span>
-        </button>
-        <p class="sr-only" aria-live="polite" data-copy-status></p>
-      </div>
+      {contactEmail && (
+        <div class="contact__actions">
+          <a class="contact__email" href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email"><span>{copy.contact.emailLabel}</span><strong>{contactEmail}</strong><Arrow direction="up" /></a>
+          <button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied} data-analytics-event="copy_email_click">
+            <span data-copy-text>{copy.contact.copy}</span><span class="copy-mark" aria-hidden="true"></span>
+          </button>
+          <p class="sr-only" aria-live="polite" data-copy-status></p>
+        </div>
+      )}
+      <ContactChannels locale={locale} />
       <footer class="site-footer">
         <span>© <span data-current-year>2026</span> VICTXR.LEV</span>
         <span>{copy.footer.note}</span>
