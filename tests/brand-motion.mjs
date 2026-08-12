@@ -82,9 +82,11 @@ async function assertBrandMotion(name, viewport) {
     return color;
   });
 
+  // The intro already performs one full X/O cycle. The header is intentionally
+  // given a long quiet hold before its own idle signature starts again.
   let maxFlight = 0;
   let sawO = false;
-  for (let i = 0; i < 100; i += 1) {
+  for (let i = 0; i < 300; i += 1) {
     const box = await slot.boundingBox();
     if (box) maxFlight = Math.max(maxFlight, distance(center(box), baselineCenter));
     if ((await glyph.textContent()) === 'O') {
@@ -94,7 +96,7 @@ async function assertBrandMotion(name, viewport) {
     await page.waitForTimeout(40);
   }
 
-  if (!sawO) throw new Error(`${name} brand never changed from X to O`);
+  if (!sawO) throw new Error(`${name} brand never changed from X to O after its intentional idle hold`);
   if (maxFlight < (viewport.width <= 760 ? 2.5 : 4)) throw new Error(`${name} X/O motion no longer has an intentional flight (${maxFlight.toFixed(1)}px)`);
 
   await waitForBrandRest(page, 'O');
@@ -110,7 +112,7 @@ async function assertBrandMotion(name, viewport) {
   await assertCrispRest(slot, glyph, name, 'O landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-o-landed.png`, fullPage: false });
 
-  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 5200 });
+  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 6500 });
   await waitForBrandRest(page, 'X');
   const xBox = await slot.boundingBox();
   if (!xBox) throw new Error(`${name} X return has no geometry`);
@@ -135,4 +137,4 @@ await assertBrandMotion('desktop-1366', { width: 1366, height: 768 });
 await assertBrandMotion('mobile-393', { width: 393, height: 852 });
 
 await browser.close();
-console.log('Brand X/O flight lands precisely on the wordmark line and returns to a transform-free crisp rest state.');
+console.log('Brand X/O flight keeps a deliberate post-intro pause, then lands precisely on the wordmark line and returns to a transform-free crisp rest state.');
