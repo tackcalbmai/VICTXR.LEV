@@ -46,6 +46,8 @@ export function initHomeMotion() {
     const secondFlightY = compact ? 5 : 8;
 
     brandCycle?.kill();
+    brandLetter.textContent = 'X';
+    brandLetter.classList.remove('is-o');
     gsap.set(brandMotion, {
       x: 0,
       y: 0,
@@ -81,6 +83,7 @@ export function initHomeMotion() {
       })
       .call(() => {
         brandLetter.textContent = 'O';
+        brandLetter.classList.add('is-o');
       })
       .set(brandMotion, {
         rotation: -24,
@@ -126,6 +129,7 @@ export function initHomeMotion() {
       })
       .call(() => {
         brandLetter.textContent = 'X';
+        brandLetter.classList.remove('is-o');
       })
       .set(brandMotion, {
         rotation: -22,
