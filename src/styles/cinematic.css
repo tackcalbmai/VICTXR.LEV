@@ -1,0 +1,209 @@
+.home-shell[data-home-intro='pending']::before {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: var(--ink);
+  content: '';
+}
+
+.home-shell[data-home-intro='pending'] .site-header,
+.home-shell[data-home-intro='pending'] .hero__meta,
+.home-shell[data-home-intro='pending'] .hero__line-inner,
+.home-shell[data-home-intro='pending'] .hero__side-note,
+.home-shell[data-home-intro='pending'] .hero__footer {
+  animation-play-state: paused !important;
+}
+
+html.is-cinematic-intro,
+html.is-cinematic-intro body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+.cinematic-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  color: var(--paper);
+  font-family: var(--font-sans);
+  pointer-events: auto;
+  user-select: none;
+}
+
+.cinematic-intro__panel {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 0;
+  height: calc(50% + 1px);
+  background: var(--ink);
+  will-change: transform;
+}
+
+.cinematic-intro__panel--top { top: 0; }
+.cinematic-intro__panel--bottom { bottom: 0; }
+
+.cinematic-intro__hud {
+  position: absolute;
+  right: max(1rem, env(safe-area-inset-right));
+  left: max(1rem, env(safe-area-inset-left));
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  text-transform: uppercase;
+  font-size: clamp(0.52rem, 0.58vw, 0.65rem);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  opacity: 0;
+}
+
+.cinematic-intro__hud--top {
+  top: max(1rem, env(safe-area-inset-top));
+}
+
+.cinematic-intro__hud--bottom {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.cinematic-intro__axis {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  background: rgb(var(--paper-rgb) / 20%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.cinematic-intro__axis--x {
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.cinematic-intro__axis--y {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.cinematic-intro__symbol {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: min(52vw, 35rem);
+  height: min(52vw, 35rem);
+  transform: translate(-50%, -50%);
+}
+
+.cinematic-intro__glyph {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: block;
+  font-size: clamp(12rem, 31vw, 34rem);
+  font-weight: 820;
+  line-height: 0.68;
+  letter-spacing: -0.1em;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+
+.cinematic-intro__glyph--x {
+  color: var(--accent);
+}
+
+.cinematic-intro__glyph--o {
+  color: var(--paper);
+}
+
+.cinematic-intro__wordmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: baseline;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  overflow: hidden;
+  text-transform: uppercase;
+  font-size: clamp(3.25rem, 8.4vw, 8.8rem);
+  font-weight: 790;
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  will-change: transform, opacity, clip-path;
+}
+
+.cinematic-intro__wordmark > span,
+.cinematic-intro__wordmark > i {
+  display: inline-block;
+  font: inherit;
+  font-style: normal;
+}
+
+.cinematic-intro__wordmark-x {
+  color: var(--accent);
+  will-change: transform, opacity;
+}
+
+.cinematic-intro__wordmark i {
+  color: #77756f;
+}
+
+@media (max-width: 760px) {
+  .cinematic-intro__hud {
+    font-size: 0.47rem;
+    letter-spacing: 0.13em;
+  }
+
+  .cinematic-intro__hud--bottom span:last-child {
+    opacity: 0.64;
+  }
+
+  .cinematic-intro__symbol {
+    width: 82vw;
+    height: 82vw;
+  }
+
+  .cinematic-intro__glyph {
+    font-size: clamp(11rem, 64vw, 18rem);
+  }
+
+  .cinematic-intro__wordmark {
+    max-width: calc(100vw - 1.5rem);
+    font-size: clamp(2.85rem, 13.4vw, 5.5rem);
+    letter-spacing: -0.07em;
+  }
+}
+
+@media (max-width: 380px) {
+  .cinematic-intro__wordmark {
+    font-size: 12.8vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-shell[data-home-intro='pending']::before {
+    display: none;
+  }
+
+  .home-shell[data-home-intro='pending'] .site-header,
+  .home-shell[data-home-intro='pending'] .hero__meta,
+  .home-shell[data-home-intro='pending'] .hero__line-inner,
+  .home-shell[data-home-intro='pending'] .hero__side-note,
+  .home-shell[data-home-intro='pending'] .hero__footer {
+    animation-play-state: running !important;
+  }
+
+  .cinematic-intro {
+    display: none;
+  }
+}
