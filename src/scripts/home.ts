@@ -9,6 +9,7 @@ export function initHomeMotion() {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const brandLetter = document.querySelector<HTMLElement>('[data-brand-letter]');
+  const brandMotion = brandLetter?.closest<HTMLElement>('.site-brand__letter-wrap') ?? brandLetter;
   const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
   let introReady: gsap.core.Tween | undefined;
   let brandIdle: gsap.core.Tween | undefined;
@@ -21,45 +22,132 @@ export function initHomeMotion() {
   };
 
   const glitchLetter = (timeline: gsap.core.Timeline, position: number | string) => {
-    if (!brandLetter) return;
-    timeline.to(brandLetter, {
+    if (!brandMotion) return;
+    timeline.to(brandMotion, {
       keyframes: [
-        { x: 0, skewX: 0, autoAlpha: 1, duration: 0.01 },
-        { x: 3, skewX: -18, autoAlpha: 0.28, duration: 0.035, ease: 'steps(1)' },
-        { x: -2, skewX: 13, autoAlpha: 1, duration: 0.035, ease: 'steps(1)' },
-        { x: 0, skewX: 0, autoAlpha: 1, duration: 0.065 },
+        { xPercent: 0, skewX: 0, autoAlpha: 1, duration: 0.01 },
+        { xPercent: 36, skewX: -18, autoAlpha: 0.3, duration: 0.035, ease: 'steps(1)' },
+        { xPercent: -24, skewX: 13, autoAlpha: 1, duration: 0.035, ease: 'steps(1)' },
+        { xPercent: 0, skewX: 0, autoAlpha: 1, duration: 0.065 },
       ],
     }, position);
   };
 
   function runBrandCycle() {
-    if (!brandLetter || document.hidden || reducedMotion) {
+    if (!brandLetter || !brandMotion || document.hidden || reducedMotion) {
       scheduleBrandCycle(6);
       return;
     }
 
+    const compact = window.matchMedia('(max-width: 760px)').matches;
+    const firstFlightX = compact ? 6 : 10;
+    const firstFlightY = compact ? -6 : -9;
+    const secondFlightX = compact ? -6 : -9;
+    const secondFlightY = compact ? 5 : 8;
+
     brandCycle?.kill();
+    gsap.set(brandMotion, {
+      x: 0,
+      y: 0,
+      xPercent: 0,
+      rotation: 0,
+      skewX: 0,
+      scale: 1,
+      autoAlpha: 1,
+      transformOrigin: '50% 52%',
+      force3D: true,
+    });
+
     brandCycle = gsap.timeline({ onComplete: () => scheduleBrandCycle(10.5) });
     brandCycle
-      .to(brandLetter, { rotation: -95, duration: 0.5, ease: 'power1.in', transformOrigin: '50% 52%' })
-      .to(brandLetter, { rotation: -360, duration: 0.27, ease: 'power4.in' });
+      .to(brandMotion, { rotation: -72, y: -1, duration: 0.42, ease: 'power1.in' })
+      .to(brandMotion, {
+        rotation: -248,
+        x: firstFlightX,
+        y: firstFlightY,
+        scale: 0.92,
+        duration: 0.24,
+        ease: 'power3.in',
+      });
     glitchLetter(brandCycle, '<-0.12');
     brandCycle
+      .to(brandMotion, {
+        rotation: -420,
+        x: firstFlightX * 1.08,
+        y: firstFlightY * 1.08,
+        autoAlpha: 0.44,
+        duration: 0.14,
+        ease: 'power4.in',
+      })
       .call(() => {
         brandLetter.textContent = 'O';
-        gsap.set(brandLetter, { rotation: 0 });
       })
-      .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.18, ease: 'power2.out' })
-      .to({}, { duration: 1.45 })
-      .to(brandLetter, { rotation: -110, duration: 0.46, ease: 'power1.in', transformOrigin: '50% 52%' })
-      .to(brandLetter, { rotation: -360, duration: 0.25, ease: 'power4.in' });
-    glitchLetter(brandCycle, '<-0.12');
+      .set(brandMotion, {
+        rotation: -24,
+        x: firstFlightX * 0.66,
+        y: firstFlightY * 0.52,
+        xPercent: 0,
+        skewX: 0,
+        scale: 0.9,
+        autoAlpha: 0.52,
+      });
+    glitchLetter(brandCycle, '<');
     brandCycle
+      .to(brandMotion, {
+        x: 0,
+        y: 0,
+        xPercent: 0,
+        rotation: 0,
+        skewX: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.3,
+        ease: 'back.out(2.5)',
+      })
+      .to({}, { duration: 1.45 })
+      .to(brandMotion, { rotation: -86, x: -1, y: 1, duration: 0.4, ease: 'power1.in' })
+      .to(brandMotion, {
+        rotation: -262,
+        x: secondFlightX,
+        y: secondFlightY,
+        scale: 0.92,
+        duration: 0.23,
+        ease: 'power3.in',
+      });
+    glitchLetter(brandCycle, '<-0.11');
+    brandCycle
+      .to(brandMotion, {
+        rotation: -420,
+        x: secondFlightX * 1.05,
+        y: secondFlightY * 1.06,
+        autoAlpha: 0.46,
+        duration: 0.14,
+        ease: 'power4.in',
+      })
       .call(() => {
         brandLetter.textContent = 'X';
-        gsap.set(brandLetter, { rotation: 0 });
       })
-      .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.18, ease: 'power2.out' });
+      .set(brandMotion, {
+        rotation: -22,
+        x: secondFlightX * 0.62,
+        y: secondFlightY * 0.48,
+        xPercent: 0,
+        skewX: 0,
+        scale: 0.9,
+        autoAlpha: 0.54,
+      });
+    glitchLetter(brandCycle, '<');
+    brandCycle.to(brandMotion, {
+      x: 0,
+      y: 0,
+      xPercent: 0,
+      rotation: 0,
+      skewX: 0,
+      scale: 1,
+      autoAlpha: 1,
+      duration: 0.29,
+      ease: 'back.out(2.5)',
+    });
   }
 
   introReady = gsap.delayedCall(reducedMotion ? 0 : 1.48, () => {
