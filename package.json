@@ -8,7 +8,7 @@
     "build": "astro build",
     "check": "astro check",
     "preview": "astro preview",
-    "visual": "node tests/visual.mjs && node tests/brand-motion.mjs && node tests/cinematic-intro.mjs",
+    "visual": "node tests/visual.mjs && node tests/cinematic-intro.mjs && node tests/brand-motion.mjs",
     "test": "npm run check && npm run build && npm run visual",
     "deploy": "npm run check && npm run build && wrangler deploy"
   },
