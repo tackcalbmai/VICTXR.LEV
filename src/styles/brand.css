@@ -1,0 +1,8 @@
+.site-brand__letter-wrap > span {
+  top: calc(50% + 0.11em);
+  color: var(--accent);
+}
+
+.site-brand__letter-wrap > span.is-o {
+  color: inherit;
+}
