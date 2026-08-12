@@ -6,7 +6,6 @@ import { contactEmail, getSiteCopy, type Locale } from '../data/site';
 import { projects } from '../data/projects';
 import '../styles/home.css';
 import '../styles/cinematic.css';
-import '../styles/editorial-intro.css';
 
 interface Props {
   locale: Locale;
@@ -183,8 +182,6 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
 </div>
 
 <script>
-  import { initEditorialIntro } from '../scripts/editorial-intro';
   import { initHomeMotion } from '../scripts/home';
-  initEditorialIntro();
   initHomeMotion();
 </script>
