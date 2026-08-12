@@ -55,7 +55,7 @@ html.is-cinematic-intro body {
 .cinematic-intro__grid-line {
   position: absolute;
   display: block;
-  background: rgb(var(--ink-rgb) / 12%);
+  background: rgb(var(--ink-rgb) / 10%);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
@@ -183,7 +183,7 @@ html.is-cinematic-intro body {
   z-index: 4;
   display: block;
   color: var(--accent);
-  font-size: clamp(15rem, 39vw, 42rem);
+  font-size: clamp(13rem, 34vw, 36rem);
   font-weight: 820;
   line-height: 0.65;
   letter-spacing: -0.1em;
@@ -200,7 +200,7 @@ html.is-cinematic-intro body {
   margin: 0;
   color: var(--ink);
   text-transform: uppercase;
-  font-size: clamp(7rem, 22vw, 24rem);
+  font-size: clamp(7rem, 20vw, 21rem);
   font-weight: 820;
   line-height: 0.7;
   letter-spacing: -0.09em;
@@ -212,24 +212,24 @@ html.is-cinematic-intro body {
 
 .cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__differently {
   visibility: visible !important;
-  animation: cinematic-differently-handoff 0.58s cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation: cinematic-differently-handoff 0.78s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 
 @keyframes cinematic-differently-handoff {
   0%,
-  18% {
+  20% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
 
   72% {
-    opacity: 0.42;
-    transform: translate(-50%, -50%) scale(1.018);
+    opacity: 0.38;
+    transform: translate(-50%, -50%) scale(1.012);
   }
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.035);
+    transform: translate(-50%, -50%) scale(1.025);
   }
 }
 
@@ -266,12 +266,12 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro__intruder {
-    font-size: clamp(14rem, 76vw, 21rem);
+    font-size: clamp(12rem, 62vw, 18rem);
   }
 
   .cinematic-intro__differently {
     top: 51%;
-    font-size: clamp(6.8rem, 37vw, 12rem);
+    font-size: clamp(6.5rem, 34vw, 11rem);
   }
 }
 
