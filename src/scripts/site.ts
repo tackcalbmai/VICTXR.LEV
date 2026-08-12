@@ -38,6 +38,13 @@ export function initSiteUI() {
     if (!menu || !menuToggle) return;
     document.documentElement.classList.toggle('menu-is-open', open);
     document.body.classList.toggle('menu-is-open', open);
+    header?.classList.toggle('is-menu-open', open);
+    // The header participates in both the cinematic handoff and section-theme
+    // transitions. Pin the open-menu surface at inline-important priority so
+    // no animation frame or cascade order can make the close control float on
+    // transparent page content; clear only this state-owned property on close.
+    if (open) header?.style.setProperty('background-color', 'var(--paper)', 'important');
+    else header?.style.removeProperty('background-color');
     menuToggle.setAttribute('aria-expanded', String(open));
     menu.setAttribute('aria-hidden', String(!open));
     menu.inert = !open;

@@ -394,7 +394,8 @@
     z-index: 1001;
     min-height: var(--header-height);
     border-color: var(--line) !important;
-    background: var(--paper) !important;
+    background-color: var(--paper) !important;
+    background-image: none !important;
     color: var(--ink) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
