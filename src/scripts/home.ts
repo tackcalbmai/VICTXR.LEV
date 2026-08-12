@@ -21,6 +21,11 @@ export function initHomeMotion() {
     brandIdle = gsap.delayedCall(delay, runBrandCycle);
   };
 
+  const settleBrandMotion = () => {
+    if (!brandMotion) return;
+    gsap.set(brandMotion, { clearProps: 'transform,opacity,visibility' });
+  };
+
   const glitchLetter = (timeline: gsap.core.Timeline, position: number | string) => {
     if (!brandMotion) return;
     timeline.to(brandMotion, {
@@ -48,17 +53,7 @@ export function initHomeMotion() {
     brandCycle?.kill();
     brandLetter.textContent = 'X';
     brandLetter.classList.remove('is-o');
-    gsap.set(brandMotion, {
-      x: 0,
-      y: 0,
-      xPercent: 0,
-      rotation: 0,
-      skewX: 0,
-      scale: 1,
-      autoAlpha: 1,
-      transformOrigin: '50% 52%',
-      force3D: true,
-    });
+    settleBrandMotion();
 
     brandCycle = gsap.timeline({ onComplete: () => scheduleBrandCycle(10.5) });
     brandCycle
@@ -107,6 +102,7 @@ export function initHomeMotion() {
         duration: 0.3,
         ease: 'back.out(2.5)',
       })
+      .call(settleBrandMotion)
       .to({}, { duration: 1.45 })
       .to(brandMotion, { rotation: -86, x: -1, y: 1, duration: 0.4, ease: 'power1.in' })
       .to(brandMotion, {
@@ -141,17 +137,19 @@ export function initHomeMotion() {
         autoAlpha: 0.54,
       });
     glitchLetter(brandCycle, '<');
-    brandCycle.to(brandMotion, {
-      x: 0,
-      y: 0,
-      xPercent: 0,
-      rotation: 0,
-      skewX: 0,
-      scale: 1,
-      autoAlpha: 1,
-      duration: 0.29,
-      ease: 'back.out(2.5)',
-    });
+    brandCycle
+      .to(brandMotion, {
+        x: 0,
+        y: 0,
+        xPercent: 0,
+        rotation: 0,
+        skewX: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.29,
+        ease: 'back.out(2.5)',
+      })
+      .call(settleBrandMotion);
   }
 
   introReady = gsap.delayedCall(reducedMotion ? 0 : 1.48, () => {
@@ -329,6 +327,7 @@ export function initHomeMotion() {
     introReady?.kill();
     brandIdle?.kill();
     brandCycle?.kill();
+    settleBrandMotion();
     journeyTween?.kill();
     scrollControl?.removeEventListener('click', onScrollJourney);
     window.removeEventListener('wheel', stopJourney);
