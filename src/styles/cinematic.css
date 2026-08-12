@@ -183,10 +183,11 @@ html.is-cinematic-intro body {
   z-index: 4;
   display: block;
   color: var(--accent);
-  font-size: clamp(13rem, 34vw, 36rem);
+  font-size: clamp(11rem, 28vw, 30rem);
   font-weight: 820;
   line-height: 0.65;
   letter-spacing: -0.1em;
+  opacity: 0;
   transform: translate(-50%, -50%);
   transform-origin: 50% 50%;
   will-change: transform, opacity, filter;
@@ -200,36 +201,36 @@ html.is-cinematic-intro body {
   margin: 0;
   color: var(--ink);
   text-transform: uppercase;
-  font-size: clamp(7rem, 20vw, 21rem);
+  font-size: clamp(6rem, 11.5vw, 10.5rem);
   font-weight: 820;
-  line-height: 0.7;
-  letter-spacing: -0.09em;
+  line-height: 0.78;
+  letter-spacing: -0.075em;
   transform: translate(-50%, -50%);
   white-space: nowrap;
   opacity: 0;
-  will-change: transform, opacity, clip-path;
+  will-change: transform, opacity;
 }
 
 .cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__differently {
   visibility: visible !important;
-  animation: cinematic-differently-handoff 0.78s cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation: cinematic-differently-handoff 0.82s cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 
 @keyframes cinematic-differently-handoff {
   0%,
-  20% {
+  18% {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
   }
 
   72% {
-    opacity: 0.38;
-    transform: translate(-50%, -50%) scale(1.012);
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1.12);
   }
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.025);
+    transform: translate(-50%, -50%) scale(1.2);
   }
 }
 
@@ -266,12 +267,14 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro__intruder {
-    font-size: clamp(12rem, 62vw, 18rem);
+    font-size: clamp(10rem, 50vw, 15rem);
   }
 
   .cinematic-intro__differently {
     top: 51%;
-    font-size: clamp(6.5rem, 34vw, 11rem);
+    font-size: clamp(2.9rem, 13vw, 4.2rem);
+    line-height: 0.82;
+    letter-spacing: -0.068em;
   }
 }
 
@@ -279,6 +282,7 @@ html.is-cinematic-intro body {
   .cinematic-intro__wordmark { font-size: 12.9vw; }
   .cinematic-intro__wrong,
   .cinematic-intro__good { top: calc(47% + 4rem); }
+  .cinematic-intro__differently { font-size: 12.4vw; }
 }
 
 @media (prefers-reduced-motion: reduce) {
