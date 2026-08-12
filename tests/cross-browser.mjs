@@ -113,10 +113,11 @@ for (const profile of profiles) {
     throw new Error(`${profile.name} has no usable navigation`);
   }
 
-  await page.evaluate(() => {
-    const section = document.querySelector('[data-disruption]');
-    window.scrollTo(0, section.offsetTop + innerHeight * 0.85);
+  const disruptionTop = await page.locator('[data-disruption]').evaluate((section) => {
+    const rect = section.getBoundingClientRect();
+    return rect.top + window.scrollY;
   });
+  await page.evaluate((targetY) => window.scrollTo({ top: targetY, behavior: 'instant' }), disruptionTop + profile.context.viewport.height * 0.82);
   // ScrollTrigger uses a scrubbed timeline; allow every engine one animation
   // frame budget plus the scrub interpolation before judging the state.
   await page.waitForTimeout(900);
