@@ -89,15 +89,26 @@ for (const profile of profiles) {
   const toggle = page.locator('[data-menu-toggle]');
   if (await toggle.isVisible()) {
     await toggle.click();
-    const state = await page.evaluate(() => ({
-      headerZ: Number.parseInt(getComputedStyle(document.querySelector('[data-site-header]')).zIndex, 10),
-      menuZ: Number.parseInt(getComputedStyle(document.querySelector('[data-mobile-menu]')).zIndex, 10),
-      menuBackground: getComputedStyle(document.querySelector('[data-mobile-menu]')).backgroundColor,
-      inert: document.querySelector('main').inert,
-    }));
-    if (state.headerZ <= state.menuZ || state.menuBackground === 'rgba(0, 0, 0, 0)' || !state.inert) throw new Error(`${profile.name} menu layering, surface or focus isolation failed`);
+    if (await toggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${profile.name} menu did not open`);
+    await page.waitForTimeout(360);
+    const state = await page.evaluate(() => {
+      const centers = [...document.querySelectorAll('[data-menu-toggle] i')].map((line) => {
+        const rect = line.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      });
+      return {
+        headerZ: Number.parseInt(getComputedStyle(document.querySelector('[data-site-header]')).zIndex, 10),
+        menuZ: Number.parseInt(getComputedStyle(document.querySelector('[data-mobile-menu]')).zIndex, 10),
+        menuBackground: getComputedStyle(document.querySelector('[data-mobile-menu]')).backgroundColor,
+        inert: document.querySelector('main').inert,
+        closeLinesMeet: centers.length === 2 && Math.hypot(centers[0].x - centers[1].x, centers[0].y - centers[1].y) <= 1.5,
+      };
+    });
+    if (state.headerZ <= state.menuZ || state.menuBackground === 'rgba(0, 0, 0, 0)' || !state.inert || !state.closeLinesMeet) throw new Error(`${profile.name} menu layering, surface, close control or focus isolation failed`);
     await page.screenshot({ path: `${outDir}/${profile.name}-menu.png`, fullPage: false });
     await toggle.click();
+    if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${profile.name} menu did not close`);
+    await page.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
   } else if (!await page.locator('.site-nav--desktop').isVisible()) {
     throw new Error(`${profile.name} has no usable navigation`);
   }
