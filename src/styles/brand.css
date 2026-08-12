@@ -1,17 +1,25 @@
 .site-brand__letter-wrap {
+  position: relative;
+  display: inline-block;
+  width: 0.66em;
+  height: 1em;
+  margin-inline: -0.02em -0.015em;
+  vertical-align: baseline;
   transform-origin: 50% 52%;
 }
 
 .site-brand__letter-wrap > span {
-  inset: auto;
-  top: calc(0.11em + 1px);
-  left: 0;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   width: 100%;
   height: 100%;
   transform: none;
   transform-origin: 50% 52%;
   will-change: auto;
   color: var(--accent);
+  line-height: 1;
 }
 
 .site-brand__letter-wrap > span.is-o {
