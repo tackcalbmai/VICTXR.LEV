@@ -165,7 +165,7 @@ html.is-cinematic-intro body {
 
 .cinematic-intro__descriptor-wrap {
   position: absolute;
-  top: calc(46.5% + clamp(2.45rem, 4.9vw, 4.85rem));
+  top: calc(46.5% + clamp(2.6rem, 5.55vw, 5.45rem));
   left: 50%;
   width: min(72vw, 68rem);
   translate: -50% 0;
