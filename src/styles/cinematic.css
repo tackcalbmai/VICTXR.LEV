@@ -199,7 +199,7 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro__descriptor-wrap {
-    top: calc(45.5% + 2.18rem);
+    top: calc(45.5% + 4rem);
     width: calc(100vw - 1.65rem);
   }
 
@@ -216,7 +216,7 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro__descriptor-wrap {
-    top: calc(45.5% + 2rem);
+    top: calc(45.5% + 3.75rem);
   }
 }
 
