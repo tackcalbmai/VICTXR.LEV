@@ -392,7 +392,7 @@ routeErrors.length = 0;
 const lvNotFound = await openPage(routePage, '/lv/this-page-does-not-exist/');
 if (lvNotFound?.status() !== 404) throw new Error(`Missing Latvian route returned ${lvNotFound?.status()} instead of 404`);
 if (await routePage.locator('html').getAttribute('lang') !== 'lv') throw new Error('Latvian 404 did not set the document language');
-if (await routePage.locator('[data-not-found-back]').innerText() !== 'Atpakaļ pie tā, kas strādā') throw new Error('Latvian 404 copy did not localize');
+if ((await routePage.locator('[data-not-found-back]').textContent())?.trim() !== 'Atpakaļ pie tā, kas strādā') throw new Error('Latvian 404 copy did not localize');
 if (await routePage.locator('[data-home-link]').first().getAttribute('href') !== '/lv/') throw new Error('Latvian 404 does not return to the Latvian homepage');
 
 routeErrors.length = 0;
