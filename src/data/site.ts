@@ -145,7 +145,7 @@ export const siteCopy = {
       twoBefore: 'Arī mājaslapai ',
       twoWord: 'nav',
       twoAfter: ' jābūt kā pārējām.',
-      caption: 'Es veidoju mājaslapu ap biznesu — nevis biznesu ap veidni.',
+      caption: 'Es veidoju mājaslapu biznesa vajadzībām — nevis pielāgoju biznesu veidnei.',
     },
     work: {
       label: 'Atlasītie darbi',
@@ -184,7 +184,7 @@ export const siteCopy = {
     },
     approach: {
       label: 'Pieeja / 04',
-      intro: 'Nav vienas formulas. Katram biznesam ir cita problēma.',
+      intro: 'Nav vienas formulas. Katram uzņēmumam ir sava problēma.',
       steps: ['Es jautāju.', 'Es apšaubu.', 'Es atmetu lieko.', 'Es būvēju.', 'Es salaužu.', 'Es salaboju.', 'Es palaižu.'],
     },
     services: {
