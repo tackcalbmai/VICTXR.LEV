@@ -62,8 +62,9 @@ async function assertBrandMotion(name, viewport) {
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 2200 });
-  await page.waitForTimeout(80);
+  await page.waitForSelector('[data-editorial-intro]', { state: 'detached', timeout: 2500 });
+  await page.waitForFunction(() => !document.documentElement.classList.contains('is-editorial-intro'), undefined, { timeout: 2500 });
+  await page.waitForTimeout(100);
 
   const slot = page.locator('.site-brand__letter-wrap');
   const glyph = page.locator('[data-brand-letter]');
