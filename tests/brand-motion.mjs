@@ -32,6 +32,17 @@ async function glyphRect(locator) {
   });
 }
 
+async function assertCrispRest(slot, glyph, name, phase) {
+  const state = await slot.evaluate((element) => ({
+    transform: getComputedStyle(element).transform,
+    willChange: getComputedStyle(element).willChange,
+  }));
+  const glyphTransform = await glyph.evaluate((element) => getComputedStyle(element).transform);
+  if (state.transform !== 'none') throw new Error(`${name} ${phase} keeps a composited transform at rest (${state.transform})`);
+  if (state.willChange.includes('transform')) throw new Error(`${name} ${phase} keeps transform will-change at rest (${state.willChange})`);
+  if (glyphTransform !== 'none') throw new Error(`${name} ${phase} glyph keeps a transform at rest (${glyphTransform})`);
+}
+
 async function assertBrandMotion(name, viewport) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
   const page = await context.newPage();
@@ -83,9 +94,10 @@ async function assertBrandMotion(name, viewport) {
   if (oOffset > 1.5) throw new Error(`${name} O landed ${oOffset.toFixed(1)}px away from its brand slot`);
   const oInk = await glyphRect(glyph);
   const oBaselineDelta = Math.abs(center(oInk).y - center(referenceGlyph).y);
-  if (oBaselineDelta > 1.5) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the wordmark line`);
+  if (oBaselineDelta > 0.8) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the wordmark line`);
   const oColor = await glyph.evaluate((element) => getComputedStyle(element).color);
   if (oColor !== referenceColor) throw new Error(`${name} O should inherit the wordmark color (${oColor} vs ${referenceColor})`);
+  await assertCrispRest(slot, glyph, name, 'O landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-o-landed.png`, fullPage: false });
 
   await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4200 });
@@ -96,9 +108,10 @@ async function assertBrandMotion(name, viewport) {
   if (xOffset > 1.5) throw new Error(`${name} X returned ${xOffset.toFixed(1)}px away from its brand slot`);
   const xInk = await glyphRect(glyph);
   const xBaselineDelta = Math.abs(center(xInk).y - center(referenceGlyph).y);
-  if (xBaselineDelta > 1.5) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the wordmark line`);
+  if (xBaselineDelta > 0.8) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the wordmark line`);
   const xColor = await glyph.evaluate((element) => getComputedStyle(element).color);
   if (xColor !== accentColor) throw new Error(`${name} X does not use the site accent (${xColor} vs ${accentColor})`);
+  await assertCrispRest(slot, glyph, name, 'X landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-x-restored.png`, fullPage: false });
 
   const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
@@ -112,4 +125,4 @@ await assertBrandMotion('desktop-1366', { width: 1366, height: 768 });
 await assertBrandMotion('mobile-393', { width: 393, height: 852 });
 
 await browser.close();
-console.log('Brand X/O flight lands on the wordmark baseline with the correct X accent on desktop and mobile.');
+console.log('Brand X/O flight lands precisely on the wordmark line and returns to a transform-free crisp rest state.');
