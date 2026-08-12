@@ -74,6 +74,7 @@
 
 .case-hero__subtitle {
   grid-column: 1 / span 6;
+  min-width: 0;
   max-width: 43rem;
   font-size: clamp(1.45rem, 2.6vw, 2.6rem);
   line-height: 1.12;
@@ -84,6 +85,7 @@
 
 .case-hero__services {
   grid-column: 8 / span 3;
+  min-width: 0;
   align-self: end;
   text-transform: uppercase;
   font-size: 0.61rem;
@@ -96,6 +98,7 @@
 
 .case-live-link {
   grid-column: 11 / -1;
+  min-width: 0;
   align-self: end;
   justify-self: end;
   display: inline-flex;
@@ -178,6 +181,7 @@
 }
 
 .case-narrative__row > div {
+  min-width: 0;
   display: grid;
   align-content: start;
   gap: 0.4rem;
@@ -192,6 +196,7 @@
 }
 
 .case-narrative__row h2 {
+  min-width: 0;
   max-width: 18ch;
   text-transform: uppercase;
   font-size: clamp(2.25rem, 4.9vw, 5.2rem);
@@ -201,6 +206,7 @@
 }
 
 .case-narrative__row p {
+  min-width: 0;
   max-width: 34rem;
   color: var(--muted);
   font-size: clamp(0.98rem, 1.2vw, 1.13rem);
@@ -225,7 +231,9 @@
   transition: transform 900ms var(--ease-out);
 }
 
-.case-gallery figure:hover img { transform: scale(1.02); }
+@media (hover: hover) and (pointer: fine) {
+  .case-gallery figure:hover img { transform: scale(1.02); }
+}
 
 .case-gallery--catrin {
   grid-template-columns: 1.1fr 0.9fr;
@@ -286,6 +294,7 @@
 }
 
 .case-result p {
+  min-width: 0;
   max-width: 58rem;
   text-transform: uppercase;
   font-size: clamp(2.1rem, 5.2vw, 5.6rem);
@@ -295,6 +304,7 @@
 }
 
 .case-result a {
+  min-width: 0;
   justify-self: end;
   display: inline-flex;
   align-items: center;
