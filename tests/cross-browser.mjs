@@ -92,10 +92,10 @@ for (const profile of profiles) {
     const state = await page.evaluate(() => ({
       headerZ: Number.parseInt(getComputedStyle(document.querySelector('[data-site-header]')).zIndex, 10),
       menuZ: Number.parseInt(getComputedStyle(document.querySelector('[data-mobile-menu]')).zIndex, 10),
-      background: getComputedStyle(document.querySelector('[data-site-header]')).backgroundColor,
+      menuBackground: getComputedStyle(document.querySelector('[data-mobile-menu]')).backgroundColor,
       inert: document.querySelector('main').inert,
     }));
-    if (state.headerZ <= state.menuZ || state.background === 'rgba(0, 0, 0, 0)' || !state.inert) throw new Error(`${profile.name} menu layering or focus isolation failed`);
+    if (state.headerZ <= state.menuZ || state.menuBackground === 'rgba(0, 0, 0, 0)' || !state.inert) throw new Error(`${profile.name} menu layering, surface or focus isolation failed`);
     await page.screenshot({ path: `${outDir}/${profile.name}-menu.png`, fullPage: false });
     await toggle.click();
   } else if (!await page.locator('.site-nav--desktop').isVisible()) {

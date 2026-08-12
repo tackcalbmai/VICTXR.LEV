@@ -154,14 +154,14 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
       return {
         headerZ: Number.parseInt(headerStyle.zIndex, 10),
         menuZ: Number.parseInt(menuStyle.zIndex, 10),
-        headerBackground: headerStyle.backgroundColor,
+        menuBackground: menuStyle.backgroundColor,
         toggleVisible: toggleRect.top >= 0 && toggleRect.bottom <= innerHeight && toggleRect.left >= 0 && toggleRect.right <= innerWidth,
         htmlLocked: document.documentElement.classList.contains('menu-is-open'),
         bodyLocked: document.body.classList.contains('menu-is-open'),
       };
     });
     if (openMenuState.headerZ <= openMenuState.menuZ) throw new Error(`${name} mobile menu covers its own close control`);
-    if (openMenuState.headerBackground.includes('/ 0)') || openMenuState.headerBackground === 'rgba(0, 0, 0, 0)') throw new Error(`${name} mobile menu header remains transparent (${openMenuState.headerBackground})`);
+    if (openMenuState.menuBackground.includes('/ 0)') || openMenuState.menuBackground === 'rgba(0, 0, 0, 0)') throw new Error(`${name} mobile menu surface remains transparent (${openMenuState.menuBackground})`);
     if (!openMenuState.toggleVisible) throw new Error(`${name} mobile menu close control is outside the viewport`);
     if (!openMenuState.htmlLocked || !openMenuState.bodyLocked) throw new Error(`${name} mobile menu does not lock both scrolling roots`);
     await screenshot(page, `${name}-menu`);
