@@ -114,8 +114,11 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
   await screenshot(page, `${name}-hero`);
 
   if (name === 'desktop-1366') {
-    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'O', undefined, { timeout: 4500 });
-    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4500 });
+    // The intro itself already performs one full X/O cycle. The header's own
+    // idle signature intentionally waits before repeating, so QA follows that
+    // art-directed hold instead of forcing another effect immediately.
+    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'O', undefined, { timeout: 12000 });
+    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 6500 });
     await instantScroll(page, 640);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.evaluate(() => document.fonts.ready);
