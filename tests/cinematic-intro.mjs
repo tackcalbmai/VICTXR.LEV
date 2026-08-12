@@ -15,8 +15,16 @@ const browser = await chromium.launch({
   } : {}),
 });
 
-async function waitPhase(page, phase, timeout = 9000) {
+async function waitPhase(page, phase, timeout = 7000) {
   await page.waitForFunction((expected) => document.querySelector('[data-cinematic-intro]')?.getAttribute('data-cinematic-phase') === expected, phase, { timeout });
+}
+
+function center(box) {
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+}
+
+function distance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
 async function assertCinematicIntro(name, viewport) {
@@ -34,91 +42,98 @@ async function assertCinematicIntro(name, viewport) {
   await page.waitForSelector('[data-cinematic-intro]', { state: 'attached', timeout: 1500 });
 
   const shellState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
-  if (shellState !== 'pending') throw new Error(`${name} hero started before the cinematic intro (${shellState})`);
+  if (shellState !== 'pending') throw new Error(`${name} hero started before the logo intro (${shellState})`);
 
   const locked = await page.evaluate(() => document.documentElement.classList.contains('is-cinematic-intro'));
-  if (!locked) throw new Error(`${name} page is not scroll-locked during the cinematic intro`);
+  if (!locked) throw new Error(`${name} page is not scroll-locked during the logo intro`);
 
   const introBox = await page.locator('[data-cinematic-intro]').boundingBox();
   if (!introBox || Math.abs(introBox.width - viewport.width) > 2 || Math.abs(introBox.height - viewport.height) > 2) {
-    throw new Error(`${name} cinematic intro does not cover the viewport`);
+    throw new Error(`${name} logo intro does not cover the viewport`);
   }
 
-  await waitPhase(page, 'normal');
-  stamp('normal');
-  await page.waitForTimeout(520);
-  const normalText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
-  if (!normalText.includes('VICTO') || !normalText.endsWith('R.LEV')) throw new Error(`${name} normal state does not read as VICTOR.LEV`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-normal.png`, fullPage: false });
+  const backdropColor = await page.locator('[data-cinematic-backdrop]').evaluate((element) => getComputedStyle(element).backgroundColor);
+  if (!backdropColor.includes('8, 8, 8')) throw new Error(`${name} intro does not open on the intended black field (${backdropColor})`);
 
-  await waitPhase(page, 'wrong');
-  stamp('wrong');
-  await page.waitForTimeout(380);
-  const wrongText = (await page.locator('[data-cinematic-wrong]').textContent())?.trim();
-  if (wrongText !== 'SOMETHING LOOKS WRONG.') throw new Error(`${name} wrong cue is malformed: ${wrongText}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-wrong.png`, fullPage: false });
+  await waitPhase(page, 'logo');
+  stamp('logo');
+  await page.waitForTimeout(620);
+  const descriptor = (await page.locator('[data-cinematic-descriptor]').textContent())?.trim();
+  if (descriptor !== 'WEB DESIGN') throw new Error(`${name} descriptor is malformed: ${descriptor}`);
+  const initialLogo = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
+  if (initialLogo !== 'VICTXR.LEV') throw new Error(`${name} initial logo is malformed: ${initialLogo}`);
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-logo.png`, fullPage: false });
 
-  await waitPhase(page, 'good');
-  stamp('good');
-  await page.waitForTimeout(320);
-  const goodText = (await page.locator('[data-cinematic-good]').textContent())?.trim();
-  if (goodText !== 'GOOD.') throw new Error(`${name} GOOD cue is malformed: ${goodText}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-good.png`, fullPage: false });
+  await waitPhase(page, 'x-to-o');
+  stamp('x-to-o');
+  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'O', undefined, { timeout: 1400 });
 
-  await waitPhase(page, 'x');
-  stamp('x');
-  await page.waitForTimeout(210);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-x-impact.png`, fullPage: false });
+  await waitPhase(page, 'o-rest');
+  stamp('o-rest');
+  await page.waitForTimeout(120);
+  const oText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
+  if (oText !== 'VICTOR.LEV') throw new Error(`${name} X→O cycle did not settle on VICTOR.LEV: ${oText}`);
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-o-rest.png`, fullPage: false });
 
-  await waitPhase(page, 'victxr');
-  stamp('victxr');
-  await page.waitForTimeout(330);
-  const oOpacity = Number(await page.locator('[data-cinematic-o]').evaluate((element) => getComputedStyle(element).opacity));
-  const xOpacity = Number(await page.locator('[data-cinematic-x]').evaluate((element) => getComputedStyle(element).opacity));
-  if (oOpacity > 0.15 || xOpacity < 0.75) throw new Error(`${name} O→X replacement did not settle cleanly (O ${oOpacity}, X ${xOpacity})`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-victxr.png`, fullPage: false });
+  await waitPhase(page, 'o-to-x');
+  stamp('o-to-x');
+  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'X', undefined, { timeout: 1400 });
 
-  await waitPhase(page, 'differently');
-  stamp('differently');
-  await page.waitForTimeout(360);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-differently.png`, fullPage: false });
+  await waitPhase(page, 'x-rest');
+  stamp('x-rest');
+  await page.waitForTimeout(120);
+  const xText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
+  if (xText !== 'VICTXR.LEV') throw new Error(`${name} full X/O cycle did not resolve on VICTXR.LEV: ${xText}`);
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-x-rest.png`, fullPage: false });
+
+  const headerBrandBox = await page.locator('.site-brand').boundingBox();
+  if (!headerBrandBox) throw new Error(`${name} header brand has no geometry`);
+
+  await waitPhase(page, 'handoff');
+  stamp('handoff');
+  await page.waitForTimeout(760);
+  const flyingBox = await page.locator('[data-cinematic-wordmark]').boundingBox();
+  if (!flyingBox) throw new Error(`${name} flying wordmark has no geometry`);
+  const handoffDistance = distance(center(flyingBox), center(headerBrandBox));
+  if (handoffDistance > Math.max(16, viewport.width * 0.025)) {
+    throw new Error(`${name} wordmark is not converging on the real header brand (${handoffDistance.toFixed(1)}px)`);
+  }
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-handoff.png`, fullPage: false });
 
   await waitPhase(page, 'reveal');
   stamp('reveal');
-  await page.waitForTimeout(190);
-  const handoffOpacity = Number(await page.locator('[data-cinematic-differently]').evaluate((element) => getComputedStyle(element).opacity));
-  const handoffVisibility = await page.locator('[data-cinematic-differently]').evaluate((element) => getComputedStyle(element).visibility);
-  if (handoffOpacity < 0.25 || handoffVisibility === 'hidden') {
-    throw new Error(`${name} reveal fell into a blank paper frame (DIFFERENTLY opacity ${handoffOpacity}, visibility ${handoffVisibility})`);
-  }
+  await page.waitForTimeout(680);
+  const headerOpacity = Number(await page.locator('[data-site-header]').evaluate((element) => getComputedStyle(element).opacity));
+  if (headerOpacity < 0.9) throw new Error(`${name} real header did not take over after the flying logo (${headerOpacity})`);
+  const backdropOpacity = Number(await page.locator('[data-cinematic-backdrop]').evaluate((element) => getComputedStyle(element).opacity));
+  if (backdropOpacity > 0.45) throw new Error(`${name} black field is not fading during hero reveal (${backdropOpacity})`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-reveal.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    ['normal', 'wrong', 1300],
-    ['wrong', 'good', 800],
-    ['good', 'x', 700],
-    ['x', 'victxr', 500],
-    ['victxr', 'differently', 550],
-    ['differently', 'reveal', 700],
+    ['logo', 'x-to-o', 850],
+    ['x-to-o', 'o-rest', 850],
+    ['o-rest', 'o-to-x', 350],
+    ['o-to-x', 'x-rest', 850],
+    ['x-rest', 'handoff', 150],
   ];
   for (const [from, to, minimum] of minimumBeatSpacing) {
     const spacing = phases[to] - phases[from];
     if (spacing < minimum) throw new Error(`${name} ${from}→${to} beat is rushed (${spacing}ms < ${minimum}ms)`);
   }
 
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 7000 });
   await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 2500 });
 
   const duration = Date.now() - startedAt;
-  if (duration < 6800 || duration > 8500) throw new Error(`${name} intro duration ${duration}ms is outside the intended cinematic window`);
+  if (duration < 4600 || duration > 6200) throw new Error(`${name} intro duration ${duration}ms is outside the intended premium hook window`);
 
   const stillLocked = await page.evaluate(() => document.documentElement.classList.contains('is-cinematic-intro'));
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
 
-  await page.waitForTimeout(650);
+  await page.waitForTimeout(500);
   const heroLine = page.locator('[data-intro-line]').first();
   const heroOpacity = Number(await heroLine.evaluate((element) => getComputedStyle(element).opacity));
-  if (heroOpacity < 0.75) throw new Error(`${name} hero did not take over after the cinematic reveal (${heroOpacity})`);
+  if (heroOpacity < 0.7) throw new Error(`${name} hero did not progressively take over after the logo handoff (${heroOpacity})`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed.png`, fullPage: false });
 
   if (errors.length) throw new Error(`${name} runtime errors:\n${errors.join('\n')}`);
@@ -129,7 +144,7 @@ async function assertCinematicIntro(name, viewport) {
 const desktop = await assertCinematicIntro('desktop-1366', { width: 1366, height: 768 });
 const mobile = await assertCinematicIntro('mobile-393', { width: 393, height: 852 });
 if (Math.abs(desktop.duration - mobile.duration) > 350) {
-  throw new Error(`Desktop/mobile cinematic timing diverged too far (${desktop.duration}ms vs ${mobile.duration}ms)`);
+  throw new Error(`Desktop/mobile premium intro timing diverged too far (${desktop.duration}ms vs ${mobile.duration}ms)`);
 }
 
 const reduced = await browser.newContext({ viewport: { width: 393, height: 852 }, reducedMotion: 'reduce' });
@@ -140,4 +155,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Cinematic intro keeps readable breathing room on desktop/mobile (${desktop.duration}ms / ${mobile.duration}ms).`);
+console.log(`Premium logo intro completes one X/O cycle and hands off into the real header (${desktop.duration}ms / ${mobile.duration}ms).`);
