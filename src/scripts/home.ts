@@ -35,13 +35,6 @@ export function initHomeMotion() {
     gsap.set(brandMotion, { clearProps: 'transform,opacity,visibility' });
   };
 
-  const restartHeroAnimations = () => {
-    const animated = shell.querySelectorAll<HTMLElement>('[data-intro-meta], [data-intro-line], [data-side-note], [data-intro-footer]');
-    animated.forEach((element) => { element.style.animation = 'none'; });
-    void shell.offsetWidth;
-    animated.forEach((element) => { element.style.removeProperty('animation'); });
-  };
-
   const glitchLetter = (timeline: gsap.core.Timeline, position: number | string) => {
     if (!brandMotion) return;
     timeline.to(brandMotion, {
@@ -429,7 +422,6 @@ export function initHomeMotion() {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'landed';
         gsap.set(wordmark, { autoAlpha: 0 });
         gsap.set(siteHeader, { autoAlpha: 1 });
-        restartHeroAnimations();
       }, [], 5.38)
       .to(headerSecondary, { autoAlpha: 1, duration: 0.44, stagger: 0.05, ease: 'power2.out' }, 5.4)
       .to(cinematicNode, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, 5.62);
