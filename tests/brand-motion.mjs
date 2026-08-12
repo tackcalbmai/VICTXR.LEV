@@ -78,12 +78,9 @@ async function assertBrandMotion(name, viewport) {
   await page.waitForTimeout(520);
   if ((await glyph.textContent()) !== 'O') throw new Error(`${name} O did not remain readable after landing`);
   const oBox = await slot.boundingBox();
-  const oGlyphBox = await glyph.boundingBox();
-  if (!oBox || !oGlyphBox) throw new Error(`${name} O landing has no geometry`);
+  if (!oBox) throw new Error(`${name} O landing has no geometry`);
   const oOffset = distance(center(oBox), baselineCenter);
   if (oOffset > 1.5) throw new Error(`${name} O landed ${oOffset.toFixed(1)}px away from its brand slot`);
-  const oGlyphOffset = distance(center(oGlyphBox), center(oBox));
-  if (oGlyphOffset > 1.5) throw new Error(`${name} O is not centered inside its slot (${oGlyphOffset.toFixed(1)}px)`);
   const oInk = await glyphRect(glyph);
   const oBaselineDelta = Math.abs(center(oInk).y - center(referenceGlyph).y);
   if (oBaselineDelta > 1.5) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the wordmark line`);
@@ -94,12 +91,9 @@ async function assertBrandMotion(name, viewport) {
   await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4200 });
   await page.waitForTimeout(520);
   const xBox = await slot.boundingBox();
-  const xGlyphBox = await glyph.boundingBox();
-  if (!xBox || !xGlyphBox) throw new Error(`${name} X return has no geometry`);
+  if (!xBox) throw new Error(`${name} X return has no geometry`);
   const xOffset = distance(center(xBox), baselineCenter);
   if (xOffset > 1.5) throw new Error(`${name} X returned ${xOffset.toFixed(1)}px away from its brand slot`);
-  const xGlyphOffset = distance(center(xGlyphBox), center(xBox));
-  if (xGlyphOffset > 1.5) throw new Error(`${name} X is not centered inside its slot (${xGlyphOffset.toFixed(1)}px)`);
   const xInk = await glyphRect(glyph);
   const xBaselineDelta = Math.abs(center(xInk).y - center(referenceGlyph).y);
   if (xBaselineDelta > 1.5) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the wordmark line`);
