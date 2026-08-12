@@ -247,9 +247,12 @@ export function initHomeMotion() {
     introLetter.textContent = 'X';
     introLetter.classList.remove('is-o');
 
-    const syncDescriptorWidth = () => {
-      const width = wordmark.getBoundingClientRect().width;
-      descriptorWrap.style.width = `${width}px`;
+    const syncDescriptorGeometry = () => {
+      const rect = wordmark.getBoundingClientRect();
+      const gap = Math.max(6, Math.min(18, rect.height * 0.045));
+      descriptorWrap.style.width = `${rect.width}px`;
+      descriptorWrap.style.left = `${rect.left}px`;
+      descriptorWrap.style.top = `${rect.bottom + gap}px`;
     };
 
     const introGlitch = (timeline: gsap.core.Timeline, position: number | string) => {
@@ -298,7 +301,7 @@ export function initHomeMotion() {
       .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.76, ease: 'power4.out' }, 0.1)
       .set(wordmark, { autoAlpha: 1 }, 0.68)
       .to(slices, { autoAlpha: 0, duration: 0.18, ease: 'power1.out' }, 0.68)
-      .call(syncDescriptorWidth, [], 0.76)
+      .call(syncDescriptorGeometry, [], 0.76)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.82)
       .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.42, ease: 'power2.out' }, 0.86);
     introGlitch(introTimeline, 0.7);
@@ -405,6 +408,7 @@ export function initHomeMotion() {
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-rest'; }, [], 4.06)
 
       // Exact FLIP handoff — top-left and dimensions converge on the real header wordmark.
+      .call(syncDescriptorGeometry, [], 4.22)
       .call(measureHandoff, [], 4.28)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 4.3)
       .to(descriptorWrap, { autoAlpha: 0, y: -4, filter: 'blur(1.5px)', duration: 0.32, ease: 'power2.in' }, 4.24)
