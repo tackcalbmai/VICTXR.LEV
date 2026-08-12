@@ -226,76 +226,88 @@ export function initHomeMotion() {
 
     gsap.set(grid, { autoAlpha: 0 });
     gsap.set(gridLines, { scale: 0, transformOrigin: '50% 50%' });
-    gsap.set(hud, { autoAlpha: 0, y: 7 });
-    gsap.set(wordmark, { autoAlpha: 0, yPercent: 28, clipPath: 'inset(0 0 100% 0)' });
+    gsap.set(hud, { autoAlpha: 0, y: 5 });
+    gsap.set(wordmark, { autoAlpha: 0, yPercent: 12, clipPath: 'inset(0 0 100% 0)' });
     gsap.set(o, { autoAlpha: 1, x: 0, y: 0, rotation: 0 });
-    gsap.set(x, { autoAlpha: 0, x: 0, y: 0, rotation: -12, scale: 0.9 });
-    gsap.set(wrong, { autoAlpha: 0, y: 10, clipPath: 'inset(0 0 100% 0)' });
-    gsap.set(good, { autoAlpha: 0, y: 8 });
+    gsap.set(x, { autoAlpha: 0, x: 0, y: 0, rotation: -7, scale: 0.94 });
+    gsap.set(wrong, { autoAlpha: 0, y: 8, clipPath: 'inset(0 0 100% 0)' });
+    gsap.set(good, { autoAlpha: 0, y: 5 });
     gsap.set(intruder, {
       autoAlpha: 0,
-      x: compact ? '42vw' : '46vw',
-      y: compact ? '-38vh' : '-42vh',
-      rotation: -26,
-      scale: 0.52,
-      filter: 'blur(3px)',
+      x: 0,
+      y: 0,
+      rotation: -5,
+      scale: 0.88,
+      filter: 'blur(2px)',
     });
-    gsap.set(differently, { autoAlpha: 0, xPercent: 7, clipPath: 'inset(0 100% 0 0)' });
+    gsap.set(differently, { autoAlpha: 0, xPercent: 3, clipPath: 'inset(0 100% 0 0)' });
 
     introTimeline = gsap.timeline({
-      defaults: { ease: 'power4.out' },
+      defaults: { ease: 'power3.out' },
       onComplete: releaseCinematic,
     });
 
     introTimeline
-      .to(grid, { autoAlpha: 1, duration: 0.28 }, 0.04)
-      .to(gridLines, { scale: 1, duration: 0.42, stagger: 0.018, ease: 'power3.out' }, 0.04)
-      .to(hud, { autoAlpha: 0.58, y: 0, duration: 0.34, stagger: 0.04 }, 0.12)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'normal'; }, [], 0.24)
-      .to(wordmark, { autoAlpha: 1, yPercent: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.58 }, 0.26)
-      .to({}, { duration: 0.38 })
-      .to(o, { x: compact ? 1.5 : 2.5, y: compact ? -2 : -3, rotation: -2.2, duration: 0.26, ease: 'power2.inOut' }, 1.04)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'wrong'; }, [], 1.2)
-      .to(wrong, { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.38 }, 1.22)
-      .to({}, { duration: 0.32 })
-      .to(wrong, { autoAlpha: 0.54, y: -3, duration: 0.22, ease: 'power2.out' }, 1.9)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'good'; }, [], 1.98)
-      .to(good, { autoAlpha: 1, y: 0, duration: 0.28, ease: 'back.out(1.8)' }, 1.99)
-      .to({}, { duration: 0.22 })
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x'; }, [], 2.27)
-      .to(intruder, { autoAlpha: 0.16, x: 0, y: 0, rotation: 0, scale: 1, filter: 'blur(0px)', duration: 0.36, ease: 'power4.inOut' }, 2.24)
+      // ORDER — give the eye time to understand the clean system before anything breaks.
+      .to(grid, { autoAlpha: 1, duration: 0.58, ease: 'power2.out' }, 0.08)
+      .to(gridLines, { scale: 1, duration: 0.72, stagger: 0.028, ease: 'power2.out' }, 0.08)
+      .to(hud, { autoAlpha: 0.48, y: 0, duration: 0.62, stagger: 0.08, ease: 'power2.out' }, 0.28)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'normal'; }, [], 0.48)
+      .to(wordmark, { autoAlpha: 1, yPercent: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.86, ease: 'power3.out' }, 0.5)
+      .to({}, { duration: 0.72 })
+
+      // WRONG — one tiny imperfection, then a readable pause.
+      .to(o, { x: compact ? 2 : 3.5, y: compact ? -2 : -3.5, rotation: -2.4, duration: 0.46, ease: 'power2.inOut' }, 1.86)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'wrong'; }, [], 2.16)
+      .to(wrong, { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: 0.56, ease: 'power2.out' }, 2.18)
+      .to({}, { duration: 0.62 })
+
+      // GOOD — do not introduce X yet. Let the line land first.
+      .to(wrong, { autoAlpha: 0.34, duration: 0.34, ease: 'power2.out' }, 3.12)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'good'; }, [], 3.24)
+      .to(good, { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power2.out' }, 3.26)
+      .to({}, { duration: 0.5 })
+      .to([wrong, good], { autoAlpha: 0, y: -4, duration: 0.3, ease: 'power2.in' }, 3.92)
+
+      // X — the only genuinely sharp beat in the opening.
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x'; }, [], 4.18)
+      .to(intruder, { autoAlpha: 0.075, rotation: 0, scale: 1.01, filter: 'blur(0px)', duration: 0.28, ease: 'power4.out' }, 4.18)
       .to(gridLines, {
         keyframes: [
-          { x: compact ? 2 : 4, y: compact ? -1 : -2, opacity: 0.55, duration: 0.045, ease: 'steps(1)' },
-          { x: compact ? -2 : -5, y: compact ? 1 : 2, opacity: 1, duration: 0.045, ease: 'steps(1)' },
-          { x: 0, y: 0, opacity: 1, duration: 0.08 },
+          { x: compact ? 1 : 2, y: compact ? -0.5 : -1, opacity: 0.7, duration: 0.045, ease: 'steps(1)' },
+          { x: compact ? -1 : -2, y: compact ? 0.5 : 1, opacity: 1, duration: 0.045, ease: 'steps(1)' },
+          { x: 0, y: 0, opacity: 1, duration: 0.075 },
         ],
-      }, 2.46)
-      .to(o, { x: compact ? 26 : 42, y: compact ? -15 : -24, rotation: -25, scale: 0.82, autoAlpha: 0, filter: 'blur(3px)', duration: 0.22, ease: 'power4.in' }, 2.49)
-      .to(x, { autoAlpha: 1, rotation: 0, scale: 1, duration: 0.22, ease: 'back.out(2.3)' }, 2.55)
+      }, 4.28)
+      .to(o, { x: compact ? 34 : 52, y: compact ? -18 : -28, rotation: -28, scale: 0.8, autoAlpha: 0, filter: 'blur(3px)', duration: 0.3, ease: 'power4.in' }, 4.32)
+      .to(x, { autoAlpha: 1, rotation: 0, scale: 1, duration: 0.32, ease: 'back.out(1.7)' }, 4.46)
       .to(x, {
         keyframes: [
-          { x: compact ? 2 : 4, skewX: -12, autoAlpha: 0.45, duration: 0.04, ease: 'steps(1)' },
-          { x: compact ? -1 : -3, skewX: 8, autoAlpha: 1, duration: 0.04, ease: 'steps(1)' },
-          { x: 0, skewX: 0, autoAlpha: 1, duration: 0.07 },
+          { x: compact ? 2 : 3, skewX: -10, autoAlpha: 0.5, duration: 0.045, ease: 'steps(1)' },
+          { x: compact ? -1 : -2, skewX: 7, autoAlpha: 1, duration: 0.045, ease: 'steps(1)' },
+          { x: 0, skewX: 0, autoAlpha: 1, duration: 0.075 },
         ],
-      }, 2.7)
-      .to([wrong, good], { autoAlpha: 0, y: -7, duration: 0.2, ease: 'power2.in' }, 2.62)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'victxr'; }, [], 2.8)
-      .to(intruder, { autoAlpha: 0.055, scale: 1.08, rotation: 4, duration: 0.28, ease: 'power2.out' }, 2.72)
-      .to({}, { duration: 0.18 })
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'differently'; }, [], 3.08)
-      .to(wordmark, { yPercent: -34, scale: 0.92, autoAlpha: 0.24, duration: 0.36, ease: 'power3.inOut' }, 3.08)
-      .to(intruder, { autoAlpha: 0, scale: 1.18, duration: 0.24, ease: 'power2.in' }, 3.08)
-      .to(differently, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', duration: 0.44, ease: 'power4.out' }, 3.1)
-      .to({}, { duration: 0.18 })
+      }, 4.72)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'victxr'; }, [], 4.9)
+      .to(intruder, { autoAlpha: 0.025, scale: 1.035, duration: 0.36, ease: 'power2.out' }, 4.82)
+      .to({}, { duration: 0.68 })
+
+      // DIFFERENTLY — its own clean frame, after VICTXR has already been read.
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'differently'; }, [], 5.62)
+      .to(wordmark, { yPercent: -18, scale: 0.96, autoAlpha: 0.08, duration: 0.5, ease: 'power3.inOut' }, 5.62)
+      .to(intruder, { autoAlpha: 0, duration: 0.28, ease: 'power2.in' }, 5.62)
+      .to(hud, { autoAlpha: 0.22, duration: 0.35, ease: 'power2.out' }, 5.62)
+      .to(differently, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', duration: 0.68, ease: 'power3.out' }, 5.72)
+      .to({}, { duration: 0.48 })
+
+      // HANDOFF — DIFFERENTLY stays alive while the actual hero is revealed underneath.
       .call(() => {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'reveal';
         shell.setAttribute('data-home-intro', 'ready');
-      }, [], 3.52)
-      .to([hud, grid, wordmark, differently], { autoAlpha: 0, duration: 0.18, ease: 'power2.in' }, 3.52)
-      .to(panelTop, { yPercent: -102, duration: 0.62, ease: 'power4.inOut' }, 3.58)
-      .to(panelBottom, { yPercent: 102, duration: 0.62, ease: 'power4.inOut' }, 3.58);
+      }, [], 6.52)
+      .to([hud, grid, wordmark], { autoAlpha: 0, duration: 0.3, ease: 'power2.in' }, 6.52)
+      .to(panelTop, { yPercent: -102, duration: 0.78, ease: 'power3.inOut' }, 6.58)
+      .to(panelBottom, { yPercent: 102, duration: 0.78, ease: 'power3.inOut' }, 6.58);
   };
 
   startCinematic();

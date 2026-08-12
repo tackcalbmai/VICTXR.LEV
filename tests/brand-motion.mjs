@@ -61,8 +61,8 @@ async function assertBrandMotion(name, viewport) {
 
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 2200 });
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
+  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 });
   await page.waitForTimeout(80);
 
   const slot = page.locator('.site-brand__letter-wrap');
