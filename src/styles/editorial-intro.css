@@ -38,7 +38,7 @@ html.is-editorial-intro .cinematic-intro {
 .editorial-intro__grid-line {
   position: absolute;
   display: block;
-  background: rgb(var(--ink-rgb) / 12%);
+  background: rgb(12 12 11 / 12%);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
