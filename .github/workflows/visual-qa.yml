@@ -36,9 +36,9 @@ jobs:
       - name: Static production audit
         run: npm run audit:static
 
-      - name: Start preview
+      - name: Start production-like Cloudflare preview
         run: |
-          npm run preview -- --host 127.0.0.1 > /tmp/victxr-preview.log 2>&1 &
+          npx wrangler dev --local --ip 127.0.0.1 --port 4321 > /tmp/victxr-preview.log 2>&1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4321 >/dev/null; then
               exit 0
@@ -57,9 +57,9 @@ jobs:
           PUBLIC_CONTACT_INSTAGRAM: "https://www.instagram.com/victxr.lev/"
         run: npm run build
 
-      - name: Start future contact preview
+      - name: Start future contact Cloudflare preview
         run: |
-          npm run preview -- --host 127.0.0.1 --port 4322 > /tmp/victxr-contacts-preview.log 2>&1 &
+          npx wrangler dev --local --ip 127.0.0.1 --port 4322 > /tmp/victxr-contacts-preview.log 2>&1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4322 >/dev/null; then
               exit 0
