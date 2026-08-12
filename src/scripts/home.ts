@@ -181,12 +181,16 @@ export function initHomeMotion() {
     cinematicNode.innerHTML = `
       <div class="cinematic-intro__backdrop" data-cinematic-backdrop></div>
       <div class="cinematic-intro__brand-stage" data-cinematic-stage>
+        <div class="cinematic-intro__assembly" data-cinematic-assembly aria-hidden="true">
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
+        </div>
         <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
           <span>VICT</span><span class="cinematic-intro__letter-wrap" data-cinematic-letter-wrap><span data-cinematic-letter>X</span></span><span>R</span><span class="cinematic-intro__dot">.</span><span>LEV</span>
         </div>
         <div class="cinematic-intro__descriptor-wrap" data-cinematic-descriptor-wrap>
-          <span class="cinematic-intro__descriptor-line" data-cinematic-descriptor-line aria-hidden="true"></span>
-          <p class="cinematic-intro__descriptor" data-cinematic-descriptor>WEB DESIGN</p>
+          <p class="cinematic-intro__descriptor" data-cinematic-descriptor><span>WEB</span><span>DESIGN</span></p>
         </div>
       </div>
     `;
@@ -199,14 +203,16 @@ export function initHomeMotion() {
     const introLetterWrap = cinematicNode.querySelector<HTMLElement>('[data-cinematic-letter-wrap]');
     const introLetter = cinematicNode.querySelector<HTMLElement>('[data-cinematic-letter]');
     const descriptorWrap = cinematicNode.querySelector<HTMLElement>('[data-cinematic-descriptor-wrap]');
-    const descriptorLine = cinematicNode.querySelector<HTMLElement>('[data-cinematic-descriptor-line]');
+    const slices = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-slice]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!backdrop || !wordmark || !introLetterWrap || !introLetter || !descriptorWrap || !descriptorLine || !siteHeader || !siteBrand) {
+    if (!backdrop || !wordmark || !introLetterWrap || !introLetter || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
       releaseCinematic();
       return;
     }
+
+    const [topSlice, middleSlice, bottomSlice] = Array.from(slices);
 
     siteHeader.classList.add('is-intro-settled');
     gsap.set(siteHeader, { autoAlpha: 0 });
@@ -214,16 +220,26 @@ export function initHomeMotion() {
 
     gsap.set(wordmark, {
       autoAlpha: 0,
-      y: compact ? 12 : 16,
-      scale: 0.985,
-      filter: 'blur(7px)',
-      clipPath: 'inset(0 0 100% 0)',
+      x: 0,
+      y: 0,
+      scaleX: 1,
+      scaleY: 1,
+      filter: 'blur(0px)',
+      clipPath: 'inset(0 0 0 0)',
+      transformOrigin: '50% 50%',
     });
-    gsap.set(descriptorWrap, { autoAlpha: 0, y: 8, filter: 'blur(2px)' });
-    gsap.set(descriptorLine, { scaleX: 0, transformOrigin: 'right center' });
+    gsap.set(topSlice, { autoAlpha: 0, x: compact ? -15 : -34, y: compact ? -1 : -2, filter: 'blur(2px)' });
+    gsap.set(middleSlice, { autoAlpha: 0, x: compact ? 7 : 14, y: 0, filter: 'blur(1px)' });
+    gsap.set(bottomSlice, { autoAlpha: 0, x: compact ? 17 : 38, y: compact ? 1 : 2, filter: 'blur(2px)' });
+    gsap.set(descriptorWrap, { autoAlpha: 0, y: 6, filter: 'blur(1.5px)' });
     gsap.set(introLetterWrap, { clearProps: 'transform,opacity,visibility' });
     introLetter.textContent = 'X';
     introLetter.classList.remove('is-o');
+
+    const syncDescriptorWidth = () => {
+      const width = wordmark.getBoundingClientRect().width;
+      descriptorWrap.style.width = `${width}px`;
+    };
 
     const introGlitch = (timeline: gsap.core.Timeline, position: number | string) => {
       timeline.to(introLetterWrap, {
@@ -240,23 +256,21 @@ export function initHomeMotion() {
     const firstFlightY = compact ? -10 : -17;
     const secondFlightX = compact ? -10 : -18;
     const secondFlightY = compact ? 8 : 14;
-    let handoff = { x: 0, y: 0, scale: 1 };
+    let handoff = { x: 0, y: 0, scaleX: 1, scaleY: 1 };
 
     const settleIntroLetter = () => {
       gsap.set(introLetterWrap, { clearProps: 'transform,opacity,visibility' });
     };
 
     const measureHandoff = () => {
+      gsap.set(wordmark, { transformOrigin: '0 0' });
       const source = wordmark.getBoundingClientRect();
       const target = siteBrand.getBoundingClientRect();
-      const sourceCenterX = source.left + source.width / 2;
-      const sourceCenterY = source.top + source.height / 2;
-      const targetCenterX = target.left + target.width / 2;
-      const targetCenterY = target.top + target.height / 2;
       handoff = {
-        x: targetCenterX - sourceCenterX,
-        y: targetCenterY - sourceCenterY,
-        scale: target.width / source.width,
+        x: target.left - source.left,
+        y: target.top - source.top,
+        scaleX: target.width / source.width,
+        scaleY: target.height / source.height,
       };
     };
 
@@ -266,23 +280,22 @@ export function initHomeMotion() {
     });
 
     introTimeline
-      // Brand reveal — quiet, deliberate, one object to read.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.12)
-      .to(wordmark, {
-        autoAlpha: 1,
-        y: 0,
-        scale: 1,
-        filter: 'blur(0px)',
-        clipPath: 'inset(0 0 0% 0)',
-        duration: 0.82,
-        ease: 'power4.out',
-      }, 0.18)
-      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power2.out' }, 0.72)
-      .to(descriptorLine, { scaleX: 1, duration: 0.42, ease: 'power3.out' }, 0.78)
+      // Opening assembly — three restrained cuts lock into one exact identity.
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.08)
+      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.72, ease: 'power4.out' }, 0.12)
+      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.64, ease: 'power4.out' }, 0.17)
+      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.76, ease: 'power4.out' }, 0.1)
+      .set(wordmark, { autoAlpha: 1 }, 0.68)
+      .to(slices, { autoAlpha: 0, duration: 0.18, ease: 'power1.out' }, 0.68)
+      .call(syncDescriptorWidth, [], 0.76)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.82)
+      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.42, ease: 'power2.out' }, 0.86);
+    introGlitch(introTimeline, 0.7);
 
+    introTimeline
       // X → O — same brand language as the header, presented at cinematic scale.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-to-o'; }, [], 1.18)
-      .to(introLetterWrap, { rotation: -72, y: -1, duration: 0.36, ease: 'power1.in' }, 1.2)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-to-o'; }, [], 1.5)
+      .to(introLetterWrap, { rotation: -72, y: -1, duration: 0.36, ease: 'power1.in' }, 1.52)
       .to(introLetterWrap, {
         rotation: -248,
         x: firstFlightX,
@@ -290,8 +303,8 @@ export function initHomeMotion() {
         scale: 0.93,
         duration: 0.22,
         ease: 'power3.in',
-      }, 1.5);
-    introGlitch(introTimeline, 1.46);
+      }, 1.82);
+    introGlitch(introTimeline, 1.78);
     introTimeline
       .to(introLetterWrap, {
         rotation: -420,
@@ -300,11 +313,11 @@ export function initHomeMotion() {
         autoAlpha: 0.42,
         duration: 0.13,
         ease: 'power4.in',
-      }, 1.68)
+      }, 2.0)
       .call(() => {
         introLetter.textContent = 'O';
         introLetter.classList.add('is-o');
-      }, [], 1.79)
+      }, [], 2.11)
       .set(introLetterWrap, {
         rotation: -24,
         x: firstFlightX * 0.66,
@@ -313,8 +326,8 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 0.9,
         autoAlpha: 0.52,
-      }, 1.79);
-    introGlitch(introTimeline, 1.79);
+      }, 2.11);
+    introGlitch(introTimeline, 2.11);
     introTimeline
       .to(introLetterWrap, {
         x: 0,
@@ -326,13 +339,13 @@ export function initHomeMotion() {
         autoAlpha: 1,
         duration: 0.3,
         ease: 'back.out(2.35)',
-      }, 1.92)
-      .call(settleIntroLetter, [], 2.23)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-rest'; }, [], 2.25)
+      }, 2.24)
+      .call(settleIntroLetter, [], 2.55)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-rest'; }, [], 2.57)
 
       // O → X — complete exactly one cycle, then leave the identity resolved on X.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-to-x'; }, [], 2.7)
-      .to(introLetterWrap, { rotation: -86, x: -1, y: 1, duration: 0.36, ease: 'power1.in' }, 2.7)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-to-x'; }, [], 3.02)
+      .to(introLetterWrap, { rotation: -86, x: -1, y: 1, duration: 0.36, ease: 'power1.in' }, 3.02)
       .to(introLetterWrap, {
         rotation: -262,
         x: secondFlightX,
@@ -340,8 +353,8 @@ export function initHomeMotion() {
         scale: 0.93,
         duration: 0.22,
         ease: 'power3.in',
-      }, 3.0);
-    introGlitch(introTimeline, 2.96);
+      }, 3.32);
+    introGlitch(introTimeline, 3.28);
     introTimeline
       .to(introLetterWrap, {
         rotation: -420,
@@ -350,11 +363,11 @@ export function initHomeMotion() {
         autoAlpha: 0.44,
         duration: 0.13,
         ease: 'power4.in',
-      }, 3.18)
+      }, 3.5)
       .call(() => {
         introLetter.textContent = 'X';
         introLetter.classList.remove('is-o');
-      }, [], 3.29)
+      }, [], 3.61)
       .set(introLetterWrap, {
         rotation: -22,
         x: secondFlightX * 0.62,
@@ -363,8 +376,8 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 0.9,
         autoAlpha: 0.54,
-      }, 3.29);
-    introGlitch(introTimeline, 3.29);
+      }, 3.61);
+    introGlitch(introTimeline, 3.61);
     introTimeline
       .to(introLetterWrap, {
         x: 0,
@@ -376,32 +389,34 @@ export function initHomeMotion() {
         autoAlpha: 1,
         duration: 0.29,
         ease: 'back.out(2.35)',
-      }, 3.42)
-      .call(settleIntroLetter, [], 3.72)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-rest'; }, [], 3.74)
+      }, 3.74)
+      .call(settleIntroLetter, [], 4.04)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-rest'; }, [], 4.06)
 
-      // Handoff — the intro wordmark becomes the real header identity.
-      .call(measureHandoff, [], 3.92)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 3.94)
-      .to(descriptorWrap, { autoAlpha: 0, y: -6, filter: 'blur(2px)', duration: 0.34, ease: 'power2.in' }, 3.9)
+      // Exact FLIP handoff — top-left and dimensions converge on the real header wordmark.
+      .call(measureHandoff, [], 4.28)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 4.3)
+      .to(descriptorWrap, { autoAlpha: 0, y: -4, filter: 'blur(1.5px)', duration: 0.32, ease: 'power2.in' }, 4.24)
       .to(wordmark, {
         x: () => handoff.x,
         y: () => handoff.y,
-        scale: () => handoff.scale,
-        duration: 0.92,
+        scaleX: () => handoff.scaleX,
+        scaleY: () => handoff.scaleY,
+        duration: 1.05,
         ease: 'power4.inOut',
-      }, 4.0)
+      }, 4.34)
       .call(() => {
         shell.setAttribute('data-home-intro', 'ready');
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'reveal';
-      }, [], 4.28)
-      .to(backdrop, { autoAlpha: 0, duration: 0.9, ease: 'power2.inOut' }, 4.28)
+      }, [], 4.84)
+      .to(backdrop, { autoAlpha: 0, duration: 1.0, ease: 'power2.inOut' }, 4.84)
       .call(() => {
+        if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'landed';
         gsap.set(wordmark, { autoAlpha: 0 });
         gsap.set(siteHeader, { autoAlpha: 1 });
-      }, [], 4.88)
-      .to(headerSecondary, { autoAlpha: 1, duration: 0.45, stagger: 0.05, ease: 'power2.out' }, 4.9)
-      .to(cinematicNode, { autoAlpha: 0, duration: 0.26, ease: 'power1.out' }, 5.08);
+      }, [], 5.38)
+      .to(headerSecondary, { autoAlpha: 1, duration: 0.44, stagger: 0.05, ease: 'power2.out' }, 5.4)
+      .to(cinematicNode, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, 5.62);
   };
 
   startCinematic();
