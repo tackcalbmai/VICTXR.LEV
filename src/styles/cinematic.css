@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 9997;
-  background: var(--ink);
+  background: var(--paper);
   content: '';
 }
 
@@ -25,7 +25,7 @@ html.is-cinematic-intro body {
   inset: 0;
   z-index: 9999;
   overflow: hidden;
-  color: var(--paper);
+  color: var(--ink);
   font-family: var(--font-sans);
   pointer-events: auto;
   user-select: none;
@@ -37,12 +37,50 @@ html.is-cinematic-intro body {
   left: 0;
   z-index: 0;
   height: calc(50% + 1px);
-  background: var(--ink);
+  background: var(--paper);
   will-change: transform;
 }
 
 .cinematic-intro__panel--top { top: 0; }
 .cinematic-intro__panel--bottom { bottom: 0; }
+
+.cinematic-intro__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cinematic-intro__grid-line {
+  position: absolute;
+  display: block;
+  background: rgb(var(--ink-rgb) / 12%);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.cinematic-intro__grid-line--v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.cinematic-intro__grid-line--v:nth-child(1) { left: 16.666%; }
+.cinematic-intro__grid-line--v:nth-child(2) { left: 33.333%; }
+.cinematic-intro__grid-line--v:nth-child(3) { left: 50%; }
+.cinematic-intro__grid-line--v:nth-child(4) { left: 66.666%; }
+.cinematic-intro__grid-line--v:nth-child(5) { left: 83.333%; }
+
+.cinematic-intro__grid-line--h {
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.cinematic-intro__grid-line--h:nth-child(6) { top: 25%; }
+.cinematic-intro__grid-line--h:nth-child(7) { top: 50%; }
+.cinematic-intro__grid-line--h:nth-child(8) { top: 75%; }
 
 .cinematic-intro__hud {
   position: absolute;
@@ -52,91 +90,32 @@ html.is-cinematic-intro body {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  color: #77756f;
   text-transform: uppercase;
-  font-size: clamp(0.52rem, 0.58vw, 0.65rem);
+  font-size: clamp(0.5rem, 0.56vw, 0.64rem);
   font-weight: 760;
   line-height: 1;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   opacity: 0;
 }
 
-.cinematic-intro__hud--top {
-  top: max(1rem, env(safe-area-inset-top));
-}
-
-.cinematic-intro__hud--bottom {
-  bottom: max(1rem, env(safe-area-inset-bottom));
-}
-
-.cinematic-intro__axis {
-  position: absolute;
-  z-index: 2;
-  display: block;
-  background: rgb(var(--paper-rgb) / 20%);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.cinematic-intro__axis--x {
-  top: 50%;
-  right: 0;
-  left: 0;
-  height: 1px;
-}
-
-.cinematic-intro__axis--y {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-}
-
-.cinematic-intro__symbol {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 3;
-  width: min(52vw, 35rem);
-  height: min(52vw, 35rem);
-  transform: translate(-50%, -50%);
-}
-
-.cinematic-intro__glyph {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  display: block;
-  font-size: clamp(12rem, 31vw, 34rem);
-  font-weight: 820;
-  line-height: 0.68;
-  letter-spacing: -0.1em;
-  transform: translate(-50%, -50%);
-  transform-origin: 50% 50%;
-  will-change: transform, opacity, filter;
-}
-
-.cinematic-intro__glyph--x {
-  color: var(--accent);
-}
-
-.cinematic-intro__glyph--o {
-  color: var(--paper);
-}
+.cinematic-intro__hud--top { top: max(1rem, env(safe-area-inset-top)); }
+.cinematic-intro__hud--bottom { bottom: max(1rem, env(safe-area-inset-bottom)); }
 
 .cinematic-intro__wordmark {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
-  z-index: 4;
+  z-index: 5;
   display: flex;
   align-items: baseline;
   width: max-content;
   max-width: calc(100vw - 2rem);
-  overflow: hidden;
   text-transform: uppercase;
-  font-size: clamp(3.25rem, 8.4vw, 8.8rem);
-  font-weight: 790;
+  font-size: clamp(3.8rem, 9.1vw, 9.5rem);
+  font-weight: 800;
   line-height: 0.84;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.078em;
   transform: translate(-50%, -50%);
   white-space: nowrap;
   will-change: transform, opacity, clip-path;
@@ -149,51 +128,161 @@ html.is-cinematic-intro body {
   font-style: normal;
 }
 
-.cinematic-intro__wordmark-x {
-  color: var(--accent);
-  will-change: transform, opacity;
+.cinematic-intro__letter-slot {
+  position: relative;
+  width: 0.66em;
+  height: 0.84em;
+  vertical-align: baseline;
 }
 
-.cinematic-intro__wordmark i {
+.cinematic-intro__letter-slot > span {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: block;
+  width: 100%;
+  text-align: center;
+  transform-origin: 50% 52%;
+  will-change: transform, opacity, filter;
+}
+
+.cinematic-intro__letter-x { color: var(--accent); }
+.cinematic-intro__wordmark i { color: #77756f; }
+
+.cinematic-intro__wrong,
+.cinematic-intro__good {
+  position: absolute;
+  top: calc(48% + clamp(4.6rem, 8vw, 8.5rem));
+  left: 50%;
+  z-index: 5;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  margin: 0;
+  transform: translateX(-50%);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cinematic-intro__wrong {
   color: #77756f;
+  font-size: clamp(0.72rem, 1vw, 0.95rem);
+  font-weight: 760;
+  letter-spacing: 0.15em;
+}
+
+.cinematic-intro__good {
+  color: var(--accent);
+  font-size: clamp(0.84rem, 1.25vw, 1.15rem);
+  font-weight: 820;
+  letter-spacing: 0.17em;
+}
+
+.cinematic-intro__intruder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 4;
+  display: block;
+  color: var(--accent);
+  font-size: clamp(15rem, 39vw, 42rem);
+  font-weight: 820;
+  line-height: 0.65;
+  letter-spacing: -0.1em;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity, filter;
+}
+
+.cinematic-intro__differently {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  z-index: 4;
+  margin: 0;
+  color: var(--ink);
+  text-transform: uppercase;
+  font-size: clamp(7rem, 22vw, 24rem);
+  font-weight: 820;
+  line-height: 0.7;
+  letter-spacing: -0.09em;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  opacity: 0;
+  will-change: transform, opacity, clip-path;
+}
+
+.cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__differently {
+  visibility: visible !important;
+  animation: cinematic-differently-handoff 0.58s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+@keyframes cinematic-differently-handoff {
+  0%,
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  72% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(1.018);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.035);
+  }
 }
 
 @media (max-width: 760px) {
   .cinematic-intro__hud {
     font-size: 0.47rem;
-    letter-spacing: 0.13em;
+    letter-spacing: 0.12em;
   }
 
-  .cinematic-intro__hud--bottom span:last-child {
-    opacity: 0.64;
-  }
-
-  .cinematic-intro__symbol {
-    width: 82vw;
-    height: 82vw;
-  }
-
-  .cinematic-intro__glyph {
-    font-size: clamp(11rem, 64vw, 18rem);
+  .cinematic-intro__hud span:last-child {
+    text-align: right;
   }
 
   .cinematic-intro__wordmark {
+    top: 47%;
     max-width: calc(100vw - 1.5rem);
-    font-size: clamp(2.85rem, 13.4vw, 5.5rem);
-    letter-spacing: -0.07em;
+    font-size: clamp(3rem, 13.6vw, 5.6rem);
+    letter-spacing: -0.072em;
+  }
+
+  .cinematic-intro__wrong,
+  .cinematic-intro__good {
+    top: calc(47% + 4.4rem);
+    max-width: calc(100vw - 1.5rem);
+  }
+
+  .cinematic-intro__wrong {
+    font-size: clamp(0.58rem, 2.45vw, 0.72rem);
+    letter-spacing: 0.11em;
+  }
+
+  .cinematic-intro__good {
+    font-size: 0.72rem;
+  }
+
+  .cinematic-intro__intruder {
+    font-size: clamp(14rem, 76vw, 21rem);
+  }
+
+  .cinematic-intro__differently {
+    top: 51%;
+    font-size: clamp(6.8rem, 37vw, 12rem);
   }
 }
 
 @media (max-width: 380px) {
-  .cinematic-intro__wordmark {
-    font-size: 12.8vw;
-  }
+  .cinematic-intro__wordmark { font-size: 12.9vw; }
+  .cinematic-intro__wrong,
+  .cinematic-intro__good { top: calc(47% + 4rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-shell[data-home-intro='pending']::before {
-    display: none;
-  }
+  .home-shell[data-home-intro='pending']::before { display: none; }
 
   .home-shell[data-home-intro='pending'] .site-header,
   .home-shell[data-home-intro='pending'] .hero__meta,
@@ -203,7 +292,5 @@ html.is-cinematic-intro body {
     animation-play-state: running !important;
   }
 
-  .cinematic-intro {
-    display: none;
-  }
+  .cinematic-intro { display: none; }
 }
