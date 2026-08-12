@@ -533,6 +533,7 @@
   font-weight: 790;
   line-height: 0.84;
   letter-spacing: -0.08em;
+  text-wrap: balance;
 }
 
 .about__statement span {
@@ -794,6 +795,7 @@
   font-weight: 780;
   line-height: 0.76;
   letter-spacing: -0.085em;
+  text-wrap: balance;
 }
 
 .contact__title span { display: block; }
@@ -827,6 +829,7 @@
 }
 
 .contact__email strong {
+  min-width: 0;
   overflow: hidden;
   font-size: clamp(1.2rem, 3vw, 3rem);
   font-weight: 500;
@@ -1102,7 +1105,9 @@
   }
 
   .about__statement {
-    font-size: clamp(3.55rem, 16.3vw, 6.5rem);
+    max-width: 100%;
+    font-size: clamp(3.15rem, 14vw, 6.5rem);
+    letter-spacing: -0.095em;
   }
 
   .about__statement span:nth-child(2) { padding-left: 0; }
@@ -1146,7 +1151,9 @@
   }
 
   .contact__title {
-    font-size: clamp(4rem, 18.2vw, 7rem);
+    max-width: 100%;
+    font-size: clamp(3.2rem, 15.2vw, 7rem);
+    letter-spacing: -0.095em;
     line-height: 0.8;
   }
 
@@ -1165,7 +1172,9 @@
   }
 
   .contact__email strong {
-    font-size: clamp(1rem, 4.3vw, 1.4rem);
+    max-width: 100%;
+    font-size: clamp(0.92rem, 3.8vw, 1.25rem);
+    overflow-wrap: anywhere;
   }
 }
 
