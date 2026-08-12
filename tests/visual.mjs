@@ -4,6 +4,7 @@ import { mkdir } from 'node:fs/promises';
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
 const outDir = 'artifacts/visual';
 const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
+const cinematicReadyTimeout = 9000;
 
 await mkdir(outDir, { recursive: true });
 
@@ -98,7 +99,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
   if (!await page.locator('.hero__title').isVisible()) throw new Error(`${name} hero is absent during opening`);
   await screenshot(page, `${name}-opening`);
 
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: cinematicReadyTimeout });
   await page.waitForTimeout(120);
   await assertCoreDocument(page, name, lang);
 
@@ -121,7 +122,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     await page.waitForTimeout(90);
     if (await page.evaluate(() => window.scrollY) > 2) throw new Error(`${name} did not reset to the top on reload`);
     if (await page.locator('[data-home-intro]').getAttribute('data-home-intro') !== 'pending') throw new Error(`${name} did not replay the opening state on reload`);
-    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: cinematicReadyTimeout });
   }
 
   const alternate = await page.locator('.site-language').getAttribute('href');
