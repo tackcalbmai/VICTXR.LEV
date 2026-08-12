@@ -10,6 +10,7 @@ export function initSiteUI() {
   const menuLabel = document.querySelector<HTMLElement>('[data-menu-label]');
   const main = document.querySelector<HTMLElement>('main');
   let menuWasOpened = false;
+  let menuClosingTimer = 0;
   let frame = 0;
   const usesCompactNavigation = () => window.matchMedia('(max-width: 760px), (max-width: 900px) and (max-height: 500px)').matches;
 
@@ -34,10 +35,19 @@ export function initSiteUI() {
   window.addEventListener('scroll', requestHeaderUpdate, { passive: true });
   window.addEventListener('resize', requestHeaderUpdate, { passive: true });
 
+  const finishMenuClosing = () => {
+    window.clearTimeout(menuClosingTimer);
+    menuClosingTimer = 0;
+    document.documentElement.classList.remove('menu-is-closing');
+  };
+
   const setMenu = (open: boolean) => {
     if (!menu || !menuToggle) return;
+    const wasOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+    if (open) finishMenuClosing();
     document.documentElement.classList.toggle('menu-is-open', open);
     document.body.classList.toggle('menu-is-open', open);
+    document.documentElement.classList.toggle('menu-is-closing', !open && wasOpen);
     menuToggle.setAttribute('aria-expanded', String(open));
     menu.setAttribute('aria-hidden', String(!open));
     menu.inert = !open;
@@ -46,8 +56,15 @@ export function initSiteUI() {
     if (open) {
       menuWasOpened = true;
       menu.querySelector<HTMLAnchorElement>('a')?.focus();
+    } else if (wasOpen) {
+      const closingDuration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 40 : 540;
+      menuClosingTimer = window.setTimeout(finishMenuClosing, closingDuration);
     }
   };
+
+  menu?.addEventListener('transitionend', (event) => {
+    if (event.propertyName === 'clip-path' && menuToggle?.getAttribute('aria-expanded') === 'false') finishMenuClosing();
+  });
 
   menuToggle?.addEventListener('click', () => setMenu(menuToggle.getAttribute('aria-expanded') !== 'true'));
   menu?.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => link.addEventListener('click', () => {

@@ -90,7 +90,7 @@ for (const profile of profiles) {
   if (await toggle.isVisible()) {
     await toggle.click();
     if (await toggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${profile.name} menu did not open`);
-    await page.waitForTimeout(360);
+    await page.waitForTimeout(540);
     const state = await page.evaluate(() => {
       const centers = [...document.querySelectorAll('[data-menu-toggle] i')].map((line) => {
         const rect = line.getBoundingClientRect();

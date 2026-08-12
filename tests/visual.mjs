@@ -144,7 +144,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     if (await page.locator('[data-mobile-menu]').getAttribute('aria-hidden') !== 'false') throw new Error(`${name} mobile menu remains hidden to assistive technology`);
     if (!await page.locator('main').evaluate((element) => element.inert)) throw new Error(`${name} page remains focusable behind the mobile menu`);
     if (!await page.locator('[data-mobile-menu] a').first().evaluate((element) => element === document.activeElement)) throw new Error(`${name} mobile menu did not receive focus`);
-    await page.waitForTimeout(360);
+    await page.waitForTimeout(540);
     const openMenuState = await page.evaluate(() => {
       const header = document.querySelector('[data-site-header]');
       const menu = document.querySelector('[data-mobile-menu]');
@@ -177,7 +177,9 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     await screenshot(page, `${name}-menu`);
     await toggle.click();
     if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} mobile menu did not close with its visible control`);
+    if (!await page.locator('html').evaluate((element) => element.classList.contains('menu-is-closing'))) throw new Error(`${name} drops the protected header theme before the menu closes`);
     await page.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
+    if (await page.locator('html').evaluate((element) => element.classList.contains('menu-is-closing'))) throw new Error(`${name} kept the closing menu state after the surface disappeared`);
     await toggle.click();
     await page.keyboard.press('Escape');
     if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} mobile menu did not close with Escape`);
@@ -445,7 +447,7 @@ if (routeErrors.length) throw new Error(`Direct-section navigation errors:\n${ro
 
 await routeContext.close();
 
-const mobileCaseContext = await browser.newContext({ viewport: { width: 393, height: 852 }, reducedMotion: 'reduce' });
+const mobileCaseContext = await browser.newContext({ viewport: { width: 393, height: 852 }, reducedMotion: 'no-preference' });
 const mobileCasePage = await mobileCaseContext.newPage();
 const mobileCaseErrors = collectRuntimeErrors(mobileCasePage);
 for (const [path, title] of [['/work/catrin/', 'CATRIN'], ['/work/anelika/', 'ANELIKA']]) {
@@ -459,7 +461,7 @@ for (const [path, title] of [['/work/catrin/', 'CATRIN'], ['/work/anelika/', 'AN
   const caseMenuToggle = mobileCasePage.locator('[data-menu-toggle]');
   await caseMenuToggle.click();
   if (await caseMenuToggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${title} case menu did not open`);
-  await mobileCasePage.waitForTimeout(360);
+  await mobileCasePage.waitForTimeout(540);
   const caseMenuLayering = await mobileCasePage.evaluate(() => ({
     header: Number.parseInt(getComputedStyle(document.querySelector('[data-site-header]')).zIndex, 10),
     menu: Number.parseInt(getComputedStyle(document.querySelector('[data-mobile-menu]')).zIndex, 10),
@@ -469,7 +471,13 @@ for (const [path, title] of [['/work/catrin/', 'CATRIN'], ['/work/anelika/', 'AN
   await screenshot(mobileCasePage, `mobile-${title.toLowerCase()}-menu`);
   await caseMenuToggle.click();
   if (await caseMenuToggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${title} case menu did not close`);
+  const caseClosingState = await mobileCasePage.evaluate(() => ({
+    protectedHeader: document.documentElement.classList.contains('menu-is-closing'),
+    headerBackground: getComputedStyle(document.querySelector('[data-site-header]')).backgroundColor,
+  }));
+  if (!caseClosingState.protectedHeader || caseClosingState.headerBackground === 'rgba(0, 0, 0, 0)') throw new Error(`${title} case header loses contrast during menu close`);
   await mobileCasePage.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
+  if (await mobileCasePage.locator('html').evaluate((element) => element.classList.contains('menu-is-closing'))) throw new Error(`${title} case kept the closing menu state`);
   await assertImagesLoaded(mobileCasePage, `${title} mobile case`);
 }
 if (mobileCaseErrors.length) throw new Error(`Mobile case runtime errors:\n${mobileCaseErrors.join('\n')}`);

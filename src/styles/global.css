@@ -402,7 +402,8 @@
     transition-delay: 0s;
   }
 
-  html.menu-is-open .site-header {
+  html.menu-is-open .site-header,
+  html.menu-is-closing .site-header {
     z-index: 1001;
     min-height: var(--header-height);
     border-color: var(--line) !important;
