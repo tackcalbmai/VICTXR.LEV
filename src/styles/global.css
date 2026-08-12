@@ -231,6 +231,7 @@
 
   .site-nav--desktop {
     display: flex;
+    min-width: 0;
     align-items: center;
     justify-content: center;
     gap: clamp(1.2rem, 2.5vw, 2.6rem);
@@ -270,6 +271,7 @@
     position: relative;
     z-index: 102;
     display: flex;
+    min-width: 0;
     align-items: center;
     justify-content: flex-end;
     gap: clamp(0.85rem, 1.8vw, 1.6rem);
