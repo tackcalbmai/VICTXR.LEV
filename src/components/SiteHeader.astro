@@ -34,17 +34,18 @@ const available = locale === 'lv' ? 'Pieejams' : 'Available';
     </button>
   </div>
 
-  <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" inert>
-    <div class="mobile-menu__meta">
-      <span>VICTXR.LEV</span>
-      <span>{copy.hero.meta}</span>
-    </div>
-    <nav class="mobile-menu__nav" aria-label={copy.nav.menu}>
-      <a href={`${home}#work`}><span>01</span>{copy.nav.work}</a>
-      <a href={`${home}#about`}><span>02</span>{copy.nav.about}</a>
-      <a href={`${home}#services`}><span>03</span>{copy.nav.services}</a>
-      <a href={`${home}#contact`}><span>04</span>{copy.nav.contact}</a>
-    </nav>
-    <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
-  </div>
 </header>
+
+<div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" inert>
+  <div class="mobile-menu__meta">
+    <span>VICTXR.LEV</span>
+    <span>{copy.hero.meta}</span>
+  </div>
+  <nav class="mobile-menu__nav" aria-label={copy.nav.menu}>
+    <a href={`${home}#work`}><span>01</span>{copy.nav.work}</a>
+    <a href={`${home}#about`}><span>02</span>{copy.nav.about}</a>
+    <a href={`${home}#services`}><span>03</span>{copy.nav.services}</a>
+    <a href={`${home}#contact`}><span>04</span>{copy.nav.contact}</a>
+  </nav>
+  <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
+</div>
