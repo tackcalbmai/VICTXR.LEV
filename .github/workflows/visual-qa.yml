@@ -9,16 +9,17 @@ on:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
@@ -47,12 +48,35 @@ jobs:
           cat /tmp/victxr-preview.log
           exit 1
 
-      - name: Capture visual states
+      - name: Capture visual and quality states
         run: npm run visual
+
+      - name: Build future contact state
+        env:
+          PUBLIC_CONTACT_WHATSAPP: "+37120000000"
+          PUBLIC_CONTACT_INSTAGRAM: "https://www.instagram.com/victxr.lev/"
+        run: npm run build
+
+      - name: Start future contact preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4322 > /tmp/victxr-contacts-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4322 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/victxr-contacts-preview.log
+          exit 1
+
+      - name: Verify enabled contact state
+        env:
+          CONTACTS_BASE_URL: "http://127.0.0.1:4322"
+        run: npm run audit:contacts
 
       - name: Upload screenshots
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: visual-qa-${{ github.sha }}
           path: artifacts/visual
