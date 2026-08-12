@@ -1,6 +1,10 @@
+.site-brand__letter-wrap {
+  transform-origin: 50% 52%;
+}
+
 .site-brand__letter-wrap > span {
   inset: auto;
-  top: calc(0.11em + 1px);
+  top: calc(0.11em + 2px);
   left: 0;
   width: 100%;
   height: 100%;
@@ -11,5 +15,6 @@
 }
 
 .site-brand__letter-wrap > span.is-o {
+  top: calc(0.11em + 1px);
   color: inherit;
 }
