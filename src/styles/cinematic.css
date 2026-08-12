@@ -165,7 +165,7 @@ html.is-cinematic-intro body {
 
 .cinematic-intro__descriptor-wrap {
   position: absolute;
-  top: calc(46.5% + clamp(2.6rem, 5.55vw, 5.45rem));
+  top: calc(46.5% + clamp(2.45rem, 4.9vw, 4.85rem));
   left: 50%;
   width: min(72vw, 68rem);
   translate: -50% 0;
@@ -180,10 +180,10 @@ html.is-cinematic-intro body {
   margin: 0;
   color: var(--muted);
   text-transform: uppercase;
-  font-size: clamp(0.88rem, 1.08vw, 1.12rem);
+  font-size: clamp(1rem, 1.28vw, 1.3rem);
   font-weight: 650;
   line-height: 1;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.2em;
 }
 
 .cinematic-intro__descriptor span:last-child {
@@ -204,8 +204,8 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro__descriptor {
-    font-size: clamp(0.7rem, 2.7vw, 0.82rem);
-    letter-spacing: 0.18em;
+    font-size: clamp(0.78rem, 3.15vw, 0.92rem);
+    letter-spacing: 0.16em;
   }
 }
 
