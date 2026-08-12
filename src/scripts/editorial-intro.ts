@@ -69,6 +69,8 @@ export function initEditorialIntro() {
   if (!brand || !o || !x || !wrong || !good || !different || !fault) {
     node.remove();
     root.classList.remove('is-editorial-intro');
+    shell.setAttribute('data-home-intro', 'ready');
+    document.dispatchEvent(new CustomEvent('victxr:editorial-complete'));
     return;
   }
 
@@ -95,23 +97,12 @@ export function initEditorialIntro() {
   });
   gsap.set(fault, { autoAlpha: 0, scaleX: 0 });
 
-  const releaseLock = () => {
-    const started = performance.now();
-    const waitForLegacyIntro = () => {
-      if (!document.querySelector('[data-cinematic-intro]') || performance.now() - started > 900) {
-        root.classList.remove('is-editorial-intro');
-        return;
-      }
-      window.setTimeout(waitForLegacyIntro, 40);
-    };
-    waitForLegacyIntro();
-  };
-
   const timeline = gsap.timeline({
     defaults: { ease: 'power4.out' },
     onComplete: () => {
       node.remove();
-      releaseLock();
+      root.classList.remove('is-editorial-intro');
+      document.dispatchEvent(new CustomEvent('victxr:editorial-complete'));
     },
   });
 
@@ -196,7 +187,10 @@ export function initEditorialIntro() {
     }, 1.82)
     .to(gridV, { x: 0, rotation: 0, opacity: 0.16, duration: 0.32, ease: 'power3.out' }, 1.88)
     .to(gridH, { y: 0, rotation: 0, opacity: 0.16, duration: 0.32, ease: 'power3.out' }, 1.88)
-    .call(() => { node.dataset.editorialPhase = 'reveal'; }, [], 2.28)
+    .call(() => {
+      node.dataset.editorialPhase = 'reveal';
+      shell.setAttribute('data-home-intro', 'ready');
+    }, [], 2.28)
     .to(different, { scale: 1.025, autoAlpha: 0.08, duration: 0.42, ease: 'power2.in' }, 2.29)
     .to([gridV, gridH], { autoAlpha: 0, duration: 0.18 }, 2.30)
     .to(node, {

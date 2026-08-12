@@ -9,6 +9,7 @@ export function initHomeMotion() {
   if (!shell) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const editorialIntroActive = document.documentElement.classList.contains('is-editorial-intro');
   const brandLetter = document.querySelector<HTMLElement>('[data-brand-letter]');
   const brandMotion = brandLetter?.closest<HTMLElement>('.site-brand__letter-wrap') ?? brandLetter;
   const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
@@ -154,6 +155,11 @@ export function initHomeMotion() {
       .call(settleBrandMotion);
   }
 
+  const onEditorialComplete = () => {
+    ScrollTrigger.refresh();
+    if (!reducedMotion) brandIdle = gsap.delayedCall(0.7, runBrandCycle);
+  };
+
   const releaseCinematic = () => {
     document.documentElement.classList.remove('is-cinematic-intro');
     cinematicNode?.remove();
@@ -272,7 +278,11 @@ export function initHomeMotion() {
     if (compact) introTimeline.timeScale(1.12);
   };
 
-  startCinematic();
+  if (editorialIntroActive) {
+    document.addEventListener('victxr:editorial-complete', onEditorialComplete, { once: true });
+  } else {
+    startCinematic();
+  }
 
   if (reducedMotion) return;
 
@@ -443,6 +453,7 @@ export function initHomeMotion() {
     introTimeline?.kill();
     cinematicNode?.remove();
     document.documentElement.classList.remove('is-cinematic-intro');
+    document.removeEventListener('victxr:editorial-complete', onEditorialComplete);
     brandIdle?.kill();
     brandCycle?.kill();
     settleBrandMotion();
