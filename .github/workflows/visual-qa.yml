@@ -9,7 +9,7 @@ on:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -38,18 +38,40 @@ jobs:
 
       - name: Start production-like Cloudflare preview
         run: |
-          npx wrangler dev --local --ip 127.0.0.1 --port 4321 > /tmp/victxr-preview.log 2>&1 &
+          npx wrangler dev --local --ip 127.0.0.1 --port 4321 > /tmp/victxr-cloudflare-preview.log 2>&1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4321 >/dev/null; then
               exit 0
             fi
             sleep 1
           done
-          cat /tmp/victxr-preview.log
+          cat /tmp/victxr-cloudflare-preview.log
           exit 1
 
-      - name: Capture visual and quality states
-        run: npm run visual
+      - name: Capture Cloudflare-specific visual states
+        run: npm run visual:core
+
+      - name: Start stable browser preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4324 > /tmp/victxr-browser-preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4324 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/victxr-browser-preview.log
+          exit 1
+
+      - name: Cross-browser QA
+        env:
+          VISUAL_BASE_URL: "http://127.0.0.1:4324"
+        run: npm run cross-browser
+
+      - name: Accessibility and performance budgets
+        env:
+          VISUAL_BASE_URL: "http://127.0.0.1:4324"
+        run: npm run audit:quality
 
       - name: Build future contact state
         env:
@@ -57,9 +79,9 @@ jobs:
           PUBLIC_CONTACT_INSTAGRAM: "https://www.instagram.com/victxr.lev/"
         run: npm run build
 
-      - name: Start future contact Cloudflare preview
+      - name: Start future contact preview
         run: |
-          npx wrangler dev --local --ip 127.0.0.1 --port 4322 > /tmp/victxr-contacts-preview.log 2>&1 &
+          npm run preview -- --host 127.0.0.1 --port 4322 > /tmp/victxr-contacts-preview.log 2>&1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4322 >/dev/null; then
               exit 0
