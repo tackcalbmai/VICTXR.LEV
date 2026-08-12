@@ -4,12 +4,26 @@ import Arrow from '../components/Arrow.astro';
 ---
 
 <BaseLayout title="404 — VICTXR.LEV" description="This page does not exist." lang="en" canonicalPath="/404/" alternatePath="/lv/404/" robots="noindex,nofollow">
-  <main class="not-found" id="main-content" tabindex="-1">
-    <a class="not-found__brand" href="/">VICTXR.LEV</a>
-    <p>Something looks wrong.</p>
-    <h1><span>Good.</span><strong>404</strong></h1>
-    <a class="not-found__back" href="/">Back to the working part <Arrow direction="right" /></a>
+  <main class="not-found" id="main-content" tabindex="-1" data-not-found>
+    <a class="not-found__brand" href="/" data-home-link>VICTXR.LEV</a>
+    <p data-not-found-lead>Something looks wrong.</p>
+    <h1><span data-not-found-reply>Good.</span><strong>404</strong></h1>
+    <a class="not-found__back" href="/" data-home-link><span data-not-found-back>Back to the working part</span> <Arrow direction="right" /></a>
   </main>
+  <script is:inline>
+    (() => {
+      // Cloudflare Workers serves /lv/404.html natively. This fallback only
+      // protects preview/static hosts that always return the root 404 file.
+      if (!/^\/lv(?:\/|$)/.test(location.pathname)) return;
+      const root = document.querySelector('[data-not-found]');
+      if (!root) return;
+      document.documentElement.lang = 'lv';
+      root.querySelector('[data-not-found-lead]').textContent = 'Kaut kas nav pareizi.';
+      root.querySelector('[data-not-found-reply]').textContent = 'Labi.';
+      root.querySelector('[data-not-found-back]').textContent = 'Atpakaļ pie tā, kas strādā';
+      root.querySelectorAll('[data-home-link]').forEach((link) => link.setAttribute('href', '/lv/'));
+    })();
+  </script>
 </BaseLayout>
 
 <style>
