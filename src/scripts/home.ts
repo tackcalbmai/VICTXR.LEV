@@ -8,6 +8,10 @@ export function initHomeMotion() {
   const shell = document.querySelector<HTMLElement>('[data-home-intro]');
   if (!shell) return;
 
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  const resetToTop = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  resetToTop();
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const siteHeader = document.querySelector<HTMLElement>('[data-site-header]');
   const siteBrand = siteHeader?.querySelector<HTMLElement>('.site-brand') ?? null;
@@ -29,6 +33,13 @@ export function initHomeMotion() {
   const settleBrandMotion = () => {
     if (!brandMotion) return;
     gsap.set(brandMotion, { clearProps: 'transform,opacity,visibility' });
+  };
+
+  const restartHeroAnimations = () => {
+    const animated = shell.querySelectorAll<HTMLElement>('[data-intro-meta], [data-intro-line], [data-side-note], [data-intro-footer]');
+    animated.forEach((element) => { element.style.animation = 'none'; });
+    void shell.offsetWidth;
+    animated.forEach((element) => { element.style.removeProperty('animation'); });
   };
 
   const glitchLetter = (timeline: gsap.core.Timeline, position: number | string) => {
@@ -196,7 +207,7 @@ export function initHomeMotion() {
     `;
     shell.prepend(cinematicNode);
     document.documentElement.classList.add('is-cinematic-intro');
-    window.scrollTo(0, 0);
+    resetToTop();
 
     const backdrop = cinematicNode.querySelector<HTMLElement>('[data-cinematic-backdrop]');
     const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
@@ -414,6 +425,7 @@ export function initHomeMotion() {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'landed';
         gsap.set(wordmark, { autoAlpha: 0 });
         gsap.set(siteHeader, { autoAlpha: 1 });
+        restartHeroAnimations();
       }, [], 5.38)
       .to(headerSecondary, { autoAlpha: 1, duration: 0.44, stagger: 0.05, ease: 'power2.out' }, 5.4)
       .to(cinematicNode, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, 5.62);
@@ -498,13 +510,13 @@ export function initHomeMotion() {
 
       disruption
         .to({}, { duration: 0.22 })
-        .to('[data-disruption-one]', { xPercent: -3, yPercent: -4, rotate: -0.5, duration: 0.28, ease: 'none' })
-        .fromTo('[data-disruption-two]', { autoAlpha: 0, color: '#aaa79f', xPercent: 7, yPercent: 6 }, { autoAlpha: 1, color: '#0c0c0b', xPercent: 0, yPercent: 0, duration: 0.34, ease: 'none' }, '<12%')
+        .to('[data-disruption-one]', { xPercent: -14, yPercent: -12, rotate: -0.8, duration: 0.34, ease: 'none' })
+        .fromTo('[data-disruption-two]', { autoAlpha: 0, color: '#aaa79f', filter: 'blur(2px)', xPercent: 15, yPercent: 10 }, { autoAlpha: 1, color: '#0c0c0b', filter: 'blur(0px)', xPercent: 0, yPercent: 0, duration: 0.42, ease: 'none' }, '<12%')
         .to('[data-disruption-x]', { autoAlpha: 0.075, scale: 1.04, rotate: 4, duration: 0.32, ease: 'none' }, '<12%')
         .to('[data-disruption-caption]', { autoAlpha: 1, y: 0, duration: 0.2, ease: 'none' }, '<16%')
         .to({}, { duration: 0.3 })
-        .to('[data-disruption-one]', { xPercent: -14, yPercent: -12, rotate: -1.5, duration: 0.42, ease: 'none' })
-        .to('[data-disruption-two]', { xPercent: 11, yPercent: 9, rotate: 1.1, duration: 0.42, ease: 'none' }, '<')
+        .to('[data-disruption-one]', { xPercent: -34, yPercent: -24, rotate: -2.8, duration: 0.46, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 31, yPercent: 22, rotate: 2.2, duration: 0.46, ease: 'none' }, '<')
         .to('[data-disruption-x]', { scale: 1.13, rotate: 8, duration: 0.42, ease: 'none' }, '<')
         .to('[data-disruption-one]', { xPercent: -31, yPercent: -23, rotate: -2.8, duration: 0.34, ease: 'none' })
         .to('[data-disruption-two]', { xPercent: 28, yPercent: 18, rotate: 2.2, duration: 0.34, ease: 'none' }, '<')
