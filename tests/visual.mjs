@@ -84,6 +84,11 @@ async function screenshot(page, name) {
   await page.screenshot({ path: `${outDir}/${name}.png`, fullPage: false });
 }
 
+async function waitForOpeningRelease(page) {
+  await page.waitForSelector('[data-editorial-intro]', { state: 'detached', timeout: 2500 });
+  await page.waitForFunction(() => !document.documentElement.classList.contains('is-editorial-intro'), undefined, { timeout: 2500 });
+}
+
 async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = false }) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(baseURL).origin });
@@ -99,6 +104,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
   await screenshot(page, `${name}-opening`);
 
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+  await waitForOpeningRelease(page);
   await page.waitForTimeout(120);
   await assertCoreDocument(page, name, lang);
 
@@ -122,6 +128,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     if (await page.evaluate(() => window.scrollY) > 2) throw new Error(`${name} did not reset to the top on reload`);
     if (await page.locator('[data-home-intro]').getAttribute('data-home-intro') !== 'pending') throw new Error(`${name} did not replay the opening state on reload`);
     await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+    await waitForOpeningRelease(page);
   }
 
   const alternate = await page.locator('.site-language').getAttribute('href');
