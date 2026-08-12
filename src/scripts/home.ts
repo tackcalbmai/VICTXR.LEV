@@ -518,3 +518,102 @@ export function initHomeMotion() {
         .fromTo('[data-disruption-two]', { autoAlpha: 0, color: '#aaa79f', filter: 'blur(2px)', xPercent: 15, yPercent: 10 }, { autoAlpha: 1, color: '#0c0c0b', filter: 'blur(0px)', xPercent: 0, yPercent: 0, duration: 0.42, ease: 'none' }, '<12%')
         .to('[data-disruption-x]', { autoAlpha: 0.075, scale: 1.04, rotate: 4, duration: 0.32, ease: 'none' }, '<12%')
         .to('[data-disruption-caption]', { autoAlpha: 1, y: 0, duration: 0.2, ease: 'none' }, '<16%')
+        .to({}, { duration: 0.3 })
+        .to('[data-disruption-one]', { xPercent: -34, yPercent: -24, rotate: -2.8, duration: 0.46, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 31, yPercent: 22, rotate: 2.2, duration: 0.46, ease: 'none' }, '<')
+        .to('[data-disruption-x]', { scale: 1.13, rotate: 8, duration: 0.42, ease: 'none' }, '<')
+        .to('[data-disruption-one]', { xPercent: -31, yPercent: -23, rotate: -2.8, duration: 0.34, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 28, yPercent: 18, rotate: 2.2, duration: 0.34, ease: 'none' }, '<')
+        .to('[data-disruption-x]', { scale: 1.22, rotate: 13, duration: 0.34, ease: 'none' }, '<');
+    });
+
+    gsap.utils.toArray<HTMLElement>('[data-project]').forEach((project, index) => {
+      const media = project.querySelector<HTMLElement>('[data-project-media]');
+      const title = project.querySelector<HTMLElement>('[data-project-title]');
+      if (media) {
+        gsap.fromTo(media, { clipPath: 'inset(11% 9% 11% 9%)', scale: 0.96 }, {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: project, start: 'top 82%', end: 'top 20%', scrub: 0.8 },
+        });
+      }
+      if (title) {
+        gsap.fromTo(title, { xPercent: index === 0 ? 7 : -6 }, {
+          xPercent: index === 0 ? -4 : 4,
+          ease: 'none',
+          scrollTrigger: { trigger: project, start: 'top bottom', end: 'bottom top', scrub: 1 },
+        });
+      }
+    });
+
+    gsap.from('[data-statement] span', {
+      yPercent: 110,
+      rotate: 1.8,
+      stagger: 0.08,
+      duration: 0.9,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: '[data-statement]', start: 'top 82%', once: true },
+    });
+
+    gsap.utils.toArray<HTMLElement>('[data-approach-step]').forEach((step) => {
+      gsap.fromTo(step, { xPercent: 4 }, {
+        xPercent: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: step, start: 'top 88%', end: 'center 58%', scrub: 0.55 },
+      });
+    });
+
+    const anti = gsap.timeline({
+      scrollTrigger: {
+        trigger: '[data-anti-sales]',
+        start: 'top top',
+        end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1,
+      },
+    });
+    anti
+      .to({}, { duration: 0.25 })
+      .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
+      .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
+      .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
+      .to({}, { duration: 0.25 });
+
+    if (window.matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll<HTMLElement>('[data-perspective-card]').forEach((card) => {
+        const onMove = (event: PointerEvent) => {
+          const rect = card.getBoundingClientRect();
+          const px = (event.clientX - rect.left) / rect.width - 0.5;
+          const py = (event.clientY - rect.top) / rect.height - 0.5;
+          card.style.setProperty('--card-ry', `${px * 5}deg`);
+          card.style.setProperty('--card-rx', `${py * -4}deg`);
+        };
+        const reset = () => {
+          card.style.setProperty('--card-ry', '0deg');
+          card.style.setProperty('--card-rx', '0deg');
+        };
+        card.addEventListener('pointermove', onMove);
+        card.addEventListener('pointerleave', reset);
+      });
+    }
+
+    return () => mm.revert();
+  }, shell);
+
+  return () => {
+    introTimeline?.kill();
+    cinematicNode?.remove();
+    document.documentElement.classList.remove('is-cinematic-intro');
+    brandIdle?.kill();
+    brandCycle?.kill();
+    settleBrandMotion();
+    journeyTween?.kill();
+    scrollControl?.removeEventListener('click', onScrollJourney);
+    window.removeEventListener('wheel', stopJourney);
+    window.removeEventListener('touchmove', stopJourney);
+    window.removeEventListener('keydown', stopJourney);
+    ctx.revert();
+  };
+}
