@@ -11,14 +11,14 @@ type ContactConfig = {
 /**
  * The single source of truth for every public contact channel.
  *
- * Leave a future channel empty until the real account exists. Once a value is
- * added here, the shared contact UI exposes it everywhere it belongs without
- * placeholder links or component-level URL changes.
+ * Production keeps future channels empty until the real accounts exist.
+ * PUBLIC_CONTACT_* overrides exist only so CI can build and visually verify
+ * the enabled state before those values are switched on for the live site.
  */
 export const contacts: ContactConfig = {
-  email: 'viktors.levdanskis@inbox.lv',
-  whatsapp: '',
-  instagram: '',
+  email: import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'viktors.levdanskis@inbox.lv',
+  whatsapp: import.meta.env.PUBLIC_CONTACT_WHATSAPP?.trim() || '',
+  instagram: import.meta.env.PUBLIC_CONTACT_INSTAGRAM?.trim() || '',
 };
 
 const localizedCopy = {
