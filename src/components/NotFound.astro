@@ -23,10 +23,10 @@ const copy = isLv
 ---
 
 <main class="not-found" id="main-content" tabindex="-1">
-  <a class="not-found__brand" href={home}>VICTXR.LEV</a>
+  <a class="not-found__brand" href={home} data-home-link>VICTXR.LEV</a>
   <p>{copy.lead}</p>
   <h1><span>{copy.reply}</span><strong>404</strong></h1>
-  <a class="not-found__back" href={home}>{copy.back} <Arrow direction="right" /></a>
+  <a class="not-found__back" href={home} data-home-link><span data-not-found-back>{copy.back}</span> <Arrow direction="right" /></a>
 </main>
 
 <style>
