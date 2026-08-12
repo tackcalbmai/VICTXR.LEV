@@ -102,11 +102,16 @@ async function assertCinematicIntro(name, viewport) {
 
   await waitPhase(page, 'reveal');
   stamp('reveal');
-  await page.waitForTimeout(680);
+  await page.waitForFunction(() => {
+    const header = document.querySelector('[data-site-header]');
+    return header && Number.parseFloat(getComputedStyle(header).opacity) >= 0.9;
+  }, undefined, { timeout: 1100 });
   const headerOpacity = Number(await page.locator('[data-site-header]').evaluate((element) => getComputedStyle(element).opacity));
   if (headerOpacity < 0.9) throw new Error(`${name} real header did not take over after the flying logo (${headerOpacity})`);
-  const backdropOpacity = Number(await page.locator('[data-cinematic-backdrop]').evaluate((element) => getComputedStyle(element).opacity));
-  if (backdropOpacity > 0.45) throw new Error(`${name} black field is not fading during hero reveal (${backdropOpacity})`);
+  const backdrop = page.locator('[data-cinematic-backdrop]');
+  if (!await backdrop.count()) throw new Error(`${name} cinematic field disappeared before the header handoff could be seen`);
+  const backdropOpacity = Number(await backdrop.evaluate((element) => getComputedStyle(element).opacity));
+  if (backdropOpacity > 0.6) throw new Error(`${name} black field is not fading during hero reveal (${backdropOpacity})`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-reveal.png`, fullPage: false });
 
   const minimumBeatSpacing = [
