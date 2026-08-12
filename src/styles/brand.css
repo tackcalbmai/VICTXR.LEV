@@ -1,5 +1,12 @@
 .site-brand__letter-wrap > span {
-  top: calc(50% + 0.11em);
+  inset: auto;
+  top: calc(0.11em + 1px);
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  transform-origin: 50% 52%;
+  will-change: auto;
   color: var(--accent);
 }
 
