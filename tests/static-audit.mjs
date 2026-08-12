@@ -31,7 +31,8 @@ const pages = {
   catrinLv: await readFile(new URL('lv/darbi/catrin/index.html', dist), 'utf8'),
   anelikaEn: await readFile(new URL('work/anelika/index.html', dist), 'utf8'),
   anelikaLv: await readFile(new URL('lv/darbi/anelika/index.html', dist), 'utf8'),
-  notFound: await readFile(new URL('404.html', dist), 'utf8'),
+  notFoundEn: await readFile(new URL('404.html', dist), 'utf8'),
+  notFoundLv: await readFile(new URL('lv/404.html', dist), 'utf8'),
 };
 
 const routablePages = {
@@ -51,14 +52,11 @@ for (const [name, html] of Object.entries(pages)) {
   assert(html.includes('rel="canonical"'), `${name} is missing a canonical URL`);
   assert(html.includes('property="og:image"'), `${name} is missing an Open Graph image`);
   assert(html.includes('name="twitter:card"'), `${name} is missing Twitter card metadata`);
+  assert((html.match(/hreflang=/g) ?? []).length >= 3, `${name} is missing hreflang coverage`);
   for (const image of html.matchAll(/<img\b[^>]*>/g)) {
     assert(/\balt(?:="[^"]*")?(?:\s|>)/.test(image[0]), `${name} contains an image without an alt attribute`);
     assert(/\bwidth="\d+"/.test(image[0]) && /\bheight="\d+"/.test(image[0]), `${name} contains an image without intrinsic dimensions`);
   }
-}
-
-for (const [name, html] of Object.entries(pages).filter(([name]) => name !== 'notFound')) {
-  assert((html.match(/hreflang=/g) ?? []).length >= 3, `${name} is missing hreflang coverage`);
 }
 
 const titles = [];
@@ -95,7 +93,10 @@ assert(pages.catrinEn.includes('class="site-language" href="/lv/darbi/catrin/"')
 assert(pages.catrinLv.includes('class="site-language" href="/work/catrin/"'), 'Latvian CATRIN language switch loses case context');
 assert(pages.anelikaEn.includes('class="site-language" href="/lv/darbi/anelika/"'), 'English ANELIKA language switch loses case context');
 assert(pages.anelikaLv.includes('class="site-language" href="/work/anelika/"'), 'Latvian ANELIKA language switch loses case context');
-assert(pages.notFound.includes("location.pathname.startsWith('/lv/')"), '404 route is not prepared for Latvian URLs');
+assert(pages.notFoundEn.includes('<html lang="en"') && pages.notFoundEn.includes('Something looks wrong.'), 'English 404 is not natively rendered in English');
+assert(pages.notFoundLv.includes('<html lang="lv"') && pages.notFoundLv.includes('Kaut kas nav pareizi.'), 'Latvian 404 is not natively rendered in Latvian');
+assert(pages.notFoundLv.includes('Šī lapa neeksistē.'), 'Latvian 404 metadata is not localized');
+assert(!pages.notFoundEn.includes("location.pathname.startsWith('/lv/')"), '404 localization still depends on client-side path mutation');
 
 const rendered = Object.values(pages).join('\n');
 assert(!/<nav class="contact-channels/.test(rendered), 'Unconfigured social channels are rendered');
@@ -103,9 +104,12 @@ assert(!/href="https:\/\/wa\.me\//.test(rendered), 'A fake WhatsApp link is rend
 assert(!/href="https:\/\/(?:www\.)?instagram\.com\//.test(rendered), 'A fake Instagram link is rendered');
 
 const contactsSource = await read('src/data/contacts.ts');
-assert(/email:\s*'[^']+@[^']+'/.test(contactsSource), 'The active email is missing from the centralized contacts config');
-assert(/whatsapp:\s*''/.test(contactsSource), 'WhatsApp must stay empty until the real number exists');
-assert(/instagram:\s*''/.test(contactsSource), 'Instagram must stay empty until the real profile exists');
+assert(contactsSource.includes("'viktors.levdanskis@inbox.lv'"), 'The active fallback email is missing from the centralized contacts config');
+assert(contactsSource.includes('PUBLIC_CONTACT_EMAIL'), 'The contact config cannot be safely build-tested with an email override');
+assert(contactsSource.includes('PUBLIC_CONTACT_WHATSAPP'), 'The contact config cannot be build-tested with a WhatsApp override');
+assert(contactsSource.includes('PUBLIC_CONTACT_INSTAGRAM'), 'The contact config cannot be build-tested with an Instagram override');
+assert(/PUBLIC_CONTACT_WHATSAPP[^\n]+\|\|\s*''/.test(contactsSource), 'WhatsApp must default to empty until the real number exists');
+assert(/PUBLIC_CONTACT_INSTAGRAM[^\n]+\|\|\s*''/.test(contactsSource), 'Instagram must default to empty until the real profile exists');
 assert(contactsSource.includes('https://wa.me/'), 'The contacts config is missing the future WhatsApp deep-link builder');
 assert(contactsSource.includes('encodeURIComponent(copy.whatsappMessage)'), 'The future WhatsApp message is not localized and URL encoded');
 
@@ -127,4 +131,4 @@ const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');
 assert(robots.includes('Sitemap: https://'), 'robots.txt does not advertise the sitemap over HTTPS');
 assert(sitemap.includes('<sitemapindex'), 'The sitemap index was not generated');
 
-console.log('Static production audit passed: contacts, content, metadata, assets and security headers are consistent.');
+console.log('Static production audit passed: contacts, localized 404s, content, metadata, assets and security headers are consistent.');
