@@ -144,6 +144,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     if (await page.locator('[data-mobile-menu]').getAttribute('aria-hidden') !== 'false') throw new Error(`${name} mobile menu remains hidden to assistive technology`);
     if (!await page.locator('main').evaluate((element) => element.inert)) throw new Error(`${name} page remains focusable behind the mobile menu`);
     if (!await page.locator('[data-mobile-menu] a').first().evaluate((element) => element === document.activeElement)) throw new Error(`${name} mobile menu did not receive focus`);
+    await page.waitForTimeout(360);
     const openMenuState = await page.evaluate(() => {
       const header = document.querySelector('[data-site-header]');
       const menu = document.querySelector('[data-mobile-menu]');
@@ -151,6 +152,10 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
       const headerStyle = getComputedStyle(header);
       const menuStyle = getComputedStyle(menu);
       const toggleRect = toggle.getBoundingClientRect();
+      const lineCenters = [...toggle.querySelectorAll('i')].map((line) => {
+        const rect = line.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      });
       return {
         headerZ: Number.parseInt(headerStyle.zIndex, 10),
         menuZ: Number.parseInt(menuStyle.zIndex, 10),
@@ -158,18 +163,25 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
         toggleVisible: toggleRect.top >= 0 && toggleRect.bottom <= innerHeight && toggleRect.left >= 0 && toggleRect.right <= innerWidth,
         htmlLocked: document.documentElement.classList.contains('menu-is-open'),
         bodyLocked: document.body.classList.contains('menu-is-open'),
+        closeLinesMeet: lineCenters.length === 2 && Math.hypot(
+          lineCenters[0].x - lineCenters[1].x,
+          lineCenters[0].y - lineCenters[1].y,
+        ) <= 1.5,
       };
     });
     if (openMenuState.headerZ <= openMenuState.menuZ) throw new Error(`${name} mobile menu covers its own close control`);
     if (openMenuState.menuBackground.includes('/ 0)') || openMenuState.menuBackground === 'rgba(0, 0, 0, 0)') throw new Error(`${name} mobile menu surface remains transparent (${openMenuState.menuBackground})`);
     if (!openMenuState.toggleVisible) throw new Error(`${name} mobile menu close control is outside the viewport`);
+    if (!openMenuState.closeLinesMeet) throw new Error(`${name} mobile menu control does not settle into a centred X`);
     if (!openMenuState.htmlLocked || !openMenuState.bodyLocked) throw new Error(`${name} mobile menu does not lock both scrolling roots`);
     await screenshot(page, `${name}-menu`);
     await toggle.click();
     if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} mobile menu did not close with its visible control`);
+    await page.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
     await toggle.click();
     await page.keyboard.press('Escape');
     if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} mobile menu did not close with Escape`);
+    await page.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
     if (await page.locator('main').evaluate((element) => element.inert)) throw new Error(`${name} page remained inert after closing the mobile menu`);
     if (!await toggle.evaluate((element) => element === document.activeElement)) throw new Error(`${name} mobile menu did not return focus`);
   }
@@ -306,8 +318,11 @@ for (const [name, viewport] of responsiveMatrix) {
     const box = await toggle.boundingBox();
     if (!box || box.width < 44 || box.height < 44) throw new Error(`${name} compact menu target is too small`);
     await toggle.click();
+    if (await toggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${name} compact menu did not open`);
     if (!await toggle.isVisible()) throw new Error(`${name} hides the close control behind the menu`);
     await toggle.click();
+    if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} compact menu did not close`);
+    await matrixPage.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
   } else if (!await matrixPage.locator('.site-nav--desktop').isVisible()) {
     throw new Error(`${name} has neither desktop nor compact navigation`);
   }

@@ -321,25 +321,36 @@
   }
 
   .site-menu-button__lines {
-    display: grid;
-    gap: 0.28rem;
-    place-items: center;
+    position: relative;
+    display: block;
+    width: 0.92rem;
+    height: 0.92rem;
   }
 
   .site-menu-button__lines i {
-    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
     width: 0.92rem;
     height: 1px;
     background: currentColor;
     transition: transform 320ms var(--ease-out);
   }
 
+  .site-menu-button__lines i:first-child {
+    transform: translate(-50%, calc(-50% - 0.14rem));
+  }
+
+  .site-menu-button__lines i:last-child {
+    transform: translate(-50%, calc(-50% + 0.14rem));
+  }
+
   .site-menu-button[aria-expanded='true'] i:first-child {
-    transform: translateY(0.14rem) rotate(45deg);
+    transform: translate(-50%, -50%) rotate(45deg);
   }
 
   .site-menu-button[aria-expanded='true'] i:last-child {
-    transform: translateY(-0.14rem) rotate(-45deg);
+    transform: translate(-50%, -50%) rotate(-45deg);
   }
 
   .mobile-menu {
@@ -356,12 +367,13 @@
     opacity: 1;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-1.5rem);
+    clip-path: inset(0 0 100% 0);
     min-height: 100svh;
     height: 100dvh;
     overflow-y: auto;
     overscroll-behavior: contain;
-    transition: transform 480ms var(--ease-out), visibility 0s linear 480ms;
+    will-change: clip-path;
+    transition: clip-path 480ms var(--ease-out), visibility 0s linear 480ms;
   }
 
   .no-js-nav {
@@ -386,7 +398,7 @@
   .menu-is-open .mobile-menu {
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
+    clip-path: inset(0);
     transition-delay: 0s;
   }
 
