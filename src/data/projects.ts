@@ -104,7 +104,7 @@ export const projects: Record<ProjectId, Project> = {
           {
             label: 'Uzdevums',
             title: 'Panākt, lai digitālā pieredze būtu tikpat pārdomāta kā pats produkts.',
-            text: 'Kāzu salonā svarīga ir uzticība, gaume un ļoti personīga pieredze — nevis katalogs. Mājaslapai bija jāsaglabā šī sajūta un vienlaikus skaidri jāpastāsta par kleitām, to pielāgošanu, kopšanu un pierakstu.',
+            text: 'Kāzu salonā svarīgas ir uzticība, gaume un ļoti personīga pieredze — nevis katalogs. Mājaslapai bija jārada tā pati sajūta un vienlaikus skaidri jāpastāsta par kleitām, to pielāgošanu, kopšanu un pierakstu.',
           },
           {
             label: 'Ko es ieraudzīju',
@@ -114,7 +114,7 @@ export const projects: Record<ProjectId, Project> = {
           {
             label: 'Kas mainījās',
             title: 'Pārdomāts vizuālais ritms, īsta lokalizācija un tiešs ceļš uz pierakstu.',
-            text: 'Rezultātā tapusi pārdomāta kleitu izlase, skaidras pakalpojumu lapas, informācija par pielaikošanu, atsauksmes un saziņas iespējas latviešu, angļu un krievu valodā. Katra valodas versija ir pilnvērtīgi indeksējama.',
+            text: 'Rezultātā tapa pārdomāta kleitu izlase, skaidras pakalpojumu lapas, informācija par pielaikošanu, atsauksmes un saziņas iespējas latviešu, angļu un krievu valodā. Katra valodas versija ir pilnvērtīgi indeksējama.',
           },
           {
             label: 'Rezultāts',
@@ -187,12 +187,12 @@ export const projects: Record<ProjectId, Project> = {
           {
             label: 'Uzdevums',
             title: 'Trīs pakalpojumu jomas. Viens uzņēmums. Apjukumam nav vietas.',
-            text: 'Uzkopšanu, teritoriju kopšanu un sīkus remontdarbus meklē atšķirīgi klienti ar atšķirīgām vajadzībām. Viena vispārīga pakalpojumu lapa noslēptu daļu piedāvājuma, bet pārāk plaša struktūra apgrūtinātu izvēli.',
+            text: 'Uzkopšanu, teritoriju kopšanu un sīkus remontdarbus meklē atšķirīgi klienti ar atšķirīgām vajadzībām. Viena vispārīga pakalpojumu lapa noslēptu daļu piedāvājuma, savukārt pārāk sadrumstalota vietne apgrūtinātu izvēli.',
           },
           {
             label: 'Ko es ieraudzīju',
             title: 'Cilvēki pakalpojumu lapas nepārlūko izklaidei. Viņiem ir konkrēts darbs.',
-            text: 'Mājaslapai ātri jāpalīdz atrast vajadzīgo pakalpojumu, jāparāda apkalpošanas teritorija un jāveido uzticība, pēc tam jādod īsākais loģiskais ceļš uz zvanu vai detalizētu pieteikumu.',
+            text: 'Mājaslapai ātri jāpalīdz atrast vajadzīgo pakalpojumu, jāparāda apkalpošanas teritorija un jārada uzticība. Pēc tam jānodrošina īsākais loģiskais ceļš uz zvanu vai detalizētu pieteikumu.',
           },
           {
             label: 'Kas mainījās',
@@ -205,7 +205,7 @@ export const projects: Record<ProjectId, Project> = {
             text: 'ANELIKA var parādīt plašu piedāvājumu visā Latvijā, vienlaikus katrai lapai saglabājot skaidru uzdevumu, nākamo soli un iemeslu uzticēties uzņēmumam.',
           },
         ],
-        resultNote: 'Apzināti citāds nekā CATRIN: mazāk atmosfēras, vairāk skaidrības, uzticības un rīcības.',
+        resultNote: 'Apzināti atšķirīgs no CATRIN: mazāk atmosfēras, vairāk skaidrības, uzticības un rīcības.',
       },
     },
   },
