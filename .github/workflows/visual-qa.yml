@@ -73,6 +73,9 @@ jobs:
           VISUAL_BASE_URL: "http://127.0.0.1:4324"
         run: npm run audit:quality
 
+      - name: Stop stable browser preview
+        run: npx astro preview stop || true
+
       - name: Build future contact state
         env:
           PUBLIC_CONTACT_WHATSAPP: "+37120000000"
