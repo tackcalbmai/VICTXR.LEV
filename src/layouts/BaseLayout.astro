@@ -89,7 +89,14 @@ const schema = {
       const navigation = performance.getEntriesByType?.('navigation')?.[0];
       if (navigation?.type === 'reload' && !location.hash) {
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-        window.scrollTo(0, 0);
+        const resetReloadScroll = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        resetReloadScroll();
+        // Browsers may restore the old position after head scripts have run.
+        // Reset again at the lifecycle points surrounding that restoration so
+        // the opening never starts halfway down the page.
+        window.addEventListener('DOMContentLoaded', resetReloadScroll, { once: true });
+        window.addEventListener('load', () => window.requestAnimationFrame(resetReloadScroll), { once: true });
+        window.addEventListener('pageshow', resetReloadScroll, { once: true });
       } else if ('scrollRestoration' in history) {
         history.scrollRestoration = 'auto';
       }
