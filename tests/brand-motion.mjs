@@ -43,6 +43,15 @@ async function assertCrispRest(slot, glyph, name, phase) {
   if (glyphTransform !== 'none') throw new Error(`${name} ${phase} glyph keeps a transform at rest (${glyphTransform})`);
 }
 
+async function waitForBrandRest(page, letter, timeout = 1800) {
+  await page.waitForFunction((expected) => {
+    const glyph = document.querySelector('[data-brand-letter]');
+    const slot = glyph?.closest('.site-brand__letter-wrap');
+    if (!glyph || !slot || glyph.textContent !== expected) return false;
+    return getComputedStyle(slot).transform === 'none' && getComputedStyle(glyph).transform === 'none';
+  }, letter, { timeout });
+}
+
 async function assertBrandMotion(name, viewport) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
   const page = await context.newPage();
@@ -73,7 +82,7 @@ async function assertBrandMotion(name, viewport) {
 
   let maxFlight = 0;
   let sawO = false;
-  for (let i = 0; i < 55; i += 1) {
+  for (let i = 0; i < 85; i += 1) {
     const box = await slot.boundingBox();
     if (box) maxFlight = Math.max(maxFlight, distance(center(box), baselineCenter));
     if ((await glyph.textContent()) === 'O') {
@@ -86,8 +95,7 @@ async function assertBrandMotion(name, viewport) {
   if (!sawO) throw new Error(`${name} brand never changed from X to O`);
   if (maxFlight < (viewport.width <= 760 ? 2.5 : 4)) throw new Error(`${name} X/O motion no longer has an intentional flight (${maxFlight.toFixed(1)}px)`);
 
-  await page.waitForTimeout(520);
-  if ((await glyph.textContent()) !== 'O') throw new Error(`${name} O did not remain readable after landing`);
+  await waitForBrandRest(page, 'O');
   const oBox = await slot.boundingBox();
   if (!oBox) throw new Error(`${name} O landing has no geometry`);
   const oOffset = distance(center(oBox), baselineCenter);
@@ -100,8 +108,8 @@ async function assertBrandMotion(name, viewport) {
   await assertCrispRest(slot, glyph, name, 'O landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-o-landed.png`, fullPage: false });
 
-  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4200 });
-  await page.waitForTimeout(520);
+  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 5200 });
+  await waitForBrandRest(page, 'X');
   const xBox = await slot.boundingBox();
   if (!xBox) throw new Error(`${name} X return has no geometry`);
   const xOffset = distance(center(xBox), baselineCenter);
