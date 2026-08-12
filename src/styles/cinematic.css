@@ -210,6 +210,29 @@ html.is-cinematic-intro body {
   will-change: transform, opacity, clip-path;
 }
 
+.cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__differently {
+  visibility: visible !important;
+  animation: cinematic-differently-handoff 0.58s cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+
+@keyframes cinematic-differently-handoff {
+  0%,
+  18% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  72% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(1.018);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.035);
+  }
+}
+
 @media (max-width: 760px) {
   .cinematic-intro__hud {
     font-size: 0.47rem;
