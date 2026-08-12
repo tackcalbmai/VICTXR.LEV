@@ -203,6 +203,16 @@ html.is-cinematic-intro body {
   will-change: transform, opacity;
 }
 
+.cinematic-intro[data-cinematic-phase='differently'] .cinematic-intro__wordmark {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.cinematic-intro[data-cinematic-phase='differently'] .cinematic-intro__differently {
+  clip-path: none !important;
+  transform: translate(-50%, -50%) !important;
+}
+
 .cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__differently {
   visibility: visible !important;
   animation: cinematic-differently-handoff 0.82s cubic-bezier(0.76, 0, 0.24, 1) both;
