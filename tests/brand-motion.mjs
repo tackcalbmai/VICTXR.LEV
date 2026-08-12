@@ -62,6 +62,8 @@ async function assertBrandMotion(name, viewport) {
   await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 2200 });
+  await page.waitForTimeout(80);
 
   const slot = page.locator('.site-brand__letter-wrap');
   const glyph = page.locator('[data-brand-letter]');
@@ -82,7 +84,7 @@ async function assertBrandMotion(name, viewport) {
 
   let maxFlight = 0;
   let sawO = false;
-  for (let i = 0; i < 85; i += 1) {
+  for (let i = 0; i < 100; i += 1) {
     const box = await slot.boundingBox();
     if (box) maxFlight = Math.max(maxFlight, distance(center(box), baselineCenter));
     if ((await glyph.textContent()) === 'O') {
