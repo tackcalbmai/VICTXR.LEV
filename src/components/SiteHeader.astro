@@ -1,0 +1,49 @@
+---
+import type { Locale } from '../data/site';
+import { getSiteCopy } from '../data/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = getSiteCopy(locale);
+const home = copy.homeHref;
+const available = locale === 'lv' ? 'Pieejams' : 'Available';
+---
+
+<header class="site-header" data-site-header>
+  <a class="site-brand" href={home}>
+    <span>VICT</span><span class="site-brand__letter-wrap"><span data-brand-letter>X</span></span><span>R</span><span class="site-brand__dot">.</span><span>LEV</span>
+  </a>
+
+  <nav class="site-nav site-nav--desktop" aria-label={copy.nav.menu}>
+    <a href={`${home}#work`}>{copy.nav.work}</a>
+    <a href={`${home}#about`}>{copy.nav.about}</a>
+    <a href={`${home}#services`}>{copy.nav.services}</a>
+    <a href={`${home}#contact`}>{copy.nav.contact}</a>
+  </nav>
+
+  <div class="site-header__utility">
+    <span class="site-status"><span aria-hidden="true"></span>{available}</span>
+    <a class="site-language" href={copy.alternateHref} hreflang={copy.alternateLabel.toLowerCase()}>{copy.alternateLabel}</a>
+    <button class="site-menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
+      <span class="sr-only" data-menu-label data-open-label={copy.nav.menu} data-close-label={copy.nav.close}>{copy.nav.menu}</span>
+      <span class="site-menu-button__lines" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" inert>
+    <div class="mobile-menu__meta">
+      <span>VICTXR.LEV</span>
+      <span>{copy.hero.meta}</span>
+    </div>
+    <nav class="mobile-menu__nav" aria-label={copy.nav.menu}>
+      <a href={`${home}#work`}><span>01</span>{copy.nav.work}</a>
+      <a href={`${home}#about`}><span>02</span>{copy.nav.about}</a>
+      <a href={`${home}#services`}><span>03</span>{copy.nav.services}</a>
+      <a href={`${home}#contact`}><span>04</span>{copy.nav.contact}</a>
+    </nav>
+    <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
+  </div>
+</header>

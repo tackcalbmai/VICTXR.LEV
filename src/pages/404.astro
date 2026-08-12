@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Arrow from '../components/Arrow.astro';
+---
+
+<BaseLayout title="404 — VICTXR.LEV" description="This page does not exist." lang="en" canonicalPath="/404/" alternatePath="/404/" robots="noindex,nofollow">
+  <main class="not-found" id="main-content" tabindex="-1">
+    <a class="not-found__brand" href="/">VICTXR.LEV</a>
+    <p>Something looks wrong.</p>
+    <h1><span>Good.</span><strong>404</strong></h1>
+    <a class="not-found__back" href="/">Back to the working part <Arrow direction="right" /></a>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 100svh;
+    grid-template-rows: auto 1fr auto;
+    padding: var(--gutter);
+    overflow: hidden;
+  }
+  .not-found__brand { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.05em; }
+  .not-found > p { align-self: center; text-transform: uppercase; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; }
+  .not-found h1 { position: absolute; inset: 50% auto auto 50%; text-transform: uppercase; transform: translate(-50%, -50%) rotate(-4deg); }
+  .not-found h1 span, .not-found h1 strong { display: block; font-size: clamp(7rem, 25vw, 25rem); font-weight: 790; line-height: 0.7; letter-spacing: -0.1em; }
+  .not-found h1 span { color: var(--accent); font-size: clamp(4rem, 10vw, 10rem); transform: translateX(-16vw); }
+  .not-found__back { z-index: 2; display: inline-flex; width: max-content; align-items: center; gap: 0.6rem; padding-bottom: 0.2rem; border-bottom: 1px solid currentColor; text-transform: uppercase; font-size: 0.65rem; font-weight: 720; letter-spacing: 0.09em; }
+</style>

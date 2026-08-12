@@ -1,0 +1,83 @@
+---
+import { Image } from 'astro:assets';
+import Arrow from './Arrow.astro';
+import SiteHeader from './SiteHeader.astro';
+import { contactEmail, getSiteCopy, type Locale } from '../data/site';
+import { projects, type ProjectId } from '../data/projects';
+import '../styles/case-study.css';
+
+interface Props {
+  locale: Locale;
+  projectId: ProjectId;
+}
+
+const { locale, projectId } = Astro.props;
+const project = projects[projectId];
+const content = project.content[locale];
+const site = getSiteCopy(locale);
+const home = site.homeHref;
+const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
+const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
+const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact.subject)}`;
+---
+
+<div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} id="top">
+  <SiteHeader locale={locale} />
+  <main id="main-content" tabindex="-1">
+    <section class="case-hero" aria-labelledby="case-title">
+      <div class="case-hero__topline"><span>{content.eyebrow}</span><span>{content.location} / {content.year}</span></div>
+      <h1 id="case-title">{content.title}</h1>
+      <p class="case-hero__subtitle">{content.subtitle}</p>
+      <ul class="case-hero__services">{content.services.map((service) => <li>{service}</li>)}</ul>
+      <a class="case-live-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer">{content.liveLabel}<Arrow direction="up" /></a>
+    </section>
+
+    <figure class="case-browser reveal" data-reveal>
+      <div class="case-browser__bar"><span></span><span></span><span></span><em>{new URL(project.liveUrl).hostname}</em></div>
+      <Image class="case-screen case-screen--desktop" src={project.hero} alt={`${content.title} ${locale === 'lv' ? 'mājaslapas datora skats' : 'website desktop view'}`} loading="eager" quality={88} />
+      <Image class="case-screen case-screen--mobile" src={project.mobile} alt={`${content.title} ${locale === 'lv' ? 'mājaslapas mobilais skats' : 'website mobile view'}`} loading="eager" quality={88} />
+    </figure>
+
+    <section class="case-narrative section-pad" data-theme="light">
+      {content.sections.map((section, index) => (
+        <article class="case-narrative__row reveal" data-reveal>
+          <div><span>{String(index + 1).padStart(2, '0')}</span><span>{section.label}</span></div>
+          <h2>{section.title}</h2>
+          <p>{section.text}</p>
+        </article>
+      ))}
+    </section>
+
+    {projectId === 'catrin' ? (
+      <section class="case-gallery case-gallery--catrin section-pad" aria-label={locale === 'lv' ? 'CATRIN projekta galerija' : 'CATRIN project gallery'}>
+        <figure class="reveal" data-reveal><Image src={project.gallery[0]} alt={locale === 'lv' ? 'CATRIN līgavas portrets' : 'CATRIN bridal portrait'} loading="lazy" quality={84} /></figure>
+        <figure class="reveal" data-reveal><Image src={project.gallery[1]} alt={locale === 'lv' ? 'CATRIN kāzu kleitu izlase' : 'CATRIN wedding dress lookbook'} loading="lazy" quality={84} /></figure>
+        <figure class="reveal" data-reveal><Image src={project.gallery[2]} alt={locale === 'lv' ? 'CATRIN kāzu kleitas detaļa' : 'CATRIN wedding dress detail'} loading="lazy" quality={84} /></figure>
+        <figure class="reveal" data-reveal><Image src={project.gallery[3]} alt={locale === 'lv' ? 'CATRIN salona atmosfēra' : 'CATRIN salon atmosphere'} loading="lazy" quality={84} /></figure>
+      </section>
+    ) : (
+      <section class="case-gallery case-gallery--anelika section-pad" aria-label={locale === 'lv' ? 'ANELIKA responsīvā projekta galerija' : 'ANELIKA responsive project gallery'}>
+        <div class="anelika-mark" aria-hidden="true">{project.mark && <Image src={project.mark} alt="" />}</div>
+        <figure class="reveal" data-reveal><Image src={project.hero} alt={locale === 'lv' ? 'ANELIKA mājaslapas datora skats' : 'ANELIKA website desktop view'} loading="lazy" quality={86} /></figure>
+        <figure class="phone-frame reveal" data-reveal><Image src={project.mobile} alt={locale === 'lv' ? 'ANELIKA mājaslapas mobilais skats' : 'ANELIKA website mobile view'} loading="lazy" quality={86} /></figure>
+      </section>
+    )}
+
+    <section class="case-result section-pad" data-theme="dark">
+      <p>{content.resultNote}</p>
+      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">{content.liveLabel}<Arrow direction="up" /></a>
+    </section>
+
+    <nav class="case-next" data-theme="light" aria-label={locale === 'lv' ? 'Projektu navigācija' : 'Project navigation'}>
+      <a href={`${home}#work`}><Arrow direction="left" />{content.backLabel}</a>
+      <a href={nextHref}>{content.nextLabel}<Arrow direction="right" /></a>
+    </nav>
+
+    <section class="case-contact section-pad" id="contact" data-theme="dark">
+      <p>{site.contact.availability}</p>
+      <h2>{site.contact.title.map((line) => <span>{line}</span>)}</h2>
+      <a href={mailto}>{contactEmail}<Arrow direction="up" /></a>
+      <footer class="site-footer"><span>© <span data-current-year>2026</span> VICTXR.LEV</span><a href="#top">{site.footer.backToTop}<Arrow direction="up" /></a></footer>
+    </section>
+  </main>
+</div>

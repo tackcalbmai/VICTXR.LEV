@@ -1,0 +1,232 @@
+export type Locale = 'en' | 'lv';
+
+export const contactEmail = 'viktors.levdanskis@inbox.lv';
+
+export const siteCopy = {
+  en: {
+    lang: 'en',
+    homeHref: '/',
+    alternateHref: '/lv/',
+    alternateLabel: 'LV',
+    seo: {
+      title: 'VICTXR.LEV — Web design & development from Latvia',
+      description: 'Distinctive websites designed and built around real business problems — not around templates.',
+    },
+    nav: {
+      work: 'Work',
+      about: 'About',
+      services: 'Services',
+      contact: 'Contact',
+      menu: 'Menu',
+      close: 'Close',
+    },
+    hero: {
+      meta: 'Independent web designer & developer — Latvia',
+      lines: ['I see', 'things', 'differently.'],
+      intro: 'Websites for businesses that refuse to look ordinary.',
+      sideNote: 'No templates were harmed in the making of this website.',
+      scroll: 'Scroll',
+      work: 'View selected work',
+      start: 'Start a project',
+    },
+    disruption: {
+      oneBefore: 'Your business ',
+      oneWord: 'isn’t',
+      oneAfter: ' generic.',
+      twoBefore: 'Your website ',
+      twoWord: 'shouldn’t',
+      twoAfter: ' be either.',
+      caption: 'I design and build around the business — not around a template.',
+    },
+    work: {
+      label: 'Selected work',
+      title: 'Two businesses. Two very different problems.',
+      intro: 'The point is not one visual style. The point is finding the right one.',
+      caseStudy: 'View case study',
+      live: 'Open live website',
+      projects: {
+        catrin: {
+          index: '01',
+          name: 'CATRIN',
+          sector: 'Bridal salon — Jelgava, Latvia',
+          summary: 'A multilingual editorial experience that feels as considered as the dresses it presents.',
+          scope: ['Strategy', 'Web design', 'Development', 'Multilingual UX'],
+          href: '/work/catrin/',
+        },
+        anelika: {
+          index: '02',
+          name: 'ANELIKA',
+          sector: 'Property services — Latvia',
+          summary: 'A broad service business turned into a clear, fast route from need to enquiry.',
+          scope: ['Information architecture', 'Web design', 'Lead generation', 'Technical SEO'],
+          href: '/work/anelika/',
+        },
+      },
+    },
+    about: {
+      label: 'About / 03',
+      title: ['How did I', 'get here?'],
+      aside: 'Good question.',
+      paragraphs: [
+        'I didn’t start as a web developer. I started by trying to solve problems. Somewhere along the way, those problems became websites.',
+        'I still don’t care much about how things are “usually done”. I care whether they work, look right and make sense.',
+      ],
+      statement: ['Apparently,', 'I’m pretty good', 'at this.'],
+    },
+    approach: {
+      label: 'Approach / 04',
+      intro: 'No fixed formula. Every business has a different problem.',
+      steps: ['I ask.', 'I question.', 'I remove.', 'I build.', 'I break it.', 'I fix it.', 'I ship it.'],
+    },
+    services: {
+      label: 'What I do / 05',
+      title: 'Useful things. Properly finished.',
+      items: [
+        ['01', 'Websites from scratch', 'Strategy, structure, visual system and production code.'],
+        ['02', 'Website redesign', 'Keep what works. Remove what does not. Rebuild the rest.'],
+        ['03', 'Landing pages', 'One clear offer, one clear path, no dead weight.'],
+        ['04', 'Multilingual websites', 'Real localized structure — not a translation widget taped on top.'],
+        ['05', 'SEO & technical setup', 'Indexable pages, metadata, speed, accessibility and analytics foundations.'],
+        ['06', 'Ongoing development', 'Measured improvements after launch instead of ceremonial abandonment.'],
+      ],
+    },
+    xo: {
+      label: 'The X/O system',
+      title: ['From X', 'to O.'],
+      text: 'Find what blocks the business. Turn it into something clear, useful and deliberate. The logo changes because the work does too.',
+    },
+    anti: {
+      first: ['You probably', 'don’t need', 'a website.'],
+      second: ['You need', 'a better', 'business tool.'],
+      text: 'Sometimes that is a website. Sometimes it is a redesign. Sometimes the best decision is removing half of what you planned.',
+    },
+    contact: {
+      label: 'Contact / 06',
+      title: ['Let’s make', 'something', 'worth looking at.'],
+      availability: 'Latvia / Available worldwide',
+      emailLabel: 'Start with an email',
+      copy: 'Copy email',
+      copied: 'Copied',
+      subject: 'New project for VICTXR.LEV',
+    },
+    footer: {
+      note: 'Designed and built in Latvia.',
+      backToTop: 'Back to top',
+    },
+  },
+  lv: {
+    lang: 'lv',
+    homeHref: '/lv/',
+    alternateHref: '/',
+    alternateLabel: 'EN',
+    seo: {
+      title: 'VICTXR.LEV — Mājaslapu dizains un izstrāde Latvijā',
+      description: 'Atšķirīgas mājaslapas, kas veidotas ap reālām biznesa vajadzībām — nevis ap veidnēm.',
+    },
+    nav: {
+      work: 'Darbi',
+      about: 'Par mani',
+      services: 'Pakalpojumi',
+      contact: 'Kontakti',
+      menu: 'Izvēlne',
+      close: 'Aizvērt',
+    },
+    hero: {
+      meta: 'Neatkarīgs mājaslapu dizainers un izstrādātājs — Latvija',
+      lines: ['Es redzu', 'lietas', 'citādi.'],
+      intro: 'Mājaslapas uzņēmumiem, kas atsakās izskatīties kā visi pārējie.',
+      sideNote: 'Šīs vietnes tapšanā nav cietusi neviena veidne.',
+      scroll: 'Ritini',
+      work: 'Skatīt darbus',
+      start: 'Sākt projektu',
+    },
+    disruption: {
+      oneBefore: 'Tavs uzņēmums ',
+      oneWord: 'nav',
+      oneAfter: ' kā visi.',
+      twoBefore: 'Arī mājaslapai ',
+      twoWord: 'nav',
+      twoAfter: ' tādai jābūt.',
+      caption: 'Es veidoju mājaslapu ap biznesu — nevis biznesu ap veidni.',
+    },
+    work: {
+      label: 'Atlasītie darbi',
+      title: 'Divi uzņēmumi. Divas pilnīgi atšķirīgas problēmas.',
+      intro: 'Mērķis nav viens vizuālais stils. Mērķis ir atrast īsto.',
+      caseStudy: 'Skatīt projektu',
+      live: 'Atvērt dzīvo mājaslapu',
+      projects: {
+        catrin: {
+          index: '01',
+          name: 'CATRIN',
+          sector: 'Kāzu salons — Jelgava, Latvija',
+          summary: 'Daudzvalodu redakcionāla pieredze, kas ir tikpat pārdomāta kā tajā parādītās kleitas.',
+          scope: ['Stratēģija', 'Web dizains', 'Izstrāde', 'Daudzvalodu UX'],
+          href: '/lv/darbi/catrin/',
+        },
+        anelika: {
+          index: '02',
+          name: 'ANELIKA',
+          sector: 'Īpašumu serviss — Latvija',
+          summary: 'Plašs pakalpojumu klāsts pārvērsts skaidrā ceļā no vajadzības līdz pieprasījumam.',
+          scope: ['Informācijas arhitektūra', 'Web dizains', 'Pieteikumu plūsma', 'Tehniskais SEO'],
+          href: '/lv/darbi/anelika/',
+        },
+      },
+    },
+    about: {
+      label: 'Par mani / 03',
+      title: ['Kā es te', 'nonācu?'],
+      aside: 'Labs jautājums.',
+      paragraphs: [
+        'Es nesāku kā web izstrādātājs. Es sāku ar problēmu risināšanu. Kādā brīdī šīs problēmas pārvērtās mājaslapās.',
+        'Man joprojām nav svarīgi, kā lietas “parasti dara”. Man ir svarīgi, lai tās strādā, izskatās pareizi un ir loģiskas.',
+      ],
+      statement: ['Izrādās,', 'man tas sanāk', 'diezgan labi.'],
+    },
+    approach: {
+      label: 'Pieeja / 04',
+      intro: 'Nav vienas formulas. Katram biznesam ir cita problēma.',
+      steps: ['Es jautāju.', 'Es apšaubu.', 'Es noņemu.', 'Es būvēju.', 'Es salaužu.', 'Es salaboju.', 'Es palaižu.'],
+    },
+    services: {
+      label: 'Ko es daru / 05',
+      title: 'Noderīgas lietas. Pabeigtas līdz galam.',
+      items: [
+        ['01', 'Mājaslapas no nulles', 'Stratēģija, struktūra, vizuālā sistēma un gatavs produkcijas kods.'],
+        ['02', 'Mājaslapu pārveide', 'Atstāt to, kas strādā. Izmest to, kas nestrādā. Pārbūvēt pārējo.'],
+        ['03', 'Pārdošanas lapas', 'Viens skaidrs piedāvājums, viens skaidrs ceļš, nekā lieka.'],
+        ['04', 'Daudzvalodu mājaslapas', 'Pilnvērtīga lokalizācija — nevis tulkošanas logrīks, kas pielīmēts augšpusē.'],
+        ['05', 'SEO un tehniskā bāze', 'Indeksējamas lapas, metadati, ātrums, piekļūstamība un analītikas pamati.'],
+        ['06', 'Tālāka attīstība', 'Izmērāmi uzlabojumi pēc palaišanas, nevis svinīga mājaslapas pamešana.'],
+      ],
+    },
+    xo: {
+      label: 'X/O sistēma',
+      title: ['No X', 'uz O.'],
+      text: 'Atrast to, kas bremzē biznesu. Pārvērst to skaidrā, noderīgā un apzinātā risinājumā. Logotips mainās, jo mainās arī rezultāts.',
+    },
+    anti: {
+      first: ['Tev, visticamāk,', 'nevajag', 'mājaslapu.'],
+      second: ['Tev vajag', 'labāku', 'biznesa rīku.'],
+      text: 'Dažreiz tā ir mājaslapa. Dažreiz — pārveide. Dažreiz labākais lēmums ir izmest pusi no sākotnējā plāna.',
+    },
+    contact: {
+      label: 'Kontakti / 06',
+      title: ['Uztaisīsim', 'ko tādu,', 'uz ko ir vērts skatīties.'],
+      availability: 'Latvija / Pieejams visā pasaulē',
+      emailLabel: 'Sāc ar e-pastu',
+      copy: 'Kopēt e-pastu',
+      copied: 'Nokopēts',
+      subject: 'Jauns projekts VICTXR.LEV',
+    },
+    footer: {
+      note: 'Dizainēts un izstrādāts Latvijā.',
+      backToTop: 'Uz augšu',
+    },
+  },
+} as const;
+
+export function getSiteCopy(locale: Locale) {
+  return siteCopy[locale];
+}

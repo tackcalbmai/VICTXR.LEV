@@ -4,210 +4,107 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export function initHomeMotion() {
-  const homeShell = document.querySelector<HTMLElement>('[data-home-intro]');
-  const brandLetter = document.querySelector<HTMLElement>('[data-brand-letter]');
+  const shell = document.querySelector<HTMLElement>('[data-home-intro]');
+  if (!shell) return;
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const brandLetter = document.querySelector<HTMLElement>('[data-brand-letter]');
+  const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
+  let introReady: gsap.core.Tween | undefined;
+  let brandIdle: gsap.core.Tween | undefined;
+  let brandCycle: gsap.core.Timeline | undefined;
+  let journeyTween: gsap.core.Tween | undefined;
 
-  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  window.scrollTo(0, 0);
+  const scheduleBrandCycle = (delay = 7.8) => {
+    brandIdle?.kill();
+    brandIdle = gsap.delayedCall(delay, runBrandCycle);
+  };
 
-  if (reducedMotion) {
-    homeShell?.setAttribute('data-home-intro', 'ready');
-    return;
+  const glitchLetter = (timeline: gsap.core.Timeline, position: number | string) => {
+    if (!brandLetter) return;
+    timeline.to(brandLetter, {
+      keyframes: [
+        { x: 0, skewX: 0, autoAlpha: 1, duration: 0.01 },
+        { x: 3, skewX: -18, autoAlpha: 0.28, duration: 0.035, ease: 'steps(1)' },
+        { x: -2, skewX: 13, autoAlpha: 1, duration: 0.035, ease: 'steps(1)' },
+        { x: 0, skewX: 0, autoAlpha: 1, duration: 0.065 },
+      ],
+    }, position);
+  };
+
+  function runBrandCycle() {
+    if (!brandLetter || document.hidden || reducedMotion) {
+      scheduleBrandCycle(6);
+      return;
+    }
+
+    brandCycle?.kill();
+    brandCycle = gsap.timeline({ onComplete: () => scheduleBrandCycle(10.5) });
+    brandCycle
+      .to(brandLetter, { rotation: -95, duration: 0.5, ease: 'power1.in', transformOrigin: '50% 52%' })
+      .to(brandLetter, { rotation: -360, duration: 0.27, ease: 'power4.in' });
+    glitchLetter(brandCycle, '<-0.12');
+    brandCycle
+      .call(() => {
+        brandLetter.textContent = 'O';
+        gsap.set(brandLetter, { rotation: 0 });
+      })
+      .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.18, ease: 'power2.out' })
+      .to({}, { duration: 1.45 })
+      .to(brandLetter, { rotation: -110, duration: 0.46, ease: 'power1.in', transformOrigin: '50% 52%' })
+      .to(brandLetter, { rotation: -360, duration: 0.25, ease: 'power4.in' });
+    glitchLetter(brandCycle, '<-0.12');
+    brandCycle
+      .call(() => {
+        brandLetter.textContent = 'X';
+        gsap.set(brandLetter, { rotation: 0 });
+      })
+      .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.18, ease: 'power2.out' });
   }
 
+  introReady = gsap.delayedCall(reducedMotion ? 0 : 1.48, () => {
+    shell.setAttribute('data-home-intro', 'ready');
+    ScrollTrigger.refresh();
+    if (!reducedMotion) brandIdle = gsap.delayedCall(0.45, runBrandCycle);
+  });
+
+  if (reducedMotion) return;
+
+  const stopJourney = () => {
+    if (!journeyTween?.isActive()) return;
+    journeyTween.kill();
+    journeyTween = undefined;
+  };
+
+  const onScrollJourney = (event: MouseEvent) => {
+    event.preventDefault();
+    const target = document.querySelector<HTMLElement>('[data-disruption]');
+    if (!target) return;
+    const mobile = window.matchMedia('(max-width: 760px)').matches;
+    const startY = window.scrollY;
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    const targetY = top + window.innerHeight * (mobile ? 0.3 : 0.62);
+    const state = { y: startY };
+    const distance = Math.abs(targetY - startY);
+    journeyTween?.kill();
+    journeyTween = gsap.to(state, {
+      y: targetY,
+      duration: gsap.utils.clamp(mobile ? 1.7 : 2, mobile ? 2.45 : 3.2, distance / (mobile ? 530 : 610)),
+      ease: mobile ? 'power2.inOut' : 'power3.inOut',
+      onUpdate: () => {
+        window.scrollTo(0, state.y);
+        ScrollTrigger.update();
+      },
+      onComplete: () => { journeyTween = undefined; },
+    });
+  };
+
+  scrollControl?.addEventListener('click', onScrollJourney);
+  window.addEventListener('wheel', stopJourney, { passive: true });
+  window.addEventListener('touchmove', stopJourney, { passive: true });
+  window.addEventListener('keydown', stopJourney);
+
   const ctx = gsap.context(() => {
-    let brandIdle: gsap.core.Tween | undefined;
-    let brandCycle: gsap.core.Timeline | undefined;
-    let brandIntroStart: gsap.core.Tween | undefined;
-
-    const scheduleBrandCycle = (delay = 7.5) => {
-      brandIdle?.kill();
-      brandIdle = gsap.delayedCall(delay, () => runBrandCycle());
-    };
-
-    const glitchBrandLetter = (timeline: gsap.core.Timeline, position: number | string) => {
-      if (!brandLetter) return;
-      timeline.to(
-        brandLetter,
-        {
-          keyframes: [
-            { x: 0, skewX: 0, autoAlpha: 1, duration: 0.01 },
-            { x: 2.5, skewX: -17, autoAlpha: 0.28, duration: 0.035, ease: 'steps(1)' },
-            { x: -2, skewX: 12, autoAlpha: 1, duration: 0.035, ease: 'steps(1)' },
-            { x: 0, skewX: 0, autoAlpha: 1, duration: 0.06 },
-          ],
-        },
-        position,
-      );
-    };
-
-    const runBrandCycle = () => {
-      if (!brandLetter || document.hidden) {
-        scheduleBrandCycle(5);
-        return;
-      }
-
-      brandCycle?.kill();
-      brandCycle = gsap.timeline({ onComplete: () => scheduleBrandCycle(9.5) });
-
-      brandCycle
-        .to(brandLetter, {
-          rotation: -105,
-          duration: 0.48,
-          ease: 'power1.in',
-          transformOrigin: '50% 52%',
-        })
-        .to(brandLetter, { rotation: -360, duration: 0.25, ease: 'power4.in' });
-
-      glitchBrandLetter(brandCycle, '<-0.11');
-
-      brandCycle
-        .call(() => {
-          brandLetter.textContent = 'O';
-          gsap.set(brandLetter, { rotation: 0 });
-        })
-        .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.16, ease: 'power2.out' })
-        .to({}, { duration: 1.35 })
-        .to(brandLetter, {
-          rotation: -120,
-          duration: 0.42,
-          ease: 'power1.in',
-          transformOrigin: '50% 52%',
-        })
-        .to(brandLetter, { rotation: -360, duration: 0.23, ease: 'power4.in' });
-
-      glitchBrandLetter(brandCycle, '<-0.11');
-
-      brandCycle
-        .call(() => {
-          brandLetter.textContent = 'X';
-          gsap.set(brandLetter, { rotation: 0 });
-        })
-        .to(brandLetter, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.16, ease: 'power2.out' });
-    };
-
-    const finishIntro = () => {
-      homeShell?.setAttribute('data-home-intro', 'ready');
-      gsap.set(
-        '[data-intro-header], [data-intro-line], [data-intro-footer], [data-side-note], [data-scroll-journey]',
-        { clearProps: 'opacity,visibility,transform,clipPath,filter' },
-      );
-      ScrollTrigger.refresh();
-      if (brandLetter) brandIntroStart = gsap.delayedCall(0.34, runBrandCycle);
-    };
-
-    const intro = gsap.timeline({
-      paused: true,
-      defaults: { ease: 'power4.out' },
-      onComplete: finishIntro,
-    });
-
-    intro
-      .to('[data-intro-header]', { autoAlpha: 1, y: 0, duration: 0.38 }, 0)
-      .to(
-        '[data-intro-line]',
-        {
-          autoAlpha: 1,
-          yPercent: 0,
-          rotate: 0,
-          clipPath: 'inset(0% 0% 0% 0%)',
-          filter: 'blur(0px)',
-          duration: 0.86,
-          stagger: 0.16,
-        },
-        0.02,
-      )
-      .to(
-        '[data-intro-line]',
-        {
-          keyframes: [
-            { x: 0, skewX: 0, duration: 0.01 },
-            { x: 6, skewX: -8, duration: 0.035, ease: 'steps(1)' },
-            { x: -4, skewX: 6, duration: 0.035, ease: 'steps(1)' },
-            { x: 2, skewX: -3, duration: 0.03, ease: 'steps(1)' },
-            { x: 0, skewX: 0, duration: 0.11, ease: 'power2.out' },
-          ],
-          stagger: 0.055,
-        },
-        0.78,
-      )
-      .to('[data-intro-footer]', { autoAlpha: 1, y: 0, duration: 0.5 }, 0.72)
-      .to(
-        '[data-side-note]',
-        {
-          autoAlpha: 1,
-          clipPath: 'inset(0% 0% 0% 0%)',
-          filter: 'blur(0px)',
-          duration: 0.7,
-        },
-        0.74,
-      )
-      .to('[data-scroll-journey]', { autoAlpha: 1, y: 0, duration: 0.48 }, 0.96)
-      .to(
-        '[data-intro-suffix]',
-        {
-          keyframes: [
-            { x: 0, skewX: 0, duration: 0.01 },
-            { x: 4, skewX: -10, duration: 0.04, ease: 'steps(1)' },
-            { x: -2, skewX: 7, duration: 0.04, ease: 'steps(1)' },
-            { x: 0, skewX: 0, duration: 0.075 },
-          ],
-        },
-        1.08,
-      );
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => intro.play(0));
-    });
-
-    const scrollControl = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
-    let journeyTween: gsap.core.Tween | undefined;
-
-    const stopJourney = () => {
-      if (journeyTween?.isActive()) {
-        journeyTween.kill();
-        journeyTween = undefined;
-      }
-    };
-
-    const onScrollJourney = (event: MouseEvent) => {
-      event.preventDefault();
-      const targetSection = document.querySelector<HTMLElement>('[data-disruption]');
-      if (!targetSection) return;
-
-      journeyTween?.kill();
-      const mobile = window.matchMedia('(max-width: 760px)').matches;
-      const startY = window.scrollY;
-      const disruptionTop = targetSection.getBoundingClientRect().top + window.scrollY;
-      const targetY = disruptionTop + window.innerHeight * (mobile ? 0.29 : 0.78);
-      const distance = Math.abs(targetY - startY);
-      const duration = gsap.utils.clamp(
-        mobile ? 1.65 : 1.95,
-        mobile ? 2.25 : 3.15,
-        distance / (mobile ? 560 : 620),
-      );
-      const state = { y: startY };
-
-      journeyTween = gsap.to(state, {
-        y: targetY,
-        duration,
-        ease: mobile ? 'power2.inOut' : 'power3.inOut',
-        onUpdate: () => {
-          window.scrollTo(0, state.y);
-          ScrollTrigger.update();
-        },
-        onComplete: () => {
-          journeyTween = undefined;
-        },
-      });
-    };
-
-    scrollControl?.addEventListener('click', onScrollJourney);
-    window.addEventListener('wheel', stopJourney, { passive: true });
-    window.addEventListener('touchmove', stopJourney, { passive: true });
-    window.addEventListener('keydown', stopJourney);
-
     const mm = gsap.matchMedia();
 
     mm.add('(min-width: 761px)', () => {
@@ -215,7 +112,7 @@ export function initHomeMotion() {
         scrollTrigger: {
           trigger: '[data-disruption]',
           start: 'top top',
-          end: '+=165%',
+          end: '+=205%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -223,31 +120,15 @@ export function initHomeMotion() {
       });
 
       disruption
-        .to('[data-disruption-one]', {
-          xPercent: -4.5,
-          yPercent: -23,
-          rotate: -1.8,
-          scale: 0.94,
-          transformOrigin: 'left center',
-          ease: 'none',
-        })
-        .to('[data-disruption-two]', { autoAlpha: 1, xPercent: 2.2, yPercent: 8, rotate: 0.9, ease: 'none' }, '<22%')
-        .to('[data-disruption-x]', { autoAlpha: 0.085, scale: 1.04, rotate: 7, ease: 'none' }, '<10%')
-        .to('[data-disruption-caption]', { autoAlpha: 1, y: -6, duration: 0.34, ease: 'none' }, '<4%');
-
-      const catrin = gsap.timeline({
-        scrollTrigger: {
-          trigger: '[data-catrin]',
-          start: 'top 92%',
-          end: 'bottom bottom',
-          scrub: 0.9,
-        },
-      });
-
-      catrin
-        .fromTo('[data-catrin-title]', { x: '9vw' }, { x: '0vw', duration: 0.18, ease: 'none' })
-        .to({}, { duration: 0.6 })
-        .to('[data-catrin-title]', { x: '-12vw', duration: 0.22, ease: 'none' });
+        .to({}, { duration: 0.18 })
+        .to('[data-disruption-one]', { xPercent: -7, yPercent: -22, rotate: -1.6, scale: 0.96, duration: 0.42, ease: 'none' })
+        .fromTo('[data-disruption-two]', { autoAlpha: 0, color: '#8d8a82', xPercent: 8, yPercent: 12 }, { autoAlpha: 1, color: '#0c0c0b', xPercent: 0, yPercent: 0, duration: 0.38, ease: 'none' }, '<18%')
+        .to('[data-disruption-x]', { autoAlpha: 0.08, scale: 1.05, rotate: 6, duration: 0.38, ease: 'none' }, '<12%')
+        .to('[data-disruption-caption]', { autoAlpha: 1, y: 0, duration: 0.25, ease: 'none' }, '<18%')
+        .to({}, { duration: 0.22 })
+        .to('[data-disruption-one]', { xPercent: -28, yPercent: -36, rotate: -3.2, duration: 0.36, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 22, yPercent: 20, rotate: 2.2, duration: 0.36, ease: 'none' }, '<')
+        .to('[data-disruption-x]', { scale: 1.22, rotate: 13, autoAlpha: 0.13, duration: 0.36, ease: 'none' }, '<');
     });
 
     mm.add('(max-width: 760px)', () => {
@@ -255,7 +136,7 @@ export function initHomeMotion() {
         scrollTrigger: {
           trigger: '[data-disruption]',
           start: 'top top',
-          end: '+=185%',
+          end: '+=220%',
           scrub: 1,
           pin: true,
           anticipatePin: 1,
@@ -263,115 +144,104 @@ export function initHomeMotion() {
       });
 
       disruption
-        .fromTo(
-          '[data-disruption-one]',
-          { xPercent: 0, yPercent: 0, rotate: 0, scale: 1 },
-          {
-            xPercent: -4,
-            yPercent: -4,
-            rotate: -0.7,
-            scale: 0.992,
-            transformOrigin: 'left center',
-            duration: 0.26,
-            ease: 'none',
-          },
-        )
-        .fromTo(
-          '[data-disruption-two]',
-          { autoAlpha: 0.08, color: '#98968f', xPercent: 5, yPercent: 4, rotate: 0.25 },
-          {
-            autoAlpha: 1,
-            color: '#0a0a0a',
-            xPercent: 0,
-            yPercent: 0,
-            rotate: 0,
-            duration: 0.3,
-            ease: 'none',
-          },
-          '<14%',
-        )
-        .to('[data-disruption-x]', {
-          autoAlpha: 0.08,
-          scale: 1.05,
-          rotate: 5,
-          duration: 0.28,
-          ease: 'none',
-        }, '<10%')
-        .to('[data-disruption-caption]', {
-          autoAlpha: 1,
-          y: -3,
-          duration: 0.2,
-          ease: 'none',
-        }, '<20%')
-        .to('[data-disruption-one]', {
-          xPercent: -12,
-          yPercent: -9,
-          rotate: -1.45,
-          duration: 0.46,
-          ease: 'none',
-        })
-        .to('[data-disruption-two]', {
-          xPercent: 10,
-          yPercent: 6,
-          rotate: 0.95,
-          duration: 0.46,
-          ease: 'none',
-        }, '<')
-        .to('[data-disruption-x]', {
-          scale: 1.12,
-          rotate: 8,
-          duration: 0.46,
-          ease: 'none',
-        }, '<')
-        .to('[data-disruption-one]', {
-          xPercent: -25,
-          yPercent: -16,
-          rotate: -2.6,
-          duration: 0.34,
-          ease: 'none',
-        })
-        .to('[data-disruption-two]', {
-          xPercent: 23,
-          yPercent: 13,
-          rotate: 1.9,
-          duration: 0.34,
-          ease: 'none',
-        }, '<')
-        .to('[data-disruption-x]', {
-          scale: 1.21,
-          rotate: 12,
-          duration: 0.34,
-          ease: 'none',
-        }, '<');
-
-      const catrin = gsap.timeline({
-        scrollTrigger: {
-          trigger: '[data-catrin]',
-          start: 'top 94%',
-          end: 'bottom bottom',
-          scrub: 0.88,
-        },
-      });
-
-      catrin
-        .fromTo('[data-catrin-title]', { x: '10vw' }, { x: '0vw', duration: 0.24, ease: 'none' })
-        .to({}, { duration: 0.58 })
-        .to('[data-catrin-title]', { x: '-13vw', duration: 0.18, ease: 'none' });
+        .to({}, { duration: 0.22 })
+        .to('[data-disruption-one]', { xPercent: -3, yPercent: -4, rotate: -0.5, duration: 0.28, ease: 'none' })
+        .fromTo('[data-disruption-two]', { autoAlpha: 0, color: '#aaa79f', xPercent: 7, yPercent: 6 }, { autoAlpha: 1, color: '#0c0c0b', xPercent: 0, yPercent: 0, duration: 0.34, ease: 'none' }, '<12%')
+        .to('[data-disruption-x]', { autoAlpha: 0.075, scale: 1.04, rotate: 4, duration: 0.32, ease: 'none' }, '<12%')
+        .to('[data-disruption-caption]', { autoAlpha: 1, y: 0, duration: 0.2, ease: 'none' }, '<16%')
+        .to({}, { duration: 0.3 })
+        .to('[data-disruption-one]', { xPercent: -14, yPercent: -12, rotate: -1.5, duration: 0.42, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 11, yPercent: 9, rotate: 1.1, duration: 0.42, ease: 'none' }, '<')
+        .to('[data-disruption-x]', { scale: 1.13, rotate: 8, duration: 0.42, ease: 'none' }, '<')
+        .to('[data-disruption-one]', { xPercent: -31, yPercent: -23, rotate: -2.8, duration: 0.34, ease: 'none' })
+        .to('[data-disruption-two]', { xPercent: 28, yPercent: 18, rotate: 2.2, duration: 0.34, ease: 'none' }, '<')
+        .to('[data-disruption-x]', { scale: 1.22, rotate: 13, duration: 0.34, ease: 'none' }, '<');
     });
 
-    return () => {
-      intro.kill();
-      brandIntroStart?.kill();
-      brandIdle?.kill();
-      brandCycle?.kill();
-      journeyTween?.kill();
-      scrollControl?.removeEventListener('click', onScrollJourney);
-      window.removeEventListener('wheel', stopJourney);
-      window.removeEventListener('touchmove', stopJourney);
-      window.removeEventListener('keydown', stopJourney);
-      mm.revert();
-    };
-  });
+    gsap.utils.toArray<HTMLElement>('[data-project]').forEach((project, index) => {
+      const media = project.querySelector<HTMLElement>('[data-project-media]');
+      const title = project.querySelector<HTMLElement>('[data-project-title]');
+      if (media) {
+        gsap.fromTo(media, { clipPath: 'inset(11% 9% 11% 9%)', scale: 0.96 }, {
+          clipPath: 'inset(0% 0% 0% 0%)',
+          scale: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: project, start: 'top 82%', end: 'top 20%', scrub: 0.8 },
+        });
+      }
+      if (title) {
+        gsap.fromTo(title, { xPercent: index === 0 ? 7 : -6 }, {
+          xPercent: index === 0 ? -4 : 4,
+          ease: 'none',
+          scrollTrigger: { trigger: project, start: 'top bottom', end: 'bottom top', scrub: 1 },
+        });
+      }
+    });
 
-  return () => ctx.revert();
+    gsap.from('[data-statement] span', {
+      yPercent: 110,
+      rotate: 1.8,
+      stagger: 0.08,
+      duration: 0.9,
+      ease: 'power4.out',
+      scrollTrigger: { trigger: '[data-statement]', start: 'top 82%', once: true },
+    });
+
+    gsap.utils.toArray<HTMLElement>('[data-approach-step]').forEach((step) => {
+      gsap.fromTo(step, { xPercent: 4 }, {
+        xPercent: 0,
+        ease: 'none',
+        scrollTrigger: { trigger: step, start: 'top 88%', end: 'center 58%', scrub: 0.55 },
+      });
+    });
+
+    const anti = gsap.timeline({
+      scrollTrigger: {
+        trigger: '[data-anti-sales]',
+        start: 'top top',
+        end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1,
+      },
+    });
+    anti
+      .to({}, { duration: 0.25 })
+      .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
+      .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
+      .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
+      .to({}, { duration: 0.25 });
+
+    if (window.matchMedia('(pointer: fine)').matches) {
+      document.querySelectorAll<HTMLElement>('[data-perspective-card]').forEach((card) => {
+        const onMove = (event: PointerEvent) => {
+          const rect = card.getBoundingClientRect();
+          const px = (event.clientX - rect.left) / rect.width - 0.5;
+          const py = (event.clientY - rect.top) / rect.height - 0.5;
+          card.style.setProperty('--card-ry', `${px * 5}deg`);
+          card.style.setProperty('--card-rx', `${py * -4}deg`);
+        };
+        const reset = () => {
+          card.style.setProperty('--card-ry', '0deg');
+          card.style.setProperty('--card-rx', '0deg');
+        };
+        card.addEventListener('pointermove', onMove);
+        card.addEventListener('pointerleave', reset);
+      });
+    }
+
+    return () => mm.revert();
+  }, shell);
+
+  return () => {
+    introReady?.kill();
+    brandIdle?.kill();
+    brandCycle?.kill();
+    journeyTween?.kill();
+    scrollControl?.removeEventListener('click', onScrollJourney);
+    window.removeEventListener('wheel', stopJourney);
+    window.removeEventListener('touchmove', stopJourney);
+    window.removeEventListener('keydown', stopJourney);
+    ctx.revert();
+  };
 }

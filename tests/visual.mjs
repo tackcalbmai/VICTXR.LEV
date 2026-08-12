@@ -1,253 +1,292 @@
-import { chromium, devices } from 'playwright';
+import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
 const outDir = 'artifacts/visual';
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
 
 await mkdir(outDir, { recursive: true });
-const browser = await chromium.launch({ headless: true });
 
-async function documentTop(page, selector) {
+const browser = await chromium.launch({
+  headless: true,
+  ...(executablePath ? {
+    executablePath,
+    args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+  } : {}),
+});
+
+function collectRuntimeErrors(page) {
+  const errors = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+  });
+  page.on('pageerror', (error) => errors.push(`page: ${error.message}`));
+  return errors;
+}
+
+async function openPage(page, path) {
+  const response = await page.goto(new URL(path, baseURL).toString(), { waitUntil: 'domcontentloaded' });
+  await page.evaluate(() => document.fonts.ready);
+  return response;
+}
+
+async function assertNoHorizontalOverflow(page, name) {
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    document: document.documentElement.scrollWidth,
+    body: document.body.scrollWidth,
+  }));
+  const overflow = Math.max(dimensions.document, dimensions.body) - dimensions.viewport;
+  if (overflow > 2) throw new Error(`${name} has ${overflow}px horizontal overflow`);
+}
+
+async function assertCoreDocument(page, name, lang) {
+  if ((await page.locator('html').getAttribute('lang')) !== lang) throw new Error(`${name} has the wrong document language`);
+  if (await page.locator('main').count() !== 1) throw new Error(`${name} must have exactly one main landmark`);
+  if (await page.locator('h1').count() !== 1) throw new Error(`${name} must have exactly one h1`);
+  if (!await page.locator('link[rel="canonical"]').getAttribute('href')) throw new Error(`${name} is missing a canonical URL`);
+  if (await page.locator('link[rel="alternate"][hreflang]').count() < 3) throw new Error(`${name} is missing language alternates`);
+  if (!await page.locator('meta[property="og:image"]').getAttribute('content')) throw new Error(`${name} is missing a social image`);
+  const skipTarget = await page.locator('.skip-link').getAttribute('href');
+  if (skipTarget !== '#main-content' || await page.locator('main#main-content').count() !== 1) throw new Error(`${name} skip link does not target the main landmark`);
+  await assertNoHorizontalOverflow(page, name);
+}
+
+async function assertImagesLoaded(page, name) {
+  await page.evaluate(async () => {
+    const step = Math.max(500, Math.floor(window.innerHeight * 0.8));
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((resolve) => setTimeout(resolve, 12));
+    }
+    window.scrollTo(0, document.documentElement.scrollHeight);
+  });
+  await page.waitForTimeout(350);
+  const broken = await page.locator('img').evaluateAll((images) => images
+    .filter((image) => image.offsetParent !== null && (!image.complete || image.naturalWidth === 0))
+    .map((image) => image.currentSrc || image.src));
+  if (broken.length) throw new Error(`${name} has broken images:\n${broken.join('\n')}`);
+}
+
+async function topOf(page, selector) {
   return page.locator(selector).evaluate((element) => {
     const rect = element.getBoundingClientRect();
     return rect.top + window.scrollY;
   });
 }
 
-async function textBox(page, selector) {
-  return page.locator(selector).evaluate((element) => {
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    const rect = range.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-  });
+async function instantScroll(page, y) {
+  await page.evaluate((targetY) => window.scrollTo({ top: targetY, behavior: 'instant' }), y);
+  await page.waitForTimeout(280);
 }
 
-async function elementBox(page, selector) {
-  return page.locator(selector).evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-  });
+async function screenshot(page, name) {
+  await page.screenshot({ path: `${outDir}/${name}.png`, fullPage: false });
 }
 
-async function assertMostlyVisible(page, selector, name, minimumRatio = 0.92) {
-  const box = await textBox(page, selector);
-  const viewport = page.viewportSize();
-  if (!box || !viewport || box.width === 0) return;
-  const visibleLeft = Math.max(0, box.x);
-  const visibleRight = Math.min(viewport.width, box.x + box.width);
-  const visibleWidth = Math.max(0, visibleRight - visibleLeft);
-  const ratio = visibleWidth / box.width;
-  if (ratio < minimumRatio) throw new Error(`${name} is only ${(ratio * 100).toFixed(1)}% visible in the viewport`);
-}
-
-async function assertNoTextOverlap(page, firstSelector, secondSelector, name) {
-  const first = await textBox(page, firstSelector);
-  const second = await textBox(page, secondSelector);
-  const overlapX = Math.max(0, Math.min(first.x + first.width, second.x + second.width) - Math.max(first.x, second.x));
-  const overlapY = Math.max(0, Math.min(first.y + first.height, second.y + second.height) - Math.max(first.y, second.y));
-  if (overlapX > 0 && overlapY > 0) throw new Error(`${name} text overlap detected (${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px)`);
-}
-
-async function assertXDirection(page, name) {
-  const glyph = page.locator('.hero__scroll-track span').nth(3);
-  const ys = [];
-  for (let i = 0; i < 6; i += 1) {
-    const box = await glyph.boundingBox();
-    if (box) ys.push(box.y);
-    await page.waitForTimeout(90);
-  }
-  let downwardSteps = 0;
-  let upwardSteps = 0;
-  for (let i = 1; i < ys.length; i += 1) {
-    const delta = ys[i] - ys[i - 1];
-    if (delta > 0.35) downwardSteps += 1;
-    if (delta < -0.35) upwardSteps += 1;
-  }
-  if (downwardSteps < 3 || upwardSteps > 1) {
-    throw new Error(`${name} X cue does not read as continuous downward motion (${ys.map((y) => y.toFixed(1)).join(' → ')})`);
-  }
-}
-
-async function assertRailSpacing(page, name) {
-  const glyphs = await page.locator('.hero__scroll-track span').evaluateAll((spans) =>
-    spans
-      .map((span) => {
-        const style = getComputedStyle(span);
-        const rect = span.getBoundingClientRect();
-        return { opacity: Number.parseFloat(style.opacity), y: rect.y, h: rect.height };
-      })
-      .filter((glyph) => glyph.opacity > 0.24)
-      .sort((a, b) => a.y - b.y),
-  );
-
-  for (let i = 1; i < glyphs.length; i += 1) {
-    const gap = glyphs[i].y - (glyphs[i - 1].y + glyphs[i - 1].h);
-    if (gap < -1.5) throw new Error(`${name} X rail glyphs overlap by ${Math.abs(gap).toFixed(1)}px`);
-  }
-}
-
-async function capture(name, contextOptions) {
-  const context = await browser.newContext({ ...contextOptions, reducedMotion: 'no-preference' });
+async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = false }) {
+  const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(baseURL).origin });
   const page = await context.newPage();
-  const consoleErrors = [];
-  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
+  const errors = collectRuntimeErrors(page);
+  await openPage(page, path);
 
-  await page.goto(baseURL, { waitUntil: 'domcontentloaded' });
-
-  if (name === 'desktop-laptop') {
-    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 4500 });
-    await page.evaluate(() => window.scrollTo(0, 640));
-    await page.waitForTimeout(80);
-    await page.reload({ waitUntil: 'domcontentloaded' });
-  }
-
-  await page.waitForTimeout(90);
-  const reloadY = await page.evaluate(() => window.scrollY);
-  if (reloadY > 2) throw new Error(`${name} did not reset to the top on load/reload (scrollY=${reloadY})`);
-
-  const introState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
-  if (introState !== 'pending') throw new Error(`${name} hero intro did not expose a real opening state`);
-
-  const openingLines = await page.locator('[data-intro-line]').evaluateAll((lines) =>
-    lines.map((line) => ({ opacity: Number.parseFloat(getComputedStyle(line).opacity), transform: getComputedStyle(line).transform })),
-  );
-  if (!openingLines.some((line) => line.opacity > 0.02) || !openingLines.some((line) => line.opacity < 0.95)) {
-    throw new Error(`${name} hero lines are not visibly sequencing during opening animation`);
-  }
-
-  const openingSideOpacity = await page.locator('[data-side-note]').evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
-  if (openingSideOpacity > 0.92) throw new Error(`${name} vertical/side note is already fully visible during intro`);
-  await page.screenshot({ path: `${outDir}/${name}-intro-opening.png`, fullPage: false });
-
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 4500 });
-  await page.waitForTimeout(160);
-  await page.screenshot({ path: `${outDir}/${name}-hero.png`, fullPage: false });
-  await page.screenshot({ path: `${outDir}/${name}-full.png`, fullPage: true });
-
-  for (const line of await page.locator('[data-intro-line]').all()) {
-    if (!(await line.isVisible())) throw new Error(`${name} hero line is hidden after intro completes`);
-  }
-
-  const suffix = page.locator('.hero__suffix');
-  if (await suffix.count()) {
-    const suffixBox = await suffix.boundingBox();
-    const viewport = page.viewportSize();
-    if (suffixBox && viewport && suffixBox.x + suffixBox.width > viewport.width - 6) throw new Error(`${name} hero suffix is clipped outside the viewport`);
-    if (name === 'mobile') {
-      const suffixSize = await suffix.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
-      const wordSize = await page.locator('.hero__line--different .hero__line-inner').evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
-      if (suffixSize < wordSize * 0.9) throw new Error(`mobile LY. suffix is still visually undersized (${suffixSize}px vs ${wordSize}px)`);
-    }
-  }
-
-  const actionText = await page.locator('.hero__actions').innerText();
-  if (/[↗↘➡⬇]/u.test(actionText)) throw new Error(`${name} hero actions still contain Unicode/emoji arrows`);
-
-  const brand = page.locator('.site-header__brand');
-  const brandSize = await brand.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
-  if (brandSize < (name === 'mobile' ? 14 : 15)) throw new Error(`${name} brand is still too small (${brandSize}px)`);
-
-  const brandLetter = page.locator('[data-brand-letter]');
-  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'O', undefined, { timeout: 3000 });
-  await page.screenshot({ path: `${outDir}/${name}-brand-victor.png`, fullPage: false });
-  await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 3200 });
-  if ((await brandLetter.textContent()) !== 'X') throw new Error(`${name} brand letter did not return to X`);
-
-  const scrollCue = page.locator('.hero__scroll');
-  const sideNote = page.locator('.hero__side-note');
-  if (!(await scrollCue.isVisible())) throw new Error(`${name} scroll cue is not visible on the opening screen`);
-  if (!(await sideNote.isVisible())) throw new Error(`${name} side note is not visible on the opening screen`);
-
-  const viewport = page.viewportSize();
-  const cueBox = await scrollCue.boundingBox();
-  if (cueBox && viewport) {
-    const offset = Math.abs(cueBox.x + cueBox.width / 2 - viewport.width / 2);
-    if (offset > 3) throw new Error(`${name} scroll cue is ${offset.toFixed(1)}px off center`);
-    if (name === 'mobile' && cueBox.height > 78) throw new Error(`mobile scroll cue is still too tall (${cueBox.height.toFixed(1)}px)`);
-  }
-
-  const glyphCount = await page.locator('.hero__scroll-track span').count();
-  if (glyphCount !== 8) throw new Error(`${name} X rail should contain 8 glyphs, found ${glyphCount}`);
-  const visibleXs = await page.locator('.hero__scroll-track span').evaluateAll((spans) => spans.filter((span) => Number.parseFloat(getComputedStyle(span).opacity) > 0.18).length);
-  if (visibleXs < 2) throw new Error(`${name} X rail does not have enough visible glyphs (${visibleXs})`);
-  await assertXDirection(page, name);
-  await assertRailSpacing(page, name);
-
-  const isMobile = name === 'mobile';
-  const vh = viewport?.height ?? 900;
-  let disruptionTop = await documentTop(page, '[data-disruption]');
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  await page.waitForTimeout(100);
-  const beforeY = await page.evaluate(() => window.scrollY);
-
-  if (isMobile) await scrollCue.tap();
-  else await scrollCue.click();
-  await page.waitForTimeout(isMobile ? 520 : 650);
-
-  const intermediateY = await page.evaluate(() => window.scrollY);
-  if (intermediateY < beforeY + 24) throw new Error(`${name} scroll control did not start moving the page`);
-  if (intermediateY > disruptionTop + vh * (isMobile ? 0.72 : 0.68)) throw new Error(`${name} scroll control jumped too far instead of animating progressively`);
-
-  await page.screenshot({ path: `${outDir}/${name}-scroll-journey.png`, fullPage: false });
-
-  await page.evaluate(() => window.dispatchEvent(new WheelEvent('wheel', { deltaY: 1 })));
   await page.waitForTimeout(80);
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  await page.waitForTimeout(250);
-  disruptionTop = await documentTop(page, '[data-disruption]');
+  const introState = await page.locator('[data-home-intro]').getAttribute('data-home-intro');
+  if (introState !== 'pending') throw new Error(`${name} skipped the real opening state`);
+  if (!await page.locator('.site-brand').isVisible()) throw new Error(`${name} opens on a blank screen`);
+  if (!await page.locator('.hero__title').isVisible()) throw new Error(`${name} hero is absent during opening`);
+  await screenshot(page, `${name}-opening`);
 
-  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: disruptionTop + vh * (isMobile ? 0.35 : 0.85) });
-  await page.waitForTimeout(900);
-  await page.screenshot({ path: `${outDir}/${name}-disruption-mid.png`, fullPage: false });
-  let mobileMidOne;
-  let mobileMidTwo;
-  if (isMobile) {
-    await assertMostlyVisible(page, '[data-disruption-one]', 'mobile first disruption statement hold', 0.86);
-    await assertMostlyVisible(page, '[data-disruption-two]', 'mobile second disruption statement hold', 0.86);
-    mobileMidOne = await elementBox(page, '[data-disruption-one]');
-    mobileMidTwo = await elementBox(page, '[data-disruption-two]');
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+  await page.waitForTimeout(120);
+  await assertCoreDocument(page, name, lang);
+
+  if (await page.locator('[data-intro-line]').count() !== 3) throw new Error(`${name} hero line structure changed`);
+  if (!await page.locator('.hero__side-note').isVisible()) throw new Error(`${name} side note is hidden`);
+  if (!await page.locator('[data-scroll-journey]').isVisible()) throw new Error(`${name} scroll control is hidden`);
+  if (await page.locator('.scroll-rail__track > span').count() !== 8) throw new Error(`${name} scroll rail must contain eight glyphs`);
+  if (await page.locator('.scroll-rail__track > .is-o').count() !== 1) throw new Error(`${name} scroll rail must contain one intentional O`);
+
+  const rail = await page.locator('.scroll-rail__window').boundingBox();
+  if (rail && Math.abs(rail.x + rail.width / 2 - viewport.width / 2) > 3) throw new Error(`${name} scroll rail is not centered`);
+  await screenshot(page, `${name}-hero`);
+
+  if (name === 'desktop-1366') {
+    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'O', undefined, { timeout: 4500 });
+    await page.waitForFunction(() => document.querySelector('[data-brand-letter]')?.textContent === 'X', undefined, { timeout: 4500 });
+    await instantScroll(page, 640);
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(90);
+    if (await page.evaluate(() => window.scrollY) > 2) throw new Error(`${name} did not reset to the top on reload`);
+    if (await page.locator('[data-home-intro]').getAttribute('data-home-intro') !== 'pending') throw new Error(`${name} did not replay the opening state on reload`);
+    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
   }
 
-  const firstStatement = (await page.locator('[data-disruption-one]').innerText()).toLowerCase();
-  const secondStatement = (await page.locator('[data-disruption-two]').innerText()).toLowerCase();
-  if (!firstStatement.includes('isn’t') || !secondStatement.includes('shouldn’t')) throw new Error(`${name} disruption contractions are not using the intended typographic apostrophes`);
+  const alternate = await page.locator('.site-language').getAttribute('href');
+  const expectedAlternate = lang === 'lv' ? '/' : '/lv/';
+  if (alternate !== expectedAlternate) throw new Error(`${name} has the wrong language switch target`);
 
-  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: disruptionTop + vh * (isMobile ? 1.03 : 1.4) });
-  await page.waitForTimeout(900);
-  await page.screenshot({ path: `${outDir}/${name}-disruption-late.png`, fullPage: false });
-
-  if (isMobile && mobileMidOne && mobileMidTwo) {
-    const lateOne = await elementBox(page, '[data-disruption-one]');
-    const lateTwo = await elementBox(page, '[data-disruption-two]');
-    const moveOne = Math.hypot(lateOne.x - mobileMidOne.x, lateOne.y - mobileMidOne.y);
-    const moveTwo = Math.hypot(lateTwo.x - mobileMidTwo.x, lateTwo.y - mobileMidTwo.y);
-    if (moveOne < 10 || moveTwo < 10) throw new Error(`mobile disruption text is not breaking frame strongly enough (${moveOne.toFixed(1)}px / ${moveTwo.toFixed(1)}px)`);
-  } else if (!isMobile) {
-    await assertNoTextOverlap(page, '[data-disruption-caption]', '[data-disruption-two]', `${name} disruption caption/headline`);
-    await assertMostlyVisible(page, '[data-disruption-one]', `${name} first disruption statement`, 0.88);
+  if (viewport.width <= 760) {
+    const toggle = page.locator('[data-menu-toggle]');
+    await toggle.click();
+    if (await toggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${name} mobile menu did not open`);
+    if (await page.locator('[data-mobile-menu]').getAttribute('aria-hidden') !== 'false') throw new Error(`${name} mobile menu remains hidden to assistive technology`);
+    if (!await page.locator('main').evaluate((element) => element.inert)) throw new Error(`${name} page remains focusable behind the mobile menu`);
+    if (!await page.locator('[data-mobile-menu] a').first().evaluate((element) => element === document.activeElement)) throw new Error(`${name} mobile menu did not receive focus`);
+    await screenshot(page, `${name}-menu`);
+    await page.keyboard.press('Escape');
+    if (await toggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${name} mobile menu did not close with Escape`);
+    if (await page.locator('main').evaluate((element) => element.inert)) throw new Error(`${name} page remained inert after closing the mobile menu`);
+    if (!await toggle.evaluate((element) => element === document.activeElement)) throw new Error(`${name} mobile menu did not return focus`);
   }
 
-  const catrinTop = await documentTop(page, '[data-catrin]');
-  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: Math.max(0, catrinTop - vh * 0.32) });
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outDir}/${name}-catrin-entry.png`, fullPage: false });
-  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: Math.max(0, catrinTop - vh * 0.28) });
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outDir}/${name}-catrin-mid.png`, fullPage: false });
-  await assertMostlyVisible(page, '[data-catrin-title]', `${name} CATRIN readable phase`, isMobile ? 0.9 : 0.98);
-  await page.evaluate(({ y }) => window.scrollTo({ top: y, behavior: 'instant' }), { y: catrinTop + vh * 0.08 });
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: `${outDir}/${name}-catrin-break.png`, fullPage: false });
+  const startY = await page.evaluate(() => window.scrollY);
+  await page.locator('[data-scroll-journey]').dispatchEvent('click');
+  await page.waitForFunction((initialY) => window.scrollY > initialY + 10, startY, { timeout: 2500 }).catch(() => {});
+  const movingY = await page.evaluate(() => window.scrollY);
+  if (movingY < startY + 10) throw new Error(`${name} scroll journey did not begin`);
+  await page.mouse.wheel(0, 1);
+  await instantScroll(page, 0);
 
-  if (consoleErrors.length) throw new Error(`${name} browser errors:\n${consoleErrors.join('\n')}`);
+  const disruptionTop = await topOf(page, '[data-disruption]');
+  await instantScroll(page, disruptionTop + viewport.height * (viewport.width <= 760 ? 0.74 : 0.82));
+  const phrases = await page.locator('.no-break').evaluateAll((spans) => spans.map((span) => ({
+    text: span.textContent,
+    whiteSpace: getComputedStyle(span).whiteSpace,
+    rects: span.getClientRects().length,
+  })));
+  if (phrases.some((phrase) => phrase.whiteSpace !== 'nowrap' || phrase.rects !== 1)) throw new Error(`${name} breaks a protected disruption word`);
+  const disruptionOpacity = await page.locator('[data-disruption-two]').evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
+  if (disruptionOpacity < 0.12) throw new Error(`${name} second disruption statement is not entering on scroll`);
+  await screenshot(page, `${name}-disruption`);
+
+  for (const id of ['work', 'about', 'approach', 'services', 'contact']) {
+    if (await page.locator(`#${id}`).count() !== 1) throw new Error(`${name} is missing #${id}`);
+  }
+  if (await page.locator('[data-project]').count() !== 2) throw new Error(`${name} must present both projects`);
+  if (!await page.locator(`a[href="${lang === 'lv' ? '/lv/darbi/catrin/' : '/work/catrin/'}"]`).count()) throw new Error(`${name} is missing the CATRIN case link`);
+  if (!await page.locator(`a[href="${lang === 'lv' ? '/lv/darbi/anelika/' : '/work/anelika/'}"]`).count()) throw new Error(`${name} is missing the ANELIKA case link`);
+
+  if (detailed) {
+    const catrinTop = await topOf(page, '.project-feature--catrin');
+    await instantScroll(page, catrinTop + 90);
+    if (await page.locator('[data-site-header]').getAttribute('data-over-theme') !== 'dark') throw new Error(`${name} header does not adapt over CATRIN`);
+    if (viewport.width > 760) {
+      const media = page.locator('.project-feature--catrin [data-perspective-card]');
+      const box = await media.boundingBox();
+      if (box) {
+        await page.mouse.move(box.x + box.width * 0.78, box.y + box.height * 0.34);
+        await page.waitForTimeout(80);
+        const rotation = await media.evaluate((element) => getComputedStyle(element).getPropertyValue('--card-ry').trim());
+        if (!rotation || rotation === '0deg') throw new Error(`${name} project perspective does not react to the pointer`);
+      }
+    }
+    await screenshot(page, `${name}-catrin`);
+
+    const anelikaTop = await topOf(page, '.project-feature--anelika');
+    await instantScroll(page, anelikaTop + 90);
+    if (await page.locator('[data-site-header]').getAttribute('data-over-theme') !== 'anelika') throw new Error(`${name} header does not adapt over ANELIKA`);
+    await screenshot(page, `${name}-anelika`);
+
+    await instantScroll(page, await topOf(page, '#about'));
+    await screenshot(page, `${name}-about`);
+    await instantScroll(page, await topOf(page, '#services'));
+    await screenshot(page, `${name}-services`);
+    await instantScroll(page, await topOf(page, '.xo-section'));
+    await screenshot(page, `${name}-xo`);
+    const antiTop = await topOf(page, '[data-anti-sales]');
+    await instantScroll(page, antiTop + viewport.height * 0.82);
+    const antiOpacity = await page.locator('[data-anti-second]').evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
+    if (antiOpacity < 0.1) throw new Error(`${name} anti-sales statement does not transform on scroll`);
+    await screenshot(page, `${name}-anti-sales`);
+    await instantScroll(page, await topOf(page, '#contact'));
+    if (await page.locator('[data-site-header]').getAttribute('data-over-theme') !== 'dark') throw new Error(`${name} header does not adapt over contact`);
+    await screenshot(page, `${name}-contact`);
+    const copyButton = page.locator('[data-copy-email]');
+    await copyButton.click();
+    await page.waitForFunction(() => document.querySelector('[data-copy-email]')?.classList.contains('is-copied'));
+    const copiedEmail = await page.evaluate(() => navigator.clipboard.readText());
+    if (copiedEmail !== 'viktors.levdanskis@inbox.lv') throw new Error(`${name} copy-email control copied the wrong value`);
+  }
+
+  await assertImagesLoaded(page, name);
+  await assertNoHorizontalOverflow(page, `${name} after scrolling`);
+  if (errors.length) throw new Error(`${name} runtime errors:\n${errors.join('\n')}`);
   await context.close();
 }
 
-await capture('desktop-laptop', { viewport: { width: 1366, height: 768 }, deviceScaleFactor: 1 });
-await capture('desktop', { viewport: { width: 1440, height: 1000 }, deviceScaleFactor: 1 });
-await capture('mobile', { ...devices['iPhone 15 Pro'], viewport: { width: 393, height: 852 } });
+await assertHome({ name: 'desktop-1366', viewport: { width: 1366, height: 768 }, detailed: true });
+await assertHome({ name: 'desktop-1440', viewport: { width: 1440, height: 1000 } });
+await assertHome({ name: 'tablet-768', viewport: { width: 768, height: 1024 } });
+await assertHome({ name: 'mobile-393', viewport: { width: 393, height: 852 }, detailed: true });
+await assertHome({ name: 'mobile-360', viewport: { width: 360, height: 800 } });
+await assertHome({ name: 'lv-mobile', viewport: { width: 390, height: 844 }, path: '/lv/', lang: 'lv', detailed: true });
+
+const routeContext = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' });
+const routePage = await routeContext.newPage();
+const routeErrors = collectRuntimeErrors(routePage);
+const routes = [
+  ['/work/catrin/', 'en', 'CATRIN'],
+  ['/work/anelika/', 'en', 'ANELIKA'],
+  ['/lv/darbi/catrin/', 'lv', 'CATRIN'],
+  ['/lv/darbi/anelika/', 'lv', 'ANELIKA'],
+];
+
+for (const [path, lang, title] of routes) {
+  const response = await openPage(routePage, path);
+  if (!response?.ok()) throw new Error(`${path} returned ${response?.status()}`);
+  await assertCoreDocument(routePage, path, lang);
+  if ((await routePage.locator('h1').innerText()).trim() !== title) throw new Error(`${path} has the wrong case title`);
+  if (await routePage.locator('.case-narrative__row').count() !== 4) throw new Error(`${path} is missing case-study narrative sections`);
+  if (!await routePage.locator('.case-live-link').getAttribute('href')) throw new Error(`${path} is missing the live-project link`);
+  await assertImagesLoaded(routePage, path);
+  await instantScroll(routePage, 0);
+  await screenshot(routePage, `${path.includes('lv/') ? 'lv-' : ''}${title.toLowerCase()}-case`);
+}
+
+if (routeErrors.length) throw new Error(`Route runtime errors:\n${routeErrors.join('\n')}`);
+routeErrors.length = 0;
+const notFound = await openPage(routePage, '/this-page-does-not-exist/');
+if (notFound?.status() !== 404) throw new Error(`Missing route returned ${notFound?.status()} instead of 404`);
+if (!await routePage.locator('.not-found').count()) throw new Error('Custom 404 page did not render');
+const unexpected404Errors = routeErrors.filter((error) => !error.includes('status of 404'));
+if (unexpected404Errors.length) throw new Error(`404 runtime errors:\n${unexpected404Errors.join('\n')}`);
+
+await routeContext.close();
+
+const mobileCaseContext = await browser.newContext({ viewport: { width: 393, height: 852 }, reducedMotion: 'reduce' });
+const mobileCasePage = await mobileCaseContext.newPage();
+const mobileCaseErrors = collectRuntimeErrors(mobileCasePage);
+for (const [path, title] of [['/work/catrin/', 'CATRIN'], ['/work/anelika/', 'ANELIKA']]) {
+  const response = await openPage(mobileCasePage, path);
+  if (!response?.ok()) throw new Error(`${path} mobile returned ${response?.status()}`);
+  await assertCoreDocument(mobileCasePage, `${title} mobile case`, 'en');
+  if (!await mobileCasePage.locator('.case-screen--mobile').isVisible()) throw new Error(`${title} mobile case does not show its responsive project screen`);
+  await screenshot(mobileCasePage, `mobile-${title.toLowerCase()}-case`);
+  await assertImagesLoaded(mobileCasePage, `${title} mobile case`);
+}
+if (mobileCaseErrors.length) throw new Error(`Mobile case runtime errors:\n${mobileCaseErrors.join('\n')}`);
+await mobileCaseContext.close();
+
+const reducedContext = await browser.newContext({ viewport: { width: 1024, height: 768 }, reducedMotion: 'reduce' });
+const reducedPage = await reducedContext.newPage();
+const reducedErrors = collectRuntimeErrors(reducedPage);
+await openPage(reducedPage, '/');
+await reducedPage.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 5000 });
+const reducedStates = await reducedPage.evaluate(() => ({
+  disruptionVisibility: getComputedStyle(document.querySelector('[data-disruption-two]')).visibility,
+  disruptionOpacity: Number.parseFloat(getComputedStyle(document.querySelector('[data-disruption-two]')).opacity),
+  antiOpacity: Number.parseFloat(getComputedStyle(document.querySelector('[data-anti-second]')).opacity),
+}));
+if (reducedStates.disruptionVisibility !== 'visible' || reducedStates.disruptionOpacity < 0.99 || reducedStates.antiOpacity < 0.99) {
+  throw new Error('Reduced-motion mode hides essential transformation copy');
+}
+await instantScroll(reducedPage, await topOf(reducedPage, '[data-disruption]'));
+await screenshot(reducedPage, 'reduced-motion-disruption');
+if (reducedErrors.length) throw new Error(`Reduced-motion runtime errors:\n${reducedErrors.join('\n')}`);
+await reducedContext.close();
 
 await browser.close();
-console.log(`Visual QA captured from ${baseURL}`);
+console.log(`Visual QA passed for 6 home viewport/language combinations, 6 case-study views and reduced-motion mode at ${baseURL}`);

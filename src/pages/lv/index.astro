@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomePage from '../../components/HomePage.astro';
+import { getSiteCopy } from '../../data/site';
+
+const copy = getSiteCopy('lv');
+---
+
+<BaseLayout title={copy.seo.title} description={copy.seo.description} lang="lv" canonicalPath="/lv/" alternatePath="/">
+  <HomePage locale="lv" />
+</BaseLayout>

@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import CaseStudy from '../../../components/CaseStudy.astro';
+import { projects } from '../../../data/projects';
+
+const copy = projects.anelika.content.lv;
+---
+
+<BaseLayout title={copy.seoTitle} description={copy.seoDescription} lang="lv" canonicalPath="/lv/darbi/anelika/" alternatePath="/work/anelika/">
+  <CaseStudy locale="lv" projectId="anelika" />
+</BaseLayout>

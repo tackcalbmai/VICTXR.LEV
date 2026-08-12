@@ -1,50 +1,94 @@
 ---
 import '../styles/global.css';
-import '../styles/hero-experience.css';
-import '../styles/hero-polish.css';
 
 interface Props {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
+  lang?: 'en' | 'lv';
+  canonicalPath?: string;
+  alternatePath?: string;
+  robots?: string;
 }
 
 const {
-  title = 'VICTXR LEV — Independent web designer & developer',
-  description = 'Websites for businesses that refuse to look ordinary.',
+  title,
+  description,
+  lang = 'en',
+  canonicalPath = '/',
+  alternatePath = lang === 'en' ? '/lv/' : '/',
+  robots = 'index,follow,max-image-preview:large',
 } = Astro.props;
+
+const siteUrl = Astro.site ?? new URL('https://victxr-lev.viktors-levdanskis.workers.dev');
+const canonical = new URL(canonicalPath, siteUrl);
+const alternate = new URL(alternatePath, siteUrl);
+const socialImage = new URL('/social-preview.png', siteUrl);
+const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
+const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
+const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
+const socialAlt = lang === 'lv' ? 'VICTXR.LEV — mājaslapu dizains un izstrāde' : 'VICTXR.LEV — web design and development';
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Viktors Levdanskis',
+  alternateName: 'Victxr Lev',
+  url: siteUrl.toString(),
+  jobTitle: 'Web designer and developer',
+  email: 'mailto:viktors.levdanskis@inbox.lv',
+  address: { '@type': 'PostalAddress', addressCountry: 'LV' },
+  knowsAbout: ['Web design', 'Web development', 'User experience', 'Technical SEO', 'Multilingual websites'],
+};
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f1f0eb" />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="robots" content={robots} />
+    <meta name="author" content="Viktors Levdanskis" />
+    <meta name="theme-color" content="#f2f0e9" />
+    <meta name="color-scheme" content="light" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={lang === 'en' ? 'lv' : 'en'} href={alternate} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/', siteUrl)} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={lang === 'lv' ? '/fonts/onest-latin-ext.woff2' : '/fonts/onest-latin.woff2'} as="font" type="font/woff2" crossorigin="anonymous" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="VICTXR.LEV" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content={socialAlt} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={locale} />
+    <meta property="og:locale:alternate" content={alternateLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={socialAlt} />
     <title>{title}</title>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     <script is:inline>
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
-
-      const resetVictxrScroll = () => {
-        if (location.hash) {
-          history.replaceState(null, '', `${location.pathname}${location.search}`);
-        }
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      const navigation = performance.getEntriesByType?.('navigation')?.[0];
+      if (navigation?.type === 'reload') {
+        if (location.hash) history.replaceState(null, '', `${location.pathname}${location.search}`);
         window.scrollTo(0, 0);
-      };
-
-      resetVictxrScroll();
-      window.addEventListener('pageshow', () => {
-        requestAnimationFrame(() => {
-          resetVictxrScroll();
-          requestAnimationFrame(resetVictxrScroll);
-        });
-      }, { once: true });
+      }
     </script>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">{skipLabel}</a>
     <slot />
+    <script>
+      import { initSiteUI } from '../scripts/site';
+      initSiteUI();
+    </script>
   </body>
 </html>

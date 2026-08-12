@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f2f0e9"/>
+  <path d="M0 74h1200M0 556h1200" stroke="#0c0c0b" stroke-opacity=".18"/>
+  <text x="52" y="47" fill="#0c0c0b" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="-1">VICTXR.LEV</text>
+  <text x="1148" y="47" fill="#0c0c0b" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" text-anchor="end" letter-spacing="2">WEB DESIGN / LATVIA</text>
+  <g fill="#0c0c0b" font-family="Arial, Helvetica, sans-serif" font-size="138" font-weight="800" letter-spacing="-9">
+    <text x="46" y="225">I SEE</text>
+    <text x="198" y="365">THINGS</text>
+    <text x="45" y="505">DIFFERENTLY.</text>
+  </g>
+  <text x="52" y="598" fill="#0c0c0b" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">CONTROLLED CHAOS. SURGICAL PRECISION.</text>
+  <g transform="translate(1052 100)">
+    <text x="0" y="0" fill="#0c0c0b" fill-opacity=".08" font-family="Arial, Helvetica, sans-serif" font-size="110" font-weight="800">X</text>
+    <circle cx="60" cy="344" r="39" fill="none" stroke="#ef4b2f" stroke-width="9"/>
+  </g>
+</svg>

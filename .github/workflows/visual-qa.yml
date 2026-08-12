@@ -21,13 +21,16 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --no-audit --no-fund
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
 
       - name: Build
         run: npm run build
+
+      - name: Type and content checks
+        run: npm run check
 
       - name: Start preview
         run: |

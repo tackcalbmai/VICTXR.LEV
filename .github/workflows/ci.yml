@@ -24,7 +24,10 @@ jobs:
           package-manager-cache: false
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
+
+      - name: Type and content checks
+        run: npm run check
 
       - name: Build
         run: npm run build
