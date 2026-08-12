@@ -458,14 +458,18 @@ for (const [path, title] of [['/work/catrin/', 'CATRIN'], ['/work/anelika/', 'AN
   await screenshot(mobileCasePage, `mobile-${title.toLowerCase()}-case`);
   const caseMenuToggle = mobileCasePage.locator('[data-menu-toggle]');
   await caseMenuToggle.click();
+  if (await caseMenuToggle.getAttribute('aria-expanded') !== 'true') throw new Error(`${title} case menu did not open`);
+  await mobileCasePage.waitForTimeout(360);
   const caseMenuLayering = await mobileCasePage.evaluate(() => ({
     header: Number.parseInt(getComputedStyle(document.querySelector('[data-site-header]')).zIndex, 10),
     menu: Number.parseInt(getComputedStyle(document.querySelector('[data-mobile-menu]')).zIndex, 10),
-    background: getComputedStyle(document.querySelector('[data-site-header]')).backgroundColor,
+    menuBackground: getComputedStyle(document.querySelector('[data-mobile-menu]')).backgroundColor,
   }));
-  if (caseMenuLayering.header <= caseMenuLayering.menu || caseMenuLayering.background === 'rgba(0, 0, 0, 0)') throw new Error(`${title} case menu merges with the project behind it`);
+  if (caseMenuLayering.header <= caseMenuLayering.menu || caseMenuLayering.menuBackground === 'rgba(0, 0, 0, 0)') throw new Error(`${title} case menu merges with the project behind it`);
   await screenshot(mobileCasePage, `mobile-${title.toLowerCase()}-menu`);
   await caseMenuToggle.click();
+  if (await caseMenuToggle.getAttribute('aria-expanded') !== 'false') throw new Error(`${title} case menu did not close`);
+  await mobileCasePage.locator('[data-mobile-menu]').waitFor({ state: 'hidden' });
   await assertImagesLoaded(mobileCasePage, `${title} mobile case`);
 }
 if (mobileCaseErrors.length) throw new Error(`Mobile case runtime errors:\n${mobileCaseErrors.join('\n')}`);
