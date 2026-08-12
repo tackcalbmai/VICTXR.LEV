@@ -6,11 +6,15 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/postbuild.mjs",
     "check": "astro check",
     "preview": "astro preview",
+    "audit:deps": "npm audit --audit-level=high",
     "audit:static": "node tests/static-audit.mjs",
+    "audit:quality": "node tests/quality-gates.mjs",
+    "audit:contacts": "node tests/contact-channels.mjs",
     "cross-browser": "node tests/cross-browser.mjs",
-    "visual": "npm run audit:static && node tests/visual.mjs && node tests/cinematic-intro.mjs && node tests/brand-motion.mjs && npm run cross-browser",
+    "visual": "npm run audit:static && node tests/visual.mjs && node tests/cinematic-intro.mjs && node tests/brand-motion.mjs && npm run cross-browser && npm run audit:quality",
     "test": "npm run check && npm run build && npm run visual",
     "deploy": "npm run check && npm run build && wrangler deploy"
   },
