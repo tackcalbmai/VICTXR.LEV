@@ -54,14 +54,14 @@ async function assertChannels(page, scope, expectedMessage) {
   const { context, page } = await openHome('/lv/', { width: 393, height: 852 });
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '#contact', 'Sveiks. Man padomā ir projekts.');
+  await assertChannels(page, '#contact', 'Sveiki! Man padomā ir projekts.');
   await page.screenshot({ path: `${outDir}/future-contacts-lv-mobile.png`, fullPage: false });
 
   await page.evaluate(() => window.scrollTo(0, 0));
   const toggle = page.locator('[data-menu-toggle]');
   await toggle.click();
   await page.waitForTimeout(540);
-  await assertChannels(page, '[data-mobile-menu]', 'Sveiks. Man padomā ir projekts.');
+  await assertChannels(page, '[data-mobile-menu]', 'Sveiki! Man padomā ir projekts.');
   await page.screenshot({ path: `${outDir}/future-contacts-lv-menu.png`, fullPage: false });
   await context.close();
 }
@@ -78,4 +78,3 @@ async function assertChannels(page, scope, expectedMessage) {
 }
 
 await browser.close();
-console.log('Enabled contact-state QA passed for EN/LV home, mobile navigation and case-study contact surfaces.');
