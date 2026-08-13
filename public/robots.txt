@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://victxr-lev.viktors-levdanskis.workers.dev/sitemap-index.xml
+Sitemap: https://xoweb.lv/sitemap-index.xml
