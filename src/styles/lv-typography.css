@@ -38,8 +38,8 @@ html[lang='lv'] .work-heading .display-title {
 }
 
 html[lang='lv'] .disruption__line {
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  line-height: 1.32;
+  letter-spacing: -0.03em;
 }
 
 html[lang='lv'] .about__statement {
@@ -100,9 +100,9 @@ html[lang='lv'] .case-result p {
   }
 
   html[lang='lv'] .disruption__line {
-    font-size: clamp(2.7rem, 12.5vw, 4.7rem);
-    line-height: 1.16;
-    letter-spacing: -0.035em;
+    font-size: clamp(2.6rem, 11.8vw, 4.5rem);
+    line-height: 1.32;
+    letter-spacing: -0.025em;
   }
 
   html[lang='lv'] .about__statement {
