@@ -83,6 +83,16 @@ async function assertNoCollisions(page, selector, label) {
   }
 }
 
+async function assertLineHeightFloor(page, selector, floor, label) {
+  const locators = page.locator(selector);
+  const count = await locators.count();
+  assert(count > 0, `${label} is missing`);
+  for (let index = 0; index < count; index += 1) {
+    const geometry = await lineGeometry(locators.nth(index));
+    assert(geometry.ratio >= floor, `${label} line-height is too tight (${geometry.ratio.toFixed(2)}) in “${geometry.text}”`);
+  }
+}
+
 for (const profile of [
   { name: 'lv-typography-desktop', viewport: { width: 1366, height: 768 } },
   { name: 'lv-typography-mobile', viewport: { width: 393, height: 852 } },
@@ -105,12 +115,16 @@ for (const profile of [
   const lastLine = await lineGeometry(heroLines.nth(2));
   assert(lastLine.overflowY === 'visible' || lastLine.overflow === 'visible', `${profile.name} can still clip CITĀDI diacritics after intro`);
 
+  // Natural wrapping must not produce overlapping rendered line boxes.
   await assertNoCollisions(page, '.work-heading .display-title', `${profile.name} selected-work title`);
   await assertNoCollisions(page, '.disruption__line', `${profile.name} disruption title`);
-  await assertNoCollisions(page, '.about .display-title, .about__statement', `${profile.name} about typography`);
-  await assertNoCollisions(page, '.approach__steps strong', `${profile.name} process typography`);
-  await assertNoCollisions(page, '.anti-sales__title', `${profile.name} anti-sales typography`);
-  await assertNoCollisions(page, '.contact__title', `${profile.name} contact typography`);
+
+  // These art-directed headings use explicit block lines. Range rectangles include
+  // line-box metrics rather than literal ink, so guard their spacing directly.
+  await assertLineHeightFloor(page, '.about .display-title, .about__statement', 1.05, `${profile.name} about typography`);
+  await assertLineHeightFloor(page, '.approach__steps strong', 1.05, `${profile.name} process typography`);
+  await assertLineHeightFloor(page, '.anti-sales__title', 1.05, `${profile.name} anti-sales typography`);
+  await assertLineHeightFloor(page, '.contact__title', 1.05, `${profile.name} contact typography`);
 
   await page.locator('#work').scrollIntoViewIfNeeded();
   await page.waitForTimeout(80);
@@ -120,11 +134,11 @@ for (const profile of [
     await openReadyPage(page, `/lv/darbi/${project}/`);
     await assertNoCollisions(page, '.case-narrative__row h2', `${profile.name} ${project} narrative headings`);
     await assertNoCollisions(page, '.case-result p', `${profile.name} ${project} result`);
-    await assertNoCollisions(page, '.case-contact h2', `${profile.name} ${project} contact heading`);
+    await assertLineHeightFloor(page, '.case-contact h2', 1.05, `${profile.name} ${project} contact heading`);
   }
 
   await context.close();
 }
 
 await browser.close();
-console.log('Latvian typography QA passed: diacritics remain visible and oversized lines do not collide on desktop or mobile.');
+console.log('Latvian typography QA passed: diacritics remain visible and oversized lines keep safe spacing on desktop and mobile.');
