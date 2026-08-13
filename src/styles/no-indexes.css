@@ -1,0 +1,36 @@
+/* Decorative section and item numbering is intentionally removed from the UI. */
+
+.section-kicker {
+  grid-template-columns: 1fr;
+}
+
+.mobile-menu__nav a {
+  grid-template-columns: 1fr;
+}
+
+.approach__steps li {
+  grid-template-columns: 1fr;
+}
+
+.service-row {
+  grid-template-columns: 1.1fr 1fr 2rem;
+}
+
+.case-narrative__row > div span:first-child {
+  color: inherit;
+}
+
+@media (max-width: 760px) {
+  .service-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .service-row p {
+    grid-column: 1 / -1;
+  }
+
+  .service-row__mark {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
