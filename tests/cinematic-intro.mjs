@@ -77,19 +77,20 @@ async function assertCinematicIntro(name, viewport) {
   stamp('logo');
   await page.waitForTimeout(300);
   const descriptor = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
-  if (descriptor !== 'WEB DESIGN') throw new Error(`${name} descriptor is malformed: ${descriptor}`);
+  if (descriptor !== 'XO·WEB BY VICTXR.LEV') throw new Error(`${name} XO WEB descriptor is malformed: ${descriptor}`);
+  if (descriptor.includes('WEB DESIGN')) throw new Error(`${name} obsolete WEB DESIGN descriptor is still rendered`);
   if (await page.locator('[data-cinematic-descriptor-line]').count()) throw new Error(`${name} obsolete descriptor rule is still rendered`);
 
   const wordmarkBox = await page.locator('[data-cinematic-wordmark]').boundingBox();
   const descriptorBox = await page.locator('[data-cinematic-descriptor-wrap]').boundingBox();
   if (!wordmarkBox || !descriptorBox) throw new Error(`${name} logo/descriptor geometry is missing`);
   const widthRatio = descriptorBox.width / wordmarkBox.width;
-  if (widthRatio < 0.94 || widthRatio > 1.03) throw new Error(`${name} WEB DESIGN does not span the wordmark (${widthRatio.toFixed(2)}×)`);
+  if (widthRatio < 0.94 || widthRatio > 1.03) throw new Error(`${name} XO WEB descriptor does not span the wordmark slot (${widthRatio.toFixed(2)}×)`);
   const verticalGap = descriptorBox.y - (wordmarkBox.y + wordmarkBox.height);
-  if (verticalGap < -4 || verticalGap > (viewport.width <= 760 ? 14 : 20)) throw new Error(`${name} WEB DESIGN is not tucked under the logo (${verticalGap.toFixed(1)}px gap)`);
+  if (verticalGap < -4 || verticalGap > (viewport.width <= 760 ? 14 : 20)) throw new Error(`${name} XO WEB descriptor is not tucked under the logo (${verticalGap.toFixed(1)}px gap)`);
   const descriptorSize = Number.parseFloat(await page.locator('[data-cinematic-descriptor]').evaluate((element) => getComputedStyle(element).fontSize));
   const minimumDescriptorSize = viewport.width <= 760 ? 10 : 13;
-  if (descriptorSize < minimumDescriptorSize) throw new Error(`${name} WEB DESIGN is still too small (${descriptorSize}px)`);
+  if (descriptorSize < minimumDescriptorSize) throw new Error(`${name} XO WEB descriptor is too small (${descriptorSize}px)`);
 
   const initialLogo = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (initialLogo !== 'VICTXR.LEV') throw new Error(`${name} initial logo is malformed: ${initialLogo}`);
@@ -115,6 +116,8 @@ async function assertCinematicIntro(name, viewport) {
   await page.waitForTimeout(120);
   const xText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (xText !== 'VICTXR.LEV') throw new Error(`${name} full X/O cycle did not resolve on VICTXR.LEV: ${xText}`);
+  const descriptorAfterCycle = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
+  if (descriptorAfterCycle !== 'XO·WEB BY VICTXR.LEV') throw new Error(`${name} intro descriptor changed during X/O cycle: ${descriptorAfterCycle}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-x-rest.png`, fullPage: false });
 
   const headerBrandBox = await page.locator('.site-brand').boundingBox();
@@ -171,7 +174,12 @@ async function assertCinematicIntro(name, viewport) {
   const stillLocked = await page.evaluate(() => document.documentElement.classList.contains('is-cinematic-intro'));
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
 
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(600);
+  const headerSubmark = (await page.locator('[data-xo-submark]').innerText()).replace(/\s+/g, '').trim();
+  if (headerSubmark !== 'XO·WEB') throw new Error(`${name} landed XO WEB header signature is malformed: ${headerSubmark}`);
+  const submarkOpacity = Number(await page.locator('[data-xo-submark]').evaluate((element) => getComputedStyle(element).opacity));
+  if (submarkOpacity < 0.9) throw new Error(`${name} landed XO WEB header signature stayed hidden (${submarkOpacity})`);
+
   const heroLine = page.locator('[data-intro-line]').first();
   const heroOpacity = Number(await heroLine.evaluate((element) => getComputedStyle(element).opacity));
   if (heroOpacity < 0.7) throw new Error(`${name} hero did not progressively take over after the logo handoff (${heroOpacity})`);
