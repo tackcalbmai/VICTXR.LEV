@@ -130,7 +130,7 @@ export const siteCopy = {
       close: 'Aizvērt',
     },
     hero: {
-      meta: 'Neatkarīgs mājaslapu dizainers un izstrādātājs — Latvija',
+      meta: 'Neatkarīgs mājaslapu dizainers un izstrādātājs Latvijā',
       lines: ['Es redzu', 'lietas', 'citādi.'],
       intro: 'Mājaslapas uzņēmumiem, kas atsakās izskatīties kā visi pārējie.',
       sideNote: 'Šīs vietnes tapšanā nav cietusi neviena veidne.',
