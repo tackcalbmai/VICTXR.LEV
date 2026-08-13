@@ -88,12 +88,20 @@
 
 .cinematic-intro__descriptor-byline {
   color: var(--muted);
+  font-size: 0.46em;
+  font-weight: 720;
+  letter-spacing: 0.17em;
 }
 
 @media (max-width: 760px) {
   .site-brand-submark {
     top: calc(50% + 0.66rem);
     font-size: 0.4rem;
+    letter-spacing: 0.14em;
+  }
+
+  .cinematic-intro__descriptor-byline {
+    font-size: 0.5em;
     letter-spacing: 0.14em;
   }
 }
