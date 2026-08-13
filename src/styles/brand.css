@@ -67,56 +67,29 @@
   opacity: 0;
 }
 
-.cinematic-intro__xo-identity {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: clamp(0.55rem, 1.1vw, 0.95rem);
-  opacity: 0;
-  pointer-events: none;
+.cinematic-intro__descriptor-brand {
+  display: inline-block;
   white-space: nowrap;
 }
 
-.cinematic-intro__xo-mark,
-.cinematic-intro__xo-byline {
-  display: inline-flex;
-  align-items: baseline;
-  opacity: 0;
-  transform: translateY(0.22rem);
-}
-
-.cinematic-intro__xo-mark {
-  gap: 0.06em;
-  color: var(--paper);
-  text-transform: uppercase;
-  font-size: clamp(1.08rem, 1.45vw, 1.48rem);
-  font-weight: 790;
-  line-height: 1;
-  letter-spacing: 0.13em;
-}
-
-.cinematic-intro__xo-mark b {
+.cinematic-intro__descriptor-brand b {
   font-weight: inherit;
 }
 
-.cinematic-intro__xo-mark b:first-child {
+.cinematic-intro__descriptor-brand b:first-child {
   color: var(--accent);
 }
 
-.cinematic-intro__xo-mark i {
+.cinematic-intro__descriptor-brand i {
   margin-inline: 0.02em 0.04em;
   font-style: normal;
   opacity: 0.48;
 }
 
-.cinematic-intro__xo-byline {
+.cinematic-intro__descriptor-byline {
   color: var(--muted);
-  text-transform: uppercase;
-  font-size: clamp(0.48rem, 0.6vw, 0.64rem);
+  font-size: 0.46em;
   font-weight: 720;
-  line-height: 1;
   letter-spacing: 0.17em;
 }
 
@@ -127,17 +100,8 @@
     letter-spacing: 0.14em;
   }
 
-  .cinematic-intro__xo-identity {
-    gap: 0.48rem;
-  }
-
-  .cinematic-intro__xo-mark {
-    font-size: clamp(0.9rem, 3.8vw, 1.02rem);
-    letter-spacing: 0.12em;
-  }
-
-  .cinematic-intro__xo-byline {
-    font-size: clamp(0.43rem, 1.75vw, 0.5rem);
+  .cinematic-intro__descriptor-byline {
+    font-size: 0.5em;
     letter-spacing: 0.14em;
   }
 }
@@ -145,10 +109,7 @@
 @media (prefers-reduced-motion: reduce) {
   .site-brand-submark,
   .site-brand-submark__core,
-  .site-brand-submark__tail,
-  .cinematic-intro__xo-identity,
-  .cinematic-intro__xo-mark,
-  .cinematic-intro__xo-byline {
+  .site-brand-submark__tail {
     animation: none !important;
     transition: none !important;
   }

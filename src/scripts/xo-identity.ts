@@ -24,8 +24,6 @@ export function initXoIdentity() {
   let headerRevealStarted = false;
   let activeCinematic: HTMLElement | null = null;
   let cinematicPhaseObserver: MutationObserver | null = null;
-  let cinematicLetterObserver: MutationObserver | null = null;
-  let identityTimer = 0;
 
   const showHeaderStatic = () => {
     headerRevealStarted = true;
@@ -69,94 +67,30 @@ export function initXoIdentity() {
     }, delay);
   };
 
-  const detachCinematicObservers = () => {
+  const detachCinematicObserver = () => {
     cinematicPhaseObserver?.disconnect();
-    cinematicLetterObserver?.disconnect();
     cinematicPhaseObserver = null;
-    cinematicLetterObserver = null;
-    if (identityTimer) window.clearTimeout(identityTimer);
-    identityTimer = 0;
     activeCinematic = null;
   };
 
   const attachCinematic = (cinematic: HTMLElement) => {
     if (activeCinematic === cinematic || cinematic.dataset.xoIdentityAttached === 'true') return;
-    detachCinematicObservers();
+    detachCinematicObserver();
     activeCinematic = cinematic;
     cinematic.dataset.xoIdentityAttached = 'true';
 
-    const descriptorWrap = cinematic.querySelector<HTMLElement>('[data-cinematic-descriptor-wrap]');
     const descriptor = cinematic.querySelector<HTMLElement>('[data-cinematic-descriptor]');
-    const introLetter = cinematic.querySelector<HTMLElement>('[data-cinematic-letter]');
-    if (!descriptorWrap || !descriptor || !introLetter) return;
+    if (!descriptor) return;
 
-    const identity = document.createElement('div');
-    identity.className = 'cinematic-intro__xo-identity';
-    identity.dataset.cinematicXoIdentity = '';
-    identity.innerHTML = `
-      <span class="cinematic-intro__xo-mark" data-cinematic-xo-mark><b>X</b><b>O</b><i>·</i><b>WEB</b></span>
-      <span class="cinematic-intro__xo-byline" data-cinematic-xo-byline>BY VICTXR.LEV</span>
+    // The studio identity now occupies the original WEB DESIGN descriptor slot
+    // at the exact same scale. No second intro label is layered on top later.
+    descriptor.innerHTML = `
+      <span class="cinematic-intro__descriptor-brand"><b>X</b><b>O</b><i>·</i><b>WEB</b></span>
+      <span class="cinematic-intro__descriptor-byline">BY VICTXR.LEV</span>
     `;
-    descriptorWrap.append(identity);
-
-    const identityMark = identity.querySelector<HTMLElement>('[data-cinematic-xo-mark]');
-    const identityByline = identity.querySelector<HTMLElement>('[data-cinematic-xo-byline]');
-    if (!identityMark || !identityByline) return;
-
-    let identityRevealed = false;
-    let finalXSeen = false;
-
-    const revealIntroIdentity = () => {
-      if (identityRevealed || !cinematic.isConnected) return;
-      identityRevealed = true;
-      cinematic.dataset.xoIdentityState = 'revealing';
-      identity.style.opacity = '1';
-
-      const descriptorAnimation = descriptor.animate([
-        { opacity: 1, transform: 'translateY(0)' },
-        { opacity: 0, transform: 'translateY(-3px)' },
-      ], { duration: 90, easing: 'ease-in', fill: 'forwards' });
-      holdFinal(descriptorAnimation, descriptor, { opacity: '0', transform: 'translateY(-3px)' });
-
-      const markAnimation = identityMark.animate([
-        { opacity: 0, transform: 'translateY(4px) scaleX(0.94)', letterSpacing: '0.22em' },
-        { opacity: 1, transform: 'translateY(0) scaleX(1)', letterSpacing: '0.13em' },
-      ], { duration: 155, delay: 45, easing: premiumEase, fill: 'forwards' });
-      holdFinal(markAnimation, identityMark, { opacity: '1', transform: 'none', letterSpacing: '0.13em' });
-
-      const bylineAnimation = identityByline.animate([
-        { opacity: 0, transform: 'translateY(3px)', filter: 'blur(1.5px)' },
-        { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
-      ], { duration: 145, delay: 105, easing: premiumEase, fill: 'forwards' });
-      holdFinal(bylineAnimation, identityByline, { opacity: '1', transform: 'none', filter: 'blur(0px)' });
-
-      window.setTimeout(() => {
-        if (cinematic.isConnected) cinematic.dataset.xoIdentityState = 'ready';
-      }, 270);
-    };
-
-    const scheduleIdentityReveal = () => {
-      if (identityRevealed || identityTimer) return;
-      identityTimer = window.setTimeout(() => {
-        identityTimer = 0;
-        revealIntroIdentity();
-      }, 205);
-    };
-
-    cinematicLetterObserver = new MutationObserver(() => {
-      const phase = cinematic.dataset.cinematicPhase;
-      const letter = introLetter.textContent?.trim();
-      if (phase === 'o-to-x' && letter === 'X' && !finalXSeen) {
-        finalXSeen = true;
-        scheduleIdentityReveal();
-      }
-    });
-    cinematicLetterObserver.observe(introLetter, { childList: true, characterData: true, subtree: true });
 
     cinematicPhaseObserver = new MutationObserver(() => {
-      const phase = cinematic.dataset.cinematicPhase;
-      if (phase === 'x-rest' && !identityRevealed) revealIntroIdentity();
-      if (phase === 'landed') revealHeaderSubmark(180);
+      if (cinematic.dataset.cinematicPhase === 'landed') revealHeaderSubmark(180);
     });
     cinematicPhaseObserver.observe(cinematic, { attributes: true, attributeFilter: ['data-cinematic-phase'] });
   };
@@ -180,7 +114,7 @@ export function initXoIdentity() {
 
     if (shell.dataset.homeIntro === 'ready' && !cinematic && !headerRevealStarted) {
       reducedMotion ? showHeaderStatic() : revealHeaderSubmark(0);
-      detachCinematicObservers();
+      detachCinematicObserver();
     }
   });
 
