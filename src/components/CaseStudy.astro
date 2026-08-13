@@ -8,6 +8,7 @@ import { contacts } from '../data/contacts';
 import { getSiteCopy, type Locale } from '../data/site';
 import { projects, type ProjectId } from '../data/projects';
 import '../styles/case-study.css';
+import '../styles/no-indexes.css';
 
 interface Props {
   locale: Locale;
@@ -39,22 +40,13 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
 
     <figure class="case-browser reveal" data-reveal>
       <div class="case-browser__bar"><span></span><span></span><span></span><em>{new URL(project.liveUrl).hostname}</em></div>
-      <ResponsiveProjectImage
-        class="case-screen"
-        desktop={project.hero}
-        mobile={project.mobile}
-        alt={`${content.title} ${locale === 'lv' ? 'mājaslapas responsīvie skati' : 'responsive website views'}`}
-        loading="eager"
-        fetchpriority="high"
-        quality={88}
-        sizes="calc(100vw - 2rem)"
-      />
+      <ResponsiveProjectImage class="case-screen" desktop={project.hero} mobile={project.mobile} alt={`${content.title} ${locale === 'lv' ? 'mājaslapas responsīvie skati' : 'responsive website views'}`} loading="eager" fetchpriority="high" quality={88} sizes="calc(100vw - 2rem)" />
     </figure>
 
     <section class="case-narrative section-pad" data-theme="light">
-      {content.sections.map((section, index) => (
+      {content.sections.map((section) => (
         <article class="case-narrative__row reveal" data-reveal>
-          <div><span>{String(index + 1).padStart(2, '0')}</span><span>{section.label}</span></div>
+          <div><span>{section.label}</span></div>
           <h2>{section.title}</h2>
           <p>{section.text}</p>
         </article>
