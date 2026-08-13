@@ -68,9 +68,8 @@
 }
 
 .cinematic-intro__descriptor-brand {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.04em;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .cinematic-intro__descriptor-brand b {
