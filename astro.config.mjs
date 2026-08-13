@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://victxr-lev.viktors-levdanskis.workers.dev',
+  site: 'https://xoweb.lv',
   output: 'static',
   integrations: [sitemap()],
   build: {
