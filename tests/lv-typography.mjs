@@ -22,11 +22,23 @@ async function lineGeometry(locator) {
     const style = getComputedStyle(element);
     const fontSize = Number.parseFloat(style.fontSize);
     const lineHeight = Number.parseFloat(style.lineHeight);
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    const fragments = [...range.getClientRects()]
-      .filter((rect) => rect.width > 1 && rect.height > 1)
-      .map((rect) => ({ top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right }));
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      },
+    });
+    const fragments = [];
+    let textNode = walker.nextNode();
+    while (textNode) {
+      const range = document.createRange();
+      range.selectNodeContents(textNode);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 1 && rect.height > 1) {
+          fragments.push({ top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right });
+        }
+      }
+      textNode = walker.nextNode();
+    }
 
     const rows = [];
     for (const fragment of fragments.sort((a, b) => a.top - b.top || a.left - b.left)) {
