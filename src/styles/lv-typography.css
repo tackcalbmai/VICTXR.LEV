@@ -71,8 +71,9 @@ html[lang='lv'] .case-narrative__row h2 {
 }
 
 html[lang='lv'] .case-result p {
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  font-size: clamp(2rem, 4.65vw, 5rem);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
 }
 
 @media (max-width: 760px) {
@@ -131,5 +132,11 @@ html[lang='lv'] .case-result p {
     font-size: clamp(2rem, 10.5vw, 3.35rem);
     line-height: 1.3;
     letter-spacing: -0.025em;
+  }
+
+  html[lang='lv'] .case-result p {
+    font-size: clamp(1.85rem, 9.4vw, 3rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
   }
 }
