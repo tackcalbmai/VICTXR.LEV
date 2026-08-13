@@ -81,7 +81,8 @@ for (const profile of [
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
   await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 }).catch(() => {});
 
-  const sourceHero = (await page.locator('.hero__title').textContent())?.replace(/\s+/g, ' ').trim();
+  const sourceHeroLines = (await page.locator('[data-intro-line]').allTextContents()).map((line) => line.trim());
+  const sourceHero = sourceHeroLines.join(' ');
   assert(sourceHero === 'Es redzu lietas citādi.', `${profile.name} lost the Latvian hero spelling: ${sourceHero}`);
 
   const fontCoverage = await page.evaluate(() => document.fonts.check('790 72px Onest', 'Ā Ē Ī Ņ Ķ Ļ Š Ž ā ē ī ņ ķ ļ š ž'));
