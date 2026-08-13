@@ -23,55 +23,55 @@ html[lang='lv'] .home-shell[data-home-intro='ready'] .hero__line {
 }
 
 html[lang='lv'] .display-title {
-  line-height: 0.94;
-  letter-spacing: -0.055em;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .work-heading .display-title {
   max-width: 14ch;
-  font-size: clamp(3.45rem, 7.7vw, 8rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
+  font-size: clamp(3.35rem, 6.8vw, 7.2rem);
+  line-height: 1.28;
+  letter-spacing: -0.035em;
   text-wrap: balance;
   word-break: normal;
   overflow-wrap: normal;
 }
 
 html[lang='lv'] .disruption__line {
-  line-height: 0.96;
-  letter-spacing: -0.055em;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .about__statement {
   overflow: visible;
-  line-height: 0.92;
-  letter-spacing: -0.06em;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .approach__steps strong {
-  line-height: 0.96;
-  letter-spacing: -0.055em;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .anti-sales__title {
-  line-height: 0.9;
-  letter-spacing: -0.06em;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .contact__title,
 html[lang='lv'] .case-contact > h2 {
-  line-height: 0.88;
-  letter-spacing: -0.06em;
+  line-height: 1.1;
+  letter-spacing: -0.045em;
 }
 
 html[lang='lv'] .case-narrative__row h2 {
-  line-height: 1.03;
-  letter-spacing: -0.05em;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
 }
 
 html[lang='lv'] .case-result p {
-  line-height: 1.05;
-  letter-spacing: -0.05em;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
 }
 
 @media (max-width: 760px) {
@@ -87,47 +87,47 @@ html[lang='lv'] .case-result p {
   }
 
   html[lang='lv'] .display-title {
-    line-height: 0.98;
-    letter-spacing: -0.05em;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
   }
 
   html[lang='lv'] .work-heading .display-title {
     max-width: 100%;
-    font-size: clamp(2.85rem, 12.8vw, 4.8rem);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
+    font-size: clamp(2.7rem, 11.2vw, 4.1rem);
+    line-height: 1.28;
+    letter-spacing: -0.03em;
     text-wrap: pretty;
   }
 
   html[lang='lv'] .disruption__line {
-    font-size: clamp(2.8rem, 13.2vw, 5rem);
-    line-height: 1;
-    letter-spacing: -0.045em;
+    font-size: clamp(2.7rem, 12.5vw, 4.7rem);
+    line-height: 1.16;
+    letter-spacing: -0.035em;
   }
 
   html[lang='lv'] .about__statement {
-    line-height: 0.98;
-    letter-spacing: -0.05em;
+    line-height: 1.16;
+    letter-spacing: -0.04em;
   }
 
   html[lang='lv'] .approach__steps strong {
-    line-height: 1;
-    letter-spacing: -0.05em;
+    line-height: 1.16;
+    letter-spacing: -0.04em;
   }
 
   html[lang='lv'] .anti-sales__title {
-    line-height: 0.96;
-    letter-spacing: -0.05em;
+    line-height: 1.16;
+    letter-spacing: -0.04em;
   }
 
   html[lang='lv'] .contact__title,
   html[lang='lv'] .case-contact > h2 {
-    line-height: 0.94;
-    letter-spacing: -0.05em;
+    line-height: 1.14;
+    letter-spacing: -0.04em;
   }
 
   html[lang='lv'] .case-narrative__row h2 {
-    line-height: 1.08;
-    letter-spacing: -0.045em;
+    line-height: 1.16;
+    letter-spacing: -0.035em;
   }
 }
