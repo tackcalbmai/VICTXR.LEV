@@ -3,6 +3,7 @@ import { mkdir } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
 const outDir = 'artifacts/visual';
+const ratioEpsilon = 0.005;
 await mkdir(outDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
@@ -77,10 +78,10 @@ async function assertLineHeightFloor(page, selector, floor, label) {
   assert(count > 0, `${label} is missing`);
   for (let index = 0; index < count; index += 1) {
     const geometry = await lineGeometry(locators.nth(index));
-    assert(geometry.ratio >= floor, `${label} line-height is too tight (${geometry.ratio.toFixed(2)}) in “${geometry.text}”`);
+    assert(geometry.ratio + ratioEpsilon >= floor, `${label} line-height is too tight (${geometry.ratio.toFixed(3)}) in “${geometry.text}”`);
     if (geometry.rows.length > 1 && geometry.minRowAdvance !== null) {
       const advanceRatio = geometry.minRowAdvance / geometry.fontSize;
-      assert(advanceRatio >= floor - 0.015, `${label} rendered row advance is too tight (${advanceRatio.toFixed(2)}) in “${geometry.text}”`);
+      assert(advanceRatio + ratioEpsilon >= floor - 0.015, `${label} rendered row advance is too tight (${advanceRatio.toFixed(3)}) in “${geometry.text}”`);
     }
   }
 }
@@ -111,7 +112,8 @@ for (const profile of [
   // For Latvian display type we therefore lock the rendered baseline/row rhythm
   // instead of requiring those invisible boxes never to overlap. This keeps the
   // typography close to the English art direction while preventing accidental
-  // compression below the visually reviewed safe values.
+  // compression below the visually reviewed safe values. A tiny epsilon absorbs
+  // browser rounding when CSS line-height is converted to device pixels.
   await assertLineHeightFloor(page, '.work-heading .display-title', 1.02, `${profile.name} selected-work title`);
   await assertLineHeightFloor(page, '.disruption__line', 1.03, `${profile.name} disruption title`);
 
