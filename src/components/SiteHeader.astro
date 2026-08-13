@@ -22,6 +22,10 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
   <a class="site-brand" href={home} aria-label={homeLabel}>
     <span>VICT</span><span class="site-brand__letter-wrap"><span data-brand-letter>X</span></span><span>R</span><span class="site-brand__dot">.</span><span>LEV</span>
   </a>
+  <span class="site-brand-submark" data-xo-submark aria-hidden="true">
+    <span class="site-brand-submark__core" data-xo-submark-core><b>X</b><b>O</b></span>
+    <span class="site-brand-submark__tail" data-xo-submark-tail><span class="site-brand-submark__dot">·</span><span class="site-brand-submark__web">WEB</span></span>
+  </span>
 
   <nav class="site-nav site-nav--desktop" aria-label={copy.nav.menu}>
     <a href={`${home}#work`}>{copy.nav.work}</a>
@@ -73,3 +77,8 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
     <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
   </div>
 </div>
+
+<script>
+  import { initXoIdentity } from '../scripts/xo-identity';
+  initXoIdentity();
+</script>
