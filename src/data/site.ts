@@ -119,7 +119,7 @@ export const siteCopy = {
     alternateLabel: 'EN',
     seo: {
       title: 'VICTXR.LEV — Mājaslapu dizains un izstrāde Latvijā',
-      description: 'Atšķirīgas mājaslapas, kas veidotas ap reālām biznesa vajadzībām — nevis ap veidnēm.',
+      description: 'Atšķirīgas mājaslapas, kas veidotas reālām uzņēmumu vajadzībām — nevis pēc veidnēm.',
     },
     nav: {
       work: 'Darbi',
@@ -130,7 +130,7 @@ export const siteCopy = {
       close: 'Aizvērt',
     },
     hero: {
-      meta: 'Neatkarīgs mājaslapu dizainers un izstrādātājs — Latvija',
+      meta: 'Neatkarīgs mājaslapu dizainers un izstrādātājs Latvijā',
       lines: ['Es redzu', 'lietas', 'citādi.'],
       intro: 'Mājaslapas uzņēmumiem, kas atsakās izskatīties kā visi pārējie.',
       sideNote: 'Šīs vietnes tapšanā nav cietusi neviena veidne.',
@@ -141,33 +141,33 @@ export const siteCopy = {
     disruption: {
       oneBefore: 'Tavs uzņēmums ',
       oneWord: 'nav',
-      oneAfter: ' kā visi.',
+      oneAfter: ' kā pārējie.',
       twoBefore: 'Arī mājaslapai ',
       twoWord: 'nav',
-      twoAfter: ' jābūt kā visām.',
-      caption: 'Es veidoju mājaslapu ap biznesu — nevis biznesu ap veidni.',
+      twoAfter: ' jābūt kā pārējām.',
+      caption: 'Es veidoju mājaslapu biznesa vajadzībām — nevis pielāgoju biznesu veidnei.',
     },
     work: {
       label: 'Atlasītie darbi',
       title: 'Divi uzņēmumi. Divas pilnīgi atšķirīgas problēmas.',
       intro: 'Mērķis nav viens vizuālais stils. Mērķis ir atrast īsto.',
       caseStudy: 'Skatīt projektu',
-      live: 'Atvērt dzīvo mājaslapu',
+      live: 'Atvērt mājaslapu',
       projects: {
         catrin: {
           index: '01',
           name: 'CATRIN',
           sector: 'Kāzu salons — Jelgava, Latvija',
-          summary: 'Daudzvalodu redakcionāla mājaslapa, kas ir tikpat pārdomāta kā tajā parādītās kleitas.',
+          summary: 'Daudzvalodu mājaslapa, kas ir tikpat rūpīgi veidota kā tajā parādītās kleitas.',
           scope: ['Stratēģija', 'Tīmekļa dizains', 'Izstrāde', 'Daudzvalodu UX'],
           href: '/lv/darbi/catrin/',
         },
         anelika: {
           index: '02',
           name: 'ANELIKA',
-          sector: 'Īpašumu serviss — Latvija',
+          sector: 'Īpašumu uzturēšana — Latvija',
           summary: 'Plašs pakalpojumu klāsts pārvērsts skaidrā ceļā no vajadzības līdz pieprasījumam.',
-          scope: ['Informācijas arhitektūra', 'Tīmekļa dizains', 'Pieteikumu plūsma', 'Tehniskais SEO'],
+          scope: ['Informācijas arhitektūra', 'Tīmekļa dizains', 'Klientu piesaiste', 'Tehniskais SEO'],
           href: '/lv/darbi/anelika/',
         },
       },
@@ -177,15 +177,15 @@ export const siteCopy = {
       title: ['Kā es te', 'nonācu?'],
       aside: 'Labs jautājums.',
       paragraphs: [
-        'Es nesāku kā tīmekļa izstrādātājs. Es sāku ar problēmu risināšanu. Kādā brīdī šīs problēmas pārvērtās mājaslapās.',
-        'Man joprojām nav svarīgi, kā lietas “parasti dara”. Man ir svarīgi, lai tās strādā, izskatās pareizi un ir loģiskas.',
+        'Sākumā es nebiju tīmekļa izstrādātājs. Es vienkārši mēģināju risināt problēmas. Kādā brīdī šīs problēmas pārvērtās mājaslapās.',
+        'Man joprojām nav svarīgi, kā lietas “parasti dara”. Man ir svarīgi, lai tās strādātu, izskatītos pareizi un būtu loģiskas.',
       ],
       statement: ['Izrādās,', 'man tas sanāk', 'diezgan labi.'],
     },
     approach: {
       label: 'Pieeja / 04',
-      intro: 'Nav vienas formulas. Katram biznesam ir cita problēma.',
-      steps: ['Es jautāju.', 'Es apšaubu.', 'Es noņemu.', 'Es būvēju.', 'Es salaužu.', 'Es salaboju.', 'Es palaižu.'],
+      intro: 'Nav vienas formulas. Katram uzņēmumam ir sava problēma.',
+      steps: ['Es jautāju.', 'Es apšaubu.', 'Es atmetu lieko.', 'Es būvēju.', 'Es salaužu.', 'Es salaboju.', 'Es palaižu.'],
     },
     services: {
       label: 'Ko es daru / 05',
@@ -202,7 +202,7 @@ export const siteCopy = {
     xo: {
       label: 'X/O sistēma',
       title: ['No X', 'uz O.'],
-      text: 'Atrast to, kas bremzē biznesu. Pārvērst to skaidrā, noderīgā un apzinātā risinājumā. Logotips mainās, jo mainās arī rezultāts.',
+      text: 'Atrast to, kas bremzē biznesu. Pārvērst to skaidrā, noderīgā un mērķtiecīgā risinājumā. Logotips mainās, jo mainās arī rezultāts.',
     },
     anti: {
       first: ['Tev, visticamāk,', 'nevajag', 'mājaslapu.'],

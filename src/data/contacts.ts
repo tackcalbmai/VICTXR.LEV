@@ -32,7 +32,7 @@ const localizedCopy = {
     whatsapp: 'WhatsApp',
     instagram: 'Instagram',
     socialLabel: 'Citi saziņas veidi',
-    whatsappMessage: 'Sveiks. Man padomā ir projekts.',
+    whatsappMessage: 'Sveiki! Man padomā ir projekts.',
   },
 } as const;
 
