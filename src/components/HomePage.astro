@@ -70,7 +70,7 @@ const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, ''
         </a>
         <nav class="hero__actions" aria-label={locale === 'lv' ? 'Galvenā navigācija' : 'Primary navigation'}>
           <a href="#work" data-analytics-event="view_work_click"><span>{copy.hero.work}</span><Arrow direction="down" /></a>
-          <a href="#contact" data-analytics-event="start_project_click"><span>{copy.hero.start}</span><Arrow direction="up" /></a>
+          <a href="#contact" data-analytics-event="start_project_click"><span>{copy.hero.start}</span><Arrow direction="down" /></a>
         </nav>
       </div>
     </section>
@@ -134,7 +134,7 @@ const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, ''
       <p class="contact__availability">{copy.contact.availability}</p>
       <h2 class="contact__title" id="contact-title">{copy.contact.title.map((line) => <span>{line}</span>)}</h2>
       <p class="contact__expectation">{copy.contact.expectation}</p>
-      {contactEmail && <div class="contact__actions"><a class="contact__email" href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email"><span>{copy.contact.emailLabel}</span><strong>{contactEmail}</strong><Arrow direction="up" /></a><button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied} data-analytics-event="copy_email_click"><span data-copy-text>{copy.contact.copy}</span><span class="copy-mark" aria-hidden="true"></span></button><p class="sr-only" aria-live="polite" data-copy-status></p></div>}
+      {contactEmail && <div class="contact__actions"><a class="contact__email" href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email"><span>{copy.contact.emailLabel}</span><strong>{contactEmail}</strong><Arrow direction="right" /></a><button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied} data-analytics-event="copy_email_click"><span data-copy-text>{copy.contact.copy}</span><span class="copy-mark" aria-hidden="true"></span></button><p class="sr-only" aria-live="polite" data-copy-status></p></div>}
       <ContactChannels locale={locale} />
       <footer class="site-footer"><span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span><span>{copy.footer.note}</span><a href="#top">{copy.footer.backToTop}<Arrow direction="up" /></a></footer>
     </section>
