@@ -4,16 +4,19 @@ import { getSiteCopy } from '../data/site';
 import ContactChannels from './ContactChannels.astro';
 import '../styles/brand.css';
 import '../styles/no-indexes.css';
+import '../styles/commercial-hardening.css';
 
 interface Props {
   locale: Locale;
   alternateHref?: string;
+  contactHref?: string;
 }
 
-const { locale, alternateHref } = Astro.props;
+const { locale, alternateHref, contactHref } = Astro.props;
 const copy = getSiteCopy(locale);
 const home = copy.homeHref;
-const available = locale === 'lv' ? 'Pieejams' : 'Available';
+const resolvedContactHref = contactHref ?? `${home}#contact`;
+const available = copy.contact.status;
 const alternateLanguage = locale === 'lv' ? 'en' : 'lv';
 const languageLabel = locale === 'lv' ? 'Pārslēgt uz angļu valodu' : 'Switch to Latvian';
 const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — home';
@@ -32,11 +35,11 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
     <a href={`${home}#work`}>{copy.nav.work}</a>
     <a href={`${home}#about`}>{copy.nav.about}</a>
     <a href={`${home}#services`}>{copy.nav.services}</a>
-    <a href={`${home}#contact`}>{copy.nav.contact}</a>
+    <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
 
   <div class="site-header__utility">
-    <span class="site-status"><span aria-hidden="true"></span>{available}</span>
+    <a class="site-status" href={resolvedContactHref} data-analytics-event="availability_click"><span aria-hidden="true"></span>{available}</a>
     <a class="site-language" href={alternateHref ?? copy.alternateHref} hreflang={alternateLanguage} lang={alternateLanguage} aria-label={languageLabel} data-analytics-event="language_switch">{copy.alternateLabel}</a>
     <button class="site-menu-button" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu">
       <span class="sr-only" data-menu-label data-open-label={copy.nav.menu} data-close-label={copy.nav.close}>{copy.nav.menu}</span>
@@ -50,7 +53,7 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
     <a href={`${home}#work`}>{copy.nav.work}</a>
     <a href={`${home}#about`}>{copy.nav.about}</a>
     <a href={`${home}#services`}>{copy.nav.services}</a>
-    <a href={`${home}#contact`}>{copy.nav.contact}</a>
+    <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
 </noscript>
 
@@ -63,11 +66,11 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
     <a href={`${home}#work`}>{copy.nav.work}</a>
     <a href={`${home}#about`}>{copy.nav.about}</a>
     <a href={`${home}#services`}>{copy.nav.services}</a>
-    <a href={`${home}#contact`}>{copy.nav.contact}</a>
+    <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
   <div class="mobile-menu__bottom">
     <ContactChannels locale={locale} variant="menu" />
-    <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><span>{available}</span></div>
+    <div class="mobile-menu__footer"><span>{locale === 'lv' ? 'Latvija' : 'Latvia'}</span><a href={resolvedContactHref}>{available}</a></div>
   </div>
 </div>
 
