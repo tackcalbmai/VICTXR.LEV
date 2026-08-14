@@ -111,6 +111,26 @@ assert(contactsSource.includes('PUBLIC_CONTACT_INSTAGRAM'), 'The contact config 
 assert(contactsSource.includes('https://wa.me/'), 'The contacts config is missing the WhatsApp deep-link builder');
 assert(contactsSource.includes('encodeURIComponent(copy.whatsappMessage)'), 'The WhatsApp message is not localized and URL encoded');
 
+const arrowSource = await read('src/components/Arrow.astro');
+assert(arrowSource.includes('--brand-arrow-angle: 90deg'), 'Down arrows are not locked to a true vertical direction');
+assert(arrowSource.includes('--brand-arrow-angle: -90deg'), 'Up arrows are not locked to a true vertical direction');
+assert(arrowSource.includes('--brand-arrow-angle: 180deg'), 'Left arrows are not locked to a true horizontal direction');
+assert(!arrowSource.includes('45deg'), 'The brand arrow component has regressed to a diagonal direction');
+assert(arrowSource.includes('brand-arrow__notch'), 'The branded cut/notch detail is missing from the arrow glyph');
+
+const homeSource = await read('src/components/HomePage.astro');
+assert(/href="#contact"[^>]*>[\s\S]*?<Arrow direction="down" \/>/.test(homeSource), 'Homepage contact CTA does not point down toward its target');
+assert(/class="contact__email"[\s\S]*?<Arrow direction="right" \/>/.test(homeSource), 'Homepage email action does not use a forward arrow');
+
+const caseSource = await read('src/components/CaseStudy.astro');
+assert(!/case-live-link[\s\S]*?<Arrow direction="up" \/>/.test(caseSource), 'Case-study outbound link still uses an upward/diagonal arrow');
+assert(/case-live-link[\s\S]*?<Arrow direction="right" \/>/.test(caseSource), 'Case-study outbound link does not use a forward arrow');
+assert(/href="#top">[\s\S]*?<Arrow direction="up" \/>/.test(caseSource), 'Back-to-top action does not point up');
+
+const channelsSource = await read('src/components/ContactChannels.astro');
+assert(channelsSource.includes('<Arrow direction="right" />'), 'Outbound social channels do not use a forward arrow');
+assert(!channelsSource.includes('<Arrow direction="up" />'), 'Outbound social channels still use an upward/diagonal arrow');
+
 const files = await sourceFiles(fileURLToPath(new URL('../src/', import.meta.url)));
 const allSource = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n');
 assert((allSource.match(/hello@xoweb\.lv/g) ?? []).length === 1, 'The contact email is hardcoded outside the centralized config');
@@ -129,4 +149,4 @@ const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');
 assert(robots.includes('Sitemap: https://'), 'robots.txt does not advertise the sitemap over HTTPS');
 assert(sitemap.includes('<sitemapindex'), 'The sitemap index was not generated');
 
-console.log('Static production audit passed: contacts, localized 404s, content, metadata, assets and security headers are consistent.');
+console.log('Static production audit passed: contacts, directional arrows, localized 404s, content, metadata, assets and security headers are consistent.');
