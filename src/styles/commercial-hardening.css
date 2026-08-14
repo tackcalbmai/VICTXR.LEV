@@ -1,5 +1,3 @@
-@import './desktop-type-safety.css';
-
 /* Small commercial/UX refinements that deliberately leave the core art direction intact. */
 
 .site-status {
@@ -83,5 +81,46 @@
   .case-live-link,
   .case-next a {
     font-size: max(0.64rem, 10px);
+  }
+}
+
+/* Desktop-only guardrails for oversized editorial type.
+ * These rules intentionally live at the end of the last component stylesheet so
+ * the base editorial CSS cannot accidentally re-introduce glyph clipping. */
+@media (min-width: 761px) {
+  .home-shell[data-home-intro='ready'] .hero__line {
+    overflow: visible;
+  }
+
+  html:not([lang='lv']) .hero__line {
+    padding-block: 0.1em;
+    margin-block: -0.1em;
+  }
+
+  html:not([lang='lv']) .hero__title { line-height: 0.82; }
+  html:not([lang='lv']) .display-title { line-height: 0.9; }
+  html:not([lang='lv']) .disruption__line { line-height: 0.92; }
+  html:not([lang='lv']) .about__statement { line-height: 0.92; }
+  html:not([lang='lv']) .approach__steps strong { line-height: 0.94; }
+  html:not([lang='lv']) .xo-section h2 { line-height: 0.82; }
+  html:not([lang='lv']) .anti-sales__title { line-height: 0.86; }
+  html:not([lang='lv']) .contact__title,
+  html:not([lang='lv']) .case-contact > h2 { line-height: 0.84; }
+  html:not([lang='lv']) .case-hero h1 { line-height: 0.78; }
+  html:not([lang='lv']) .case-narrative__row h2 { line-height: 1; }
+  html:not([lang='lv']) .case-result p { line-height: 1.01; }
+
+  .about__statement {
+    overflow: visible;
+  }
+
+  .project-feature__title {
+    left: clamp(0.6rem, 0.7vw, 0.9rem);
+  }
+
+  .home-shell,
+  .case-page {
+    overflow-x: clip;
+    overflow-y: visible;
   }
 }
