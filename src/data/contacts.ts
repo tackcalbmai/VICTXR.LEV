@@ -25,13 +25,13 @@ const localizedCopy = {
     whatsapp: 'WhatsApp',
     instagram: 'Instagram',
     socialLabel: 'Other ways to get in touch',
-    whatsappMessage: 'Hey. I have a project in mind.',
+    whatsappMessage: 'Hi! I visited xoweb.lv and would like to discuss a website project.',
   },
   lv: {
     whatsapp: 'WhatsApp',
     instagram: 'Instagram',
     socialLabel: 'Citi saziņas veidi',
-    whatsappMessage: 'Sveiki! Man padomā ir projekts.',
+    whatsappMessage: 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas projektu.',
   },
 } as const;
 
@@ -58,6 +58,13 @@ function getInstagramContact(value: string) {
   }
 }
 
+function formatLatvianPhone(digits: string) {
+  if (digits.length === 11 && digits.startsWith('371')) {
+    return `+371 ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`;
+  }
+  return `+${digits}`;
+}
+
 export function getSocialContactLinks(locale: Locale): SocialContactLink[] {
   const copy = localizedCopy[locale];
   const links: SocialContactLink[] = [];
@@ -67,7 +74,7 @@ export function getSocialContactLinks(locale: Locale): SocialContactLink[] {
     links.push({
       channel: 'whatsapp',
       label: copy.whatsapp,
-      display: `+${whatsappNumber}`,
+      display: formatLatvianPhone(whatsappNumber),
       href: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(copy.whatsappMessage)}`,
     });
   }
