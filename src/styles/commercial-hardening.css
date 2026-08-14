@@ -85,42 +85,39 @@
 }
 
 /* Desktop-only guardrails for oversized editorial type.
- * These rules intentionally live at the end of the last component stylesheet so
- * the base editorial CSS cannot accidentally re-introduce glyph clipping. */
+ * Vite may reorder component CSS chunks, so the safety properties use !important
+ * deliberately: these are narrow invariants, not a second visual system. Mobile
+ * remains completely outside this block. */
 @media (min-width: 761px) {
   .home-shell[data-home-intro='ready'] .hero__line {
-    overflow: visible;
+    overflow: visible !important;
   }
 
   html:not([lang='lv']) .hero__line {
-    padding-block: 0.1em;
-    margin-block: -0.1em;
+    padding-block: 0.1em !important;
+    margin-block: -0.1em !important;
   }
 
-  html:not([lang='lv']) .hero__title { line-height: 0.82; }
-  html:not([lang='lv']) .display-title { line-height: 0.9; }
-  html:not([lang='lv']) .disruption__line { line-height: 0.92; }
-  html:not([lang='lv']) .about__statement { line-height: 0.92; }
-  html:not([lang='lv']) .approach__steps strong { line-height: 0.94; }
-  html:not([lang='lv']) .xo-section h2 { line-height: 0.82; }
-  html:not([lang='lv']) .anti-sales__title { line-height: 0.86; }
+  html:not([lang='lv']) .hero__title { line-height: 0.82 !important; }
+  html:not([lang='lv']) .display-title { line-height: 0.9 !important; }
+  html:not([lang='lv']) .disruption__line { line-height: 0.92 !important; }
+  html:not([lang='lv']) .about__statement { line-height: 0.92 !important; }
+  html:not([lang='lv']) .approach__steps strong { line-height: 0.94 !important; }
+  html:not([lang='lv']) .xo-section h2 { line-height: 0.82 !important; }
+  html:not([lang='lv']) .anti-sales__title { line-height: 0.86 !important; }
   html:not([lang='lv']) .contact__title,
-  html:not([lang='lv']) .case-contact > h2 { line-height: 0.84; }
-  html:not([lang='lv']) .case-hero h1 { line-height: 0.78; }
-  html:not([lang='lv']) .case-narrative__row h2 { line-height: 1; }
-  html:not([lang='lv']) .case-result p { line-height: 1.01; }
+  html:not([lang='lv']) .case-contact > h2 { line-height: 0.84 !important; }
+  html:not([lang='lv']) .case-hero h1 { line-height: 0.78 !important; }
+  html:not([lang='lv']) .case-narrative__row h2 { line-height: 1 !important; }
+  html:not([lang='lv']) .case-result p { line-height: 1.01 !important; }
 
   .about__statement {
-    overflow: visible;
+    overflow: visible !important;
   }
 
+  /* The old -0.025em optical overhang painted the C in CATRIN ~6px outside
+   * a clipping project section at 1024px. Keep the title large, but fully painted. */
   .project-feature__title {
-    left: clamp(0.6rem, 0.7vw, 0.9rem);
-  }
-
-  .home-shell,
-  .case-page {
-    overflow-x: clip;
-    overflow-y: visible;
+    left: clamp(0.6rem, 0.7vw, 0.9rem) !important;
   }
 }
