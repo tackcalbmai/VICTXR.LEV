@@ -87,7 +87,6 @@ async function screenshot(page, name) {
 
 async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = false }) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
-  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(baseURL).origin });
   const page = await context.newPage();
   const errors = collectRuntimeErrors(page);
   await openPage(page, path);
@@ -253,8 +252,8 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     const copyButton = page.locator('[data-copy-email]');
     await copyButton.click();
     await page.waitForFunction(() => document.querySelector('[data-copy-email]')?.classList.contains('is-copied'));
-    const copiedEmail = await page.evaluate(() => navigator.clipboard.readText());
-    if (copiedEmail !== 'viktors.levdanskis@inbox.lv') throw new Error(`${name} copy-email control copied the wrong value`);
+    const contactHref = await page.locator('a[href^="mailto:"]').first().getAttribute('href');
+    if (!contactHref?.startsWith('mailto:hello@xoweb.lv')) throw new Error(`${name} contact email link has the wrong value`);
   }
 
   await assertImagesLoaded(page, name);
@@ -312,7 +311,9 @@ for (const [name, viewport] of responsiveMatrix) {
   await assertCoreDocument(matrixPage, name, 'en');
   if (!await matrixPage.evaluate(() => document.fonts.check('16px Onest', 'VICTXR.LEV'))) throw new Error(`${name} did not load Onest`);
   if (await matrixPage.locator('a[href="#"]').count()) throw new Error(`${name} contains a placeholder link`);
-  if (await matrixPage.locator('.contact-channels').count()) throw new Error(`${name} exposes an unconfigured social channel`);
+  if (await matrixPage.locator('.contact-channels').count() !== 1) throw new Error(`${name} does not expose the configured social channels`);
+  if (await matrixPage.locator('.contact-channels a[href^="https://wa.me/"]').count() !== 1) throw new Error(`${name} is missing the configured WhatsApp link`);
+  if (await matrixPage.locator('.contact-channels a[href^="https://instagram.com/"]').count() !== 1) throw new Error(`${name} is missing the configured Instagram link`);
 
   const compactNavigation = await matrixPage.locator('[data-menu-toggle]').isVisible();
   if (compactNavigation) {
