@@ -99,19 +99,17 @@ assert(pages.notFoundLv.includes('Šī lapa neeksistē.'), 'Latvian 404 metadata
 assert(!pages.notFoundEn.includes("location.pathname.startsWith('/lv/')"), '404 localization still depends on client-side path mutation');
 
 const rendered = Object.values(pages).join('\n');
-assert(!/<nav class="contact-channels/.test(rendered), 'Unconfigured social channels are rendered');
-assert(!/href="https:\/\/wa\.me\//.test(rendered), 'A fake WhatsApp link is rendered');
-assert(!/href="https:\/\/(?:www\.)?instagram\.com\//.test(rendered), 'A fake Instagram link is rendered');
+assert(/<nav class="contact-channels/.test(rendered), 'Configured social channels are not rendered');
+assert(/href="https:\/\/wa\.me\//.test(rendered), 'The production WhatsApp deep link is missing');
+assert(/href="https:\/\/(?:www\.)?instagram\.com\//.test(rendered), 'The production Instagram link is missing');
 
 const contactsSource = await read('src/data/contacts.ts');
 assert(contactsSource.includes("'hello@xoweb.lv'"), 'The active fallback email is missing from the centralized contacts config');
 assert(contactsSource.includes('PUBLIC_CONTACT_EMAIL'), 'The contact config cannot be safely build-tested with an email override');
 assert(contactsSource.includes('PUBLIC_CONTACT_WHATSAPP'), 'The contact config cannot be build-tested with a WhatsApp override');
 assert(contactsSource.includes('PUBLIC_CONTACT_INSTAGRAM'), 'The contact config cannot be safely build-tested with an Instagram override');
-assert(/PUBLIC_CONTACT_WHATSAPP[^\n]+\|\|\s*''/.test(contactsSource), 'WhatsApp must default to empty until the real number exists');
-assert(/PUBLIC_CONTACT_INSTAGRAM[^\n]+\|\|\s*''/.test(contactsSource), 'Instagram must default to empty until the real profile exists');
-assert(contactsSource.includes('https://wa.me/'), 'The contacts config is missing the future WhatsApp deep-link builder');
-assert(contactsSource.includes('encodeURIComponent(copy.whatsappMessage)'), 'The future WhatsApp message is not localized and URL encoded');
+assert(contactsSource.includes('https://wa.me/'), 'The contacts config is missing the WhatsApp deep-link builder');
+assert(contactsSource.includes('encodeURIComponent(copy.whatsappMessage)'), 'The WhatsApp message is not localized and URL encoded');
 
 const files = await sourceFiles(fileURLToPath(new URL('../src/', import.meta.url)));
 const allSource = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n');

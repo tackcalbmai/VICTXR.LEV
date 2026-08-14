@@ -11,14 +11,13 @@ type ContactConfig = {
 /**
  * The single source of truth for every public contact channel.
  *
- * Production keeps future channels empty until the real accounts exist.
- * PUBLIC_CONTACT_* overrides exist only so CI can build and visually verify
- * the enabled state before those values are switched on for the live site.
+ * PUBLIC_CONTACT_* overrides remain available so CI/preview builds can safely
+ * verify alternate contact states without changing the production defaults.
  */
 export const contacts: ContactConfig = {
   email: import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'hello@xoweb.lv',
-  whatsapp: import.meta.env.PUBLIC_CONTACT_WHATSAPP?.trim() || '',
-  instagram: import.meta.env.PUBLIC_CONTACT_INSTAGRAM?.trim() || '',
+  whatsapp: import.meta.env.PUBLIC_CONTACT_WHATSAPP?.trim() || '+37124868701',
+  instagram: import.meta.env.PUBLIC_CONTACT_INSTAGRAM?.trim() || 'https://instagram.com/xoweb.lv/',
 };
 
 const localizedCopy = {
