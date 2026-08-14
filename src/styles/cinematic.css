@@ -207,28 +207,6 @@ html.is-cinematic-intro body {
   padding-right: 0.02em;
 }
 
-@keyframes cinematic-mobile-descriptor-in {
-  0% {
-    opacity: 0;
-    visibility: visible;
-    transform: translateY(0.8rem);
-    filter: blur(3px);
-  }
-
-  35% {
-    opacity: 0.12;
-    transform: translateY(0.55rem);
-    filter: blur(2.2px);
-  }
-
-  100% {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
 @media (max-width: 760px) {
   .cinematic-intro__wordmark,
   .cinematic-intro__slice-wordmark {
@@ -239,18 +217,36 @@ html.is-cinematic-intro body {
 
   .cinematic-intro__descriptor-wrap {
     width: min(calc(100vw - 1.65rem), 68rem);
-  }
-
-  .cinematic-intro[data-cinematic-phase='boot'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='assemble'] .cinematic-intro__descriptor-wrap {
     opacity: 0 !important;
     visibility: hidden !important;
-    transform: translateY(0.8rem) !important;
-    filter: blur(3px) !important;
+    transform: translate3d(0, 0.9rem, 0) !important;
+    filter: blur(4px) !important;
+    transition:
+      opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) 120ms,
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1) 120ms,
+      filter 700ms cubic-bezier(0.22, 1, 0.36, 1) 120ms;
   }
 
-  .cinematic-intro[data-cinematic-phase='logo'] .cinematic-intro__descriptor-wrap {
-    animation: cinematic-mobile-descriptor-in 430ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  .cinematic-intro[data-cinematic-phase='logo'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='x-to-o'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='o-rest'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='o-to-x'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='x-rest'] .cinematic-intro__descriptor-wrap {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translate3d(0, 0, 0) !important;
+    filter: blur(0) !important;
+  }
+
+  .cinematic-intro[data-cinematic-phase='handoff'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='reveal'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='landed'] .cinematic-intro__descriptor-wrap {
+    opacity: 0 !important;
+    visibility: visible !important;
+    transform: translate3d(0, -0.25rem, 0) !important;
+    filter: blur(1.5px) !important;
+    transition-duration: 240ms;
+    transition-delay: 0ms;
   }
 
   .cinematic-intro__descriptor {
