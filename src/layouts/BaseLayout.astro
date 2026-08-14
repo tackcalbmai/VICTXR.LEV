@@ -22,17 +22,18 @@ const {
   preloadSerif = false,
 } = Astro.props;
 
+const publicTitle = title.replace(' | VICTXR.LEV', '');
 const siteUrl = Astro.site ?? new URL('https://xoweb.lv');
 const canonical = new URL(canonicalPath, siteUrl);
 const alternate = new URL(alternatePath, siteUrl);
 const xDefault = new URL(lang === 'en' ? canonicalPath : alternatePath, siteUrl);
-const socialImage = new URL('/social-preview.png', siteUrl);
+const socialImage = new URL('/xo-web-preview.png', siteUrl);
 const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
 const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
 const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
 const socialAlt = lang === 'lv'
-  ? 'XO WEB by VICTXR.LEV — mājaslapu dizains un izstrāde'
-  : 'XO WEB by VICTXR.LEV — web design and development';
+  ? 'XO WEB — mājaslapu dizains un izstrāde Latvijā'
+  : 'XO WEB — web design and development from Latvia';
 const socialProfiles = getSocialContactLinks(lang)
   .filter((contact) => contact.channel === 'instagram')
   .map((contact) => contact.href);
@@ -47,6 +48,7 @@ const schema = {
       '@id': websiteId,
       url: siteUrl.toString(),
       name: 'XO WEB',
+      alternateName: 'xoweb.lv',
       description,
       inLanguage: lang,
       brand: { '@id': brandId },
@@ -57,7 +59,9 @@ const schema = {
       '@type': 'Brand',
       '@id': brandId,
       name: 'XO WEB',
+      alternateName: 'xoweb.lv',
       url: siteUrl.toString(),
+      sameAs: socialProfiles.length ? socialProfiles : undefined,
     },
     {
       '@type': 'Person',
@@ -96,7 +100,7 @@ const schema = {
     {preloadSerif && <link rel="preload" href="/fonts/noto-serif-display-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="XO WEB" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={publicTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
@@ -106,11 +110,11 @@ const schema = {
     <meta property="og:locale" content={locale} />
     <meta property="og:locale:alternate" content={alternateLocale} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={publicTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:image:alt" content={socialAlt} />
-    <title>{title}</title>
+    <title>{publicTitle}</title>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
     <script is:inline>
       const navigation = performance.getEntriesByType?.('navigation')?.[0];

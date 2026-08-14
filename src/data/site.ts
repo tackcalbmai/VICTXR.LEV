@@ -7,7 +7,7 @@ export const siteCopy = {
     alternateHref: '/lv/',
     alternateLabel: 'LV',
     seo: {
-      title: 'XO WEB — Web design & development from Latvia | VICTXR.LEV',
+      title: 'XO WEB — Web design & development from Latvia',
       description: 'Distinctive websites designed and built around real business problems — not around templates.',
     },
     nav: {
@@ -120,7 +120,7 @@ export const siteCopy = {
     alternateHref: '/',
     alternateLabel: 'EN',
     seo: {
-      title: 'XO WEB — Mājaslapu dizains un izstrāde Latvijā | VICTXR.LEV',
+      title: 'XO WEB — Mājaslapu dizains un izstrāde Latvijā',
       description: 'Atšķirīgas mājaslapas, kas veidotas reālām uzņēmumu vajadzībām — nevis pēc veidnēm.',
     },
     nav: {
