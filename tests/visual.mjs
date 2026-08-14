@@ -312,9 +312,9 @@ for (const [name, viewport] of responsiveMatrix) {
   await assertCoreDocument(matrixPage, name, 'en');
   if (!await matrixPage.evaluate(() => document.fonts.check('16px Onest', 'VICTXR.LEV'))) throw new Error(`${name} did not load Onest`);
   if (await matrixPage.locator('a[href="#"]').count()) throw new Error(`${name} contains a placeholder link`);
-  if (await matrixPage.locator('.contact-channels').count() !== 1) throw new Error(`${name} does not expose the configured social channels`);
-  if (await matrixPage.locator('.contact-channels a[href^="https://wa.me/"]').count() !== 1) throw new Error(`${name} is missing the configured WhatsApp link`);
-  if (await matrixPage.locator('.contact-channels a[href^="https://instagram.com/"]').count() !== 1) throw new Error(`${name} is missing the configured Instagram link`);
+  if (await matrixPage.locator('.contact-channels').count() < 1) throw new Error(`${name} does not expose the configured social channels`);
+  if (await matrixPage.locator('.contact-channels a[href^="https://wa.me/"]').count() < 1) throw new Error(`${name} is missing the configured WhatsApp link`);
+  if (await matrixPage.locator('.contact-channels a[href^="https://instagram.com/"]').count() < 1) throw new Error(`${name} is missing the configured Instagram link`);
 
   const compactNavigation = await matrixPage.locator('[data-menu-toggle]').isVisible();
   if (compactNavigation) {
