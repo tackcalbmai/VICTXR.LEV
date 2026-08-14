@@ -68,6 +68,24 @@ async function assertNoOverflow(page, name) {
   if (overflow > 2) throw new Error(`${name} has ${overflow}px horizontal overflow`);
 }
 
+async function advanceScrollChoreography(page, targetY) {
+  await page.evaluate(async (target) => {
+    const start = window.scrollY;
+    const steps = 6;
+    for (let step = 1; step <= steps; step += 1) {
+      const progress = step / steps;
+      window.scrollTo(0, start + (target - start) * progress);
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      await new Promise((resolve) => setTimeout(resolve, 70));
+    }
+  }, targetY);
+
+  await page.waitForFunction(() => {
+    const element = document.querySelector('[data-disruption-two]');
+    return element && Number.parseFloat(getComputedStyle(element).opacity) >= 0.05;
+  }, undefined, { timeout: 1800 });
+}
+
 for (const profile of profiles) {
   const browser = await profile.engine.launch({ headless: true });
   const context = await browser.newContext({ ...profile.context, reducedMotion: 'no-preference' });
@@ -117,10 +135,11 @@ for (const profile of profiles) {
     const rect = section.getBoundingClientRect();
     return rect.top + window.scrollY;
   });
-  await page.evaluate((targetY) => window.scrollTo(0, targetY), disruptionTop + profile.context.viewport.height * 0.82);
-  // ScrollTrigger uses a scrubbed timeline; allow every engine one animation
-  // frame budget plus the scrub interpolation before judging the state.
-  await page.waitForTimeout(900);
+  // A scrubbed ScrollTrigger is driven by successive scroll frames. A single
+  // synthetic jump is not equivalent across browser engines, especially in
+  // headless WebKit, so advance it through real frame boundaries and assert
+  // the rendered state rather than relying on an arbitrary fixed delay.
+  await advanceScrollChoreography(page, disruptionTop + profile.context.viewport.height * 0.82);
   const disruptionOpacity = Number(await page.locator('[data-disruption-two]').evaluate((element) => getComputedStyle(element).opacity));
   if (disruptionOpacity < 0.05) throw new Error(`${profile.name} did not advance the scroll choreography`);
 
