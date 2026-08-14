@@ -31,8 +31,8 @@ const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
 const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
 const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
 const socialAlt = lang === 'lv'
-  ? 'XO WEB by VICTXR.LEV — mājaslapu dizains un izstrāde'
-  : 'XO WEB by VICTXR.LEV — web design and development';
+  ? 'XO WEB — mājaslapu dizains un izstrāde Latvijā'
+  : 'XO WEB — web design and development from Latvia';
 const socialProfiles = getSocialContactLinks(lang)
   .filter((contact) => contact.channel === 'instagram')
   .map((contact) => contact.href);
@@ -47,6 +47,7 @@ const schema = {
       '@id': websiteId,
       url: siteUrl.toString(),
       name: 'XO WEB',
+      alternateName: 'xoweb.lv',
       description,
       inLanguage: lang,
       brand: { '@id': brandId },
@@ -57,7 +58,9 @@ const schema = {
       '@type': 'Brand',
       '@id': brandId,
       name: 'XO WEB',
+      alternateName: 'xoweb.lv',
       url: siteUrl.toString(),
+      sameAs: socialProfiles.length ? socialProfiles : undefined,
     },
     {
       '@type': 'Person',
