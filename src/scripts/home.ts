@@ -3,6 +3,29 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const introSessionKey = 'xoweb:intro-seen';
+const introReadyMark = 'xoweb:intro-ready';
+
+function hasSeenIntroThisSession() {
+  try {
+    return sessionStorage.getItem(introSessionKey) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markIntroSeen() {
+  try {
+    sessionStorage.setItem(introSessionKey, '1');
+  } catch {
+    // Storage can be unavailable in hardened/private contexts. The intro still works.
+  }
+}
+
+function markIntroReady() {
+  if (!performance.getEntriesByName(introReadyMark).length) performance.mark(introReadyMark);
+}
+
 export function initHomeMotion() {
   const shell = document.querySelector<HTMLElement>('[data-home-intro]');
   if (!shell) return;
@@ -12,6 +35,7 @@ export function initHomeMotion() {
   const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
   const returningFromHistory = navigation?.type === 'back_forward';
   const introWasBypassed = shell.dataset.introBypassed === 'true';
+  const introSeenThisSession = hasSeenIntroThisSession();
   let initialHashTarget: HTMLElement | null = null;
   if (!returningFromHistory && location.hash.length > 1) {
     try {
@@ -184,8 +208,9 @@ export function initHomeMotion() {
   };
 
   const startCinematic = () => {
-    if (reducedMotion || returningFromHistory || initialHashTarget || introWasBypassed) {
+    if (reducedMotion || returningFromHistory || initialHashTarget || introWasBypassed || introSeenThisSession) {
       shell.setAttribute('data-home-intro', 'ready');
+      markIntroReady();
       if (!reducedMotion) scheduleBrandCycle(8.5);
       return;
     }
@@ -207,7 +232,10 @@ export function initHomeMotion() {
           <span>VICT</span><span class="cinematic-intro__letter-wrap" data-cinematic-letter-wrap><span data-cinematic-letter>X</span></span><span>R</span><span class="cinematic-intro__dot">.</span><span>LEV</span>
         </div>
         <div class="cinematic-intro__descriptor-wrap" data-cinematic-descriptor-wrap>
-          <p class="cinematic-intro__descriptor" data-cinematic-descriptor><span>WEB</span><span>DESIGN</span></p>
+          <p class="cinematic-intro__descriptor" data-cinematic-descriptor>
+            <span class="cinematic-intro__descriptor-brand"><b>X</b><b>O</b><i>·</i><b>WEB</b></span>
+            <span class="cinematic-intro__descriptor-byline">BY VICTXR.LEV</span>
+          </p>
         </div>
       </div>
     `;
@@ -225,6 +253,7 @@ export function initHomeMotion() {
 
     if (!backdrop || !wordmark || !introLetterWrap || !introLetter || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
+      markIntroReady();
       releaseCinematic();
       return;
     }
@@ -300,44 +329,42 @@ export function initHomeMotion() {
     });
 
     introTimeline
-      // Opening assembly — three restrained cuts lock into one exact identity.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.08)
-      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.72, ease: 'power4.out' }, 0.12)
-      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.64, ease: 'power4.out' }, 0.17)
-      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.76, ease: 'power4.out' }, 0.1)
-      .set(wordmark, { autoAlpha: 1 }, 0.68)
-      .to(slices, { autoAlpha: 0, duration: 0.18, ease: 'power1.out' }, 0.68)
-      .call(syncDescriptorGeometry, [], 0.76)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.82)
-      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.42, ease: 'power2.out' }, 0.86);
-    introGlitch(introTimeline, 0.7);
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.06)
+      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.55, ease: 'power4.out' }, 0.08)
+      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power4.out' }, 0.12)
+      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.58, ease: 'power4.out' }, 0.07)
+      .set(wordmark, { autoAlpha: 1 }, 0.56)
+      .to(slices, { autoAlpha: 0, duration: 0.15, ease: 'power1.out' }, 0.56)
+      .call(syncDescriptorGeometry, [], 0.64)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.68)
+      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.33, ease: 'power2.out' }, 0.72);
+    introGlitch(introTimeline, 0.57);
 
     introTimeline
-      // X → O — same brand language as the header, presented at cinematic scale.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-to-o'; }, [], 1.5)
-      .to(introLetterWrap, { rotation: -72, y: -1, duration: 0.36, ease: 'power1.in' }, 1.52)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-to-o'; }, [], 1.12)
+      .to(introLetterWrap, { rotation: -72, y: -1, duration: 0.32, ease: 'power1.in' }, 1.14)
       .to(introLetterWrap, {
         rotation: -248,
         x: firstFlightX,
         y: firstFlightY,
         scale: 0.93,
-        duration: 0.22,
+        duration: 0.2,
         ease: 'power3.in',
-      }, 1.82);
-    introGlitch(introTimeline, 1.78);
+      }, 1.4);
+    introGlitch(introTimeline, 1.37);
     introTimeline
       .to(introLetterWrap, {
         rotation: -420,
         x: firstFlightX * 1.08,
         y: firstFlightY * 1.08,
         autoAlpha: 0.42,
-        duration: 0.13,
+        duration: 0.12,
         ease: 'power4.in',
-      }, 2.0)
+      }, 1.58)
       .call(() => {
         introLetter.textContent = 'O';
         introLetter.classList.add('is-o');
-      }, [], 2.11)
+      }, [], 1.68)
       .set(introLetterWrap, {
         rotation: -24,
         x: firstFlightX * 0.66,
@@ -346,8 +373,8 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 0.9,
         autoAlpha: 0.52,
-      }, 2.11);
-    introGlitch(introTimeline, 2.11);
+      }, 1.68);
+    introGlitch(introTimeline, 1.68);
     introTimeline
       .to(introLetterWrap, {
         x: 0,
@@ -357,37 +384,35 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 1,
         autoAlpha: 1,
-        duration: 0.3,
+        duration: 0.28,
         ease: 'back.out(2.35)',
-      }, 2.24)
-      .call(settleIntroLetter, [], 2.55)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-rest'; }, [], 2.57)
-
-      // O → X — complete exactly one cycle, then leave the identity resolved on X.
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-to-x'; }, [], 3.02)
-      .to(introLetterWrap, { rotation: -86, x: -1, y: 1, duration: 0.36, ease: 'power1.in' }, 3.02)
+      }, 1.8)
+      .call(settleIntroLetter, [], 2.08)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-rest'; }, [], 2.1)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'o-to-x'; }, [], 2.34)
+      .to(introLetterWrap, { rotation: -86, x: -1, y: 1, duration: 0.32, ease: 'power1.in' }, 2.34)
       .to(introLetterWrap, {
         rotation: -262,
         x: secondFlightX,
         y: secondFlightY,
         scale: 0.93,
-        duration: 0.22,
+        duration: 0.2,
         ease: 'power3.in',
-      }, 3.32);
-    introGlitch(introTimeline, 3.28);
+      }, 2.6);
+    introGlitch(introTimeline, 2.57);
     introTimeline
       .to(introLetterWrap, {
         rotation: -420,
         x: secondFlightX * 1.05,
         y: secondFlightY * 1.06,
         autoAlpha: 0.44,
-        duration: 0.13,
+        duration: 0.12,
         ease: 'power4.in',
-      }, 3.5)
+      }, 2.78)
       .call(() => {
         introLetter.textContent = 'X';
         introLetter.classList.remove('is-o');
-      }, [], 3.61)
+      }, [], 2.88)
       .set(introLetterWrap, {
         rotation: -22,
         x: secondFlightX * 0.62,
@@ -396,8 +421,8 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 0.9,
         autoAlpha: 0.54,
-      }, 3.61);
-    introGlitch(introTimeline, 3.61);
+      }, 2.88);
+    introGlitch(introTimeline, 2.88);
     introTimeline
       .to(introLetterWrap, {
         x: 0,
@@ -407,37 +432,37 @@ export function initHomeMotion() {
         skewX: 0,
         scale: 1,
         autoAlpha: 1,
-        duration: 0.29,
+        duration: 0.28,
         ease: 'back.out(2.35)',
-      }, 3.74)
-      .call(settleIntroLetter, [], 4.04)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-rest'; }, [], 4.06)
-
-      // Exact FLIP handoff — top-left and dimensions converge on the real header wordmark.
-      .call(syncDescriptorGeometry, [], 4.22)
-      .call(measureHandoff, [], 4.28)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 4.3)
-      .to(descriptorWrap, { autoAlpha: 0, y: -4, filter: 'blur(1.5px)', duration: 0.32, ease: 'power2.in' }, 4.24)
+      }, 3.0)
+      .call(settleIntroLetter, [], 3.28)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'x-rest'; }, [], 3.3)
+      .call(syncDescriptorGeometry, [], 3.43)
+      .call(measureHandoff, [], 3.48)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 3.5)
+      .to(descriptorWrap, { autoAlpha: 0, y: -4, filter: 'blur(1.5px)', duration: 0.24, ease: 'power2.in' }, 3.42)
       .to(wordmark, {
         x: () => handoff.x,
         y: () => handoff.y,
         scaleX: () => handoff.scaleX,
         scaleY: () => handoff.scaleY,
-        duration: 1.05,
+        duration: 0.88,
         ease: 'power4.inOut',
-      }, 4.34)
+      }, 3.54)
       .call(() => {
+        markIntroSeen();
+        markIntroReady();
         shell.setAttribute('data-home-intro', 'ready');
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'reveal';
-      }, [], 4.84)
-      .to(backdrop, { autoAlpha: 0, duration: 1.0, ease: 'power2.inOut' }, 4.84)
+      }, [], 4.1)
+      .to(backdrop, { autoAlpha: 0, duration: 0.72, ease: 'power2.inOut' }, 4.1)
       .call(() => {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'landed';
         gsap.set(wordmark, { autoAlpha: 0 });
         gsap.set(siteHeader, { autoAlpha: 1 });
-      }, [], 5.38)
-      .to(headerSecondary, { autoAlpha: 1, duration: 0.44, stagger: 0.05, ease: 'power2.out' }, 5.4)
-      .to(cinematicNode, { autoAlpha: 0, duration: 0.3, ease: 'power1.out' }, 5.62);
+      }, [], 4.42)
+      .to(headerSecondary, { autoAlpha: 1, duration: 0.34, stagger: 0.04, ease: 'power2.out' }, 4.44)
+      .to(cinematicNode, { autoAlpha: 0, duration: 0.24, ease: 'power1.out' }, 4.8);
   };
 
   startCinematic();
