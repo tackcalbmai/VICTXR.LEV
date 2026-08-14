@@ -7,6 +7,67 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
-<svg class:list={['ui-arrow', `ui-arrow--${direction}`, className]} viewBox="0 0 18 18" aria-hidden="true">
-  <path d="M3 9h11M10 5l4 4-4 4" />
+<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 20 20" aria-hidden="true">
+  <path class="brand-arrow__rail brand-arrow__rail--start" d="M2.25 10H8.05" />
+  <path class="brand-arrow__notch" d="M8.85 11.45L9.75 8.55" />
+  <path class="brand-arrow__rail brand-arrow__rail--end" d="M10.45 10H16.15" />
+  <path class="brand-arrow__head" d="M12.45 6.25L16.2 10L12.45 13.75" />
 </svg>
+
+<style>
+  .brand-arrow {
+    --brand-arrow-angle: 0deg;
+    transform: rotate(var(--brand-arrow-angle));
+    transform-origin: 50% 50%;
+    transition: transform 360ms var(--ease-out);
+  }
+
+  .brand-arrow--down { --brand-arrow-angle: 90deg; }
+  .brand-arrow--left { --brand-arrow-angle: 180deg; }
+  .brand-arrow--up { --brand-arrow-angle: -90deg; }
+
+  .brand-arrow__rail,
+  .brand-arrow__head,
+  .brand-arrow__notch {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .brand-arrow__rail,
+  .brand-arrow__head {
+    transition: transform 360ms var(--ease-out);
+  }
+
+  .brand-arrow__notch {
+    stroke: var(--accent);
+    stroke-width: 1.35;
+    opacity: 0.95;
+    transition: transform 360ms var(--ease-out), opacity 220ms ease;
+  }
+
+  :global(a:hover) .brand-arrow,
+  :global(a:focus-visible) .brand-arrow {
+    transform: rotate(var(--brand-arrow-angle)) translateX(0.16rem);
+  }
+
+  :global(a:hover) .brand-arrow__rail--end,
+  :global(a:focus-visible) .brand-arrow__rail--end,
+  :global(a:hover) .brand-arrow__head,
+  :global(a:focus-visible) .brand-arrow__head {
+    transform: translateX(0.55px);
+  }
+
+  :global(a:hover) .brand-arrow__notch,
+  :global(a:focus-visible) .brand-arrow__notch {
+    transform: translateX(-0.35px);
+    opacity: 0.72;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-arrow,
+    .brand-arrow__rail,
+    .brand-arrow__head,
+    .brand-arrow__notch {
+      transition: none;
+    }
+  }
+</style>
