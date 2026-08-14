@@ -36,9 +36,11 @@
     overflow: visible;
   }
 
-  /* Keep giant project names visually flush without shaving the first glyph. */
+  /* Keep giant project names visually flush without shaving the first glyph.
+   * The font's painted C extends several pixels left of its layout box at 1024px,
+   * so use a small bounded inset rather than an em-relative optical overhang. */
   .project-feature__title {
-    left: 0.015em;
+    left: clamp(0.6rem, 0.7vw, 0.9rem);
   }
 
   /* These wrappers only need horizontal containment. Vertical glyph paint should
