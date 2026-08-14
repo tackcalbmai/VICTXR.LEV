@@ -53,7 +53,7 @@ export const projects: Record<ProjectId, Project> = {
     gallery: [catrinPortrait, catrinLookbook, catrinDetail, catrinSalon],
     content: {
       en: {
-        seoTitle: 'CATRIN case study — VICTXR.LEV',
+        seoTitle: 'CATRIN case study — XO WEB | VICTXR.LEV',
         seoDescription: 'A multilingual editorial website for the CATRIN bridal salon in Jelgava.',
         eyebrow: 'Selected work / 01',
         title: 'CATRIN',
@@ -89,7 +89,7 @@ export const projects: Record<ProjectId, Project> = {
         resultNote: 'No invented vanity metrics. The deliverable is live, indexable and built around the real customer journey.',
       },
       lv: {
-        seoTitle: 'CATRIN projekts — VICTXR.LEV',
+        seoTitle: 'CATRIN projekts — XO WEB | VICTXR.LEV',
         seoDescription: 'Daudzvalodu mājaslapa kāzu salonam CATRIN Jelgavā.',
         eyebrow: 'Atlasītie darbi / 01',
         title: 'CATRIN',
@@ -136,7 +136,7 @@ export const projects: Record<ProjectId, Project> = {
     mark: anelikaMark,
     content: {
       en: {
-        seoTitle: 'ANELIKA case study — VICTXR.LEV',
+        seoTitle: 'ANELIKA case study — XO WEB | VICTXR.LEV',
         seoDescription: 'A conversion-focused, multilingual service website for ANELIKA across Latvia.',
         eyebrow: 'Selected work / 02',
         title: 'ANELIKA',
@@ -172,7 +172,7 @@ export const projects: Record<ProjectId, Project> = {
         resultNote: 'Different from CATRIN on purpose: less atmosphere, more orientation, proof and action.',
       },
       lv: {
-        seoTitle: 'ANELIKA projekts — VICTXR.LEV',
+        seoTitle: 'ANELIKA projekts — XO WEB | VICTXR.LEV',
         seoDescription: 'Uz pieteikumiem orientēta daudzvalodu pakalpojumu mājaslapa ANELIKA visā Latvijā.',
         eyebrow: 'Atlasītie darbi / 02',
         title: 'ANELIKA',
