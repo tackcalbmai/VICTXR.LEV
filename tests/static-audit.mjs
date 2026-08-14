@@ -104,10 +104,10 @@ assert(!/href="https:\/\/wa\.me\//.test(rendered), 'A fake WhatsApp link is rend
 assert(!/href="https:\/\/(?:www\.)?instagram\.com\//.test(rendered), 'A fake Instagram link is rendered');
 
 const contactsSource = await read('src/data/contacts.ts');
-assert(contactsSource.includes("'viktors.levdanskis@inbox.lv'"), 'The active fallback email is missing from the centralized contacts config');
+assert(contactsSource.includes("'hello@xoweb.lv'"), 'The active fallback email is missing from the centralized contacts config');
 assert(contactsSource.includes('PUBLIC_CONTACT_EMAIL'), 'The contact config cannot be safely build-tested with an email override');
 assert(contactsSource.includes('PUBLIC_CONTACT_WHATSAPP'), 'The contact config cannot be build-tested with a WhatsApp override');
-assert(contactsSource.includes('PUBLIC_CONTACT_INSTAGRAM'), 'The contact config cannot be build-tested with an Instagram override');
+assert(contactsSource.includes('PUBLIC_CONTACT_INSTAGRAM'), 'The contact config cannot be safely build-tested with an Instagram override');
 assert(/PUBLIC_CONTACT_WHATSAPP[^\n]+\|\|\s*''/.test(contactsSource), 'WhatsApp must default to empty until the real number exists');
 assert(/PUBLIC_CONTACT_INSTAGRAM[^\n]+\|\|\s*''/.test(contactsSource), 'Instagram must default to empty until the real profile exists');
 assert(contactsSource.includes('https://wa.me/'), 'The contacts config is missing the future WhatsApp deep-link builder');
@@ -115,7 +115,7 @@ assert(contactsSource.includes('encodeURIComponent(copy.whatsappMessage)'), 'The
 
 const files = await sourceFiles(fileURLToPath(new URL('../src/', import.meta.url)));
 const allSource = (await Promise.all(files.map((file) => readFile(file, 'utf8')))).join('\n');
-assert((allSource.match(/viktors\.levdanskis@inbox\.lv/g) ?? []).length === 1, 'The contact email is hardcoded outside the centralized config');
+assert((allSource.match(/hello@xoweb\.lv/g) ?? []).length === 1, 'The contact email is hardcoded outside the centralized config');
 for (const stalePhrase of ['gatavs produkcijas kods', 'Jelgava / all Latvia', 'Atsevišķi pakalpojumu centri', 'web izstrādātājs']) {
   assert(!allSource.includes(stalePhrase), `Stale or unnatural copy remains: ${stalePhrase}`);
 }
