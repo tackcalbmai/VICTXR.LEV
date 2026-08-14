@@ -87,6 +87,7 @@ async function screenshot(page, name) {
 
 async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = false }) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: 'no-preference' });
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: new URL(baseURL).origin });
   const page = await context.newPage();
   const errors = collectRuntimeErrors(page);
   await openPage(page, path);
