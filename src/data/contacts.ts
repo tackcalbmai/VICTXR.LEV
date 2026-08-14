@@ -16,7 +16,7 @@ type ContactConfig = {
  * the enabled state before those values are switched on for the live site.
  */
 export const contacts: ContactConfig = {
-  email: import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'viktors.levdanskis@inbox.lv',
+  email: import.meta.env.PUBLIC_CONTACT_EMAIL?.trim() || 'hello@xoweb.lv',
   whatsapp: import.meta.env.PUBLIC_CONTACT_WHATSAPP?.trim() || '',
   instagram: import.meta.env.PUBLIC_CONTACT_INSTAGRAM?.trim() || '',
 };
