@@ -27,7 +27,7 @@ const siteUrl = Astro.site ?? new URL('https://xoweb.lv');
 const canonical = new URL(canonicalPath, siteUrl);
 const alternate = new URL(alternatePath, siteUrl);
 const xDefault = new URL(lang === 'en' ? canonicalPath : alternatePath, siteUrl);
-const socialImage = new URL('/social-preview.png', siteUrl);
+const socialImage = new URL('/xo-web-preview.png', siteUrl);
 const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
 const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
 const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
