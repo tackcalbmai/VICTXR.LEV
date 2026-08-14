@@ -124,11 +124,10 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
     await instantScroll(page, 640);
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(90);
+    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 1200 });
     if (await page.evaluate(() => window.scrollY) > 2) throw new Error(`${name} did not reset to the top on reload`);
-    if (await page.locator('[data-home-intro]').getAttribute('data-home-intro') !== 'pending') throw new Error(`${name} did not replay the opening state on reload`);
-    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: cinematicReadyTimeout });
-    await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 });
+    if (await page.locator('[data-cinematic-intro]').count()) throw new Error(`${name} replayed the full cinematic within the same browser session`);
+    if (await page.evaluate(() => sessionStorage.getItem('xoweb:intro-seen')) !== '1') throw new Error(`${name} lost the session intro state on reload`);
   }
 
   const alternate = await page.locator('.site-language').getAttribute('href');
