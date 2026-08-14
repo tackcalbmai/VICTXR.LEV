@@ -79,18 +79,8 @@ export function initXoIdentity() {
     activeCinematic = cinematic;
     cinematic.dataset.xoIdentityAttached = 'true';
 
-    const descriptor = cinematic.querySelector<HTMLElement>('[data-cinematic-descriptor]');
-    if (!descriptor) return;
-
-    // The studio identity now occupies the original WEB DESIGN descriptor slot
-    // at the exact same scale. No second intro label is layered on top later.
-    descriptor.innerHTML = `
-      <span class="cinematic-intro__descriptor-brand"><b>X</b><b>O</b><i>·</i><b>WEB</b></span>
-      <span class="cinematic-intro__descriptor-byline">BY VICTXR.LEV</span>
-    `;
-
     cinematicPhaseObserver = new MutationObserver(() => {
-      if (cinematic.dataset.cinematicPhase === 'landed') revealHeaderSubmark(180);
+      if (cinematic.dataset.cinematicPhase === 'landed') revealHeaderSubmark(140);
     });
     cinematicPhaseObserver.observe(cinematic, { attributes: true, attributeFilter: ['data-cinematic-phase'] });
   };

@@ -22,7 +22,7 @@ const {
   preloadSerif = false,
 } = Astro.props;
 
-const siteUrl = Astro.site ?? new URL('https://victxr-lev.viktors-levdanskis.workers.dev');
+const siteUrl = Astro.site ?? new URL('https://xoweb.lv');
 const canonical = new URL(canonicalPath, siteUrl);
 const alternate = new URL(alternatePath, siteUrl);
 const xDefault = new URL(lang === 'en' ? canonicalPath : alternatePath, siteUrl);
@@ -30,21 +30,48 @@ const socialImage = new URL('/social-preview.png', siteUrl);
 const locale = lang === 'lv' ? 'lv_LV' : 'en_US';
 const alternateLocale = lang === 'lv' ? 'en_US' : 'lv_LV';
 const skipLabel = lang === 'lv' ? 'Pāriet uz saturu' : 'Skip to content';
-const socialAlt = lang === 'lv' ? 'VICTXR.LEV — mājaslapu dizains un izstrāde' : 'VICTXR.LEV — web design and development';
+const socialAlt = lang === 'lv'
+  ? 'XO WEB by VICTXR.LEV — mājaslapu dizains un izstrāde'
+  : 'XO WEB by VICTXR.LEV — web design and development';
 const socialProfiles = getSocialContactLinks(lang)
   .filter((contact) => contact.channel === 'instagram')
   .map((contact) => contact.href);
+const websiteId = new URL('/#website', siteUrl).toString();
+const brandId = new URL('/#brand', siteUrl).toString();
+const creatorId = new URL('/#creator', siteUrl).toString();
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Viktors Levdanskis',
-  alternateName: 'Victxr Lev',
-  url: siteUrl.toString(),
-  jobTitle: lang === 'lv' ? 'Tīmekļa dizainers un izstrādātājs' : 'Web designer and developer',
-  email: contacts.email ? `mailto:${contacts.email}` : undefined,
-  sameAs: socialProfiles.length ? socialProfiles : undefined,
-  address: { '@type': 'PostalAddress', addressCountry: 'LV' },
-  knowsAbout: ['Web design', 'Web development', 'User experience', 'Technical SEO', 'Multilingual websites'],
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      url: siteUrl.toString(),
+      name: 'XO WEB',
+      description,
+      inLanguage: lang,
+      brand: { '@id': brandId },
+      creator: { '@id': creatorId },
+      provider: { '@id': creatorId },
+    },
+    {
+      '@type': 'Brand',
+      '@id': brandId,
+      name: 'XO WEB',
+      url: siteUrl.toString(),
+    },
+    {
+      '@type': 'Person',
+      '@id': creatorId,
+      name: 'Viktors Levdanskis',
+      alternateName: 'VICTXR.LEV',
+      url: siteUrl.toString(),
+      jobTitle: lang === 'lv' ? 'Tīmekļa dizainers un izstrādātājs' : 'Web designer and developer',
+      email: contacts.email ? `mailto:${contacts.email}` : undefined,
+      sameAs: socialProfiles.length ? socialProfiles : undefined,
+      address: { '@type': 'PostalAddress', addressCountry: 'LV' },
+      knowsAbout: ['Web design', 'Web development', 'User experience', 'Technical SEO', 'Multilingual websites'],
+    },
+  ],
 };
 ---
 
@@ -68,7 +95,7 @@ const schema = {
     {lang === 'lv' && <link rel="preload" href="/fonts/onest-latin-ext.woff2" as="font" type="font/woff2" crossorigin="anonymous" />}
     {preloadSerif && <link rel="preload" href="/fonts/noto-serif-display-latin.woff2" as="font" type="font/woff2" crossorigin="anonymous" />}
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="VICTXR.LEV" />
+    <meta property="og:site_name" content="XO WEB" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -91,9 +118,6 @@ const schema = {
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         const resetReloadScroll = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         resetReloadScroll();
-        // Browsers may restore the old position after head scripts have run.
-        // Reset again at the lifecycle points surrounding that restoration so
-        // the opening never starts halfway down the page.
         window.addEventListener('DOMContentLoaded', resetReloadScroll, { once: true });
         window.addEventListener('load', () => window.requestAnimationFrame(resetReloadScroll), { once: true });
         window.addEventListener('pageshow', resetReloadScroll, { once: true });

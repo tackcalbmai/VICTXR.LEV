@@ -1,0 +1,85 @@
+/* Small commercial/UX refinements that deliberately leave the core art direction intact. */
+
+.site-status {
+  min-height: 2rem;
+  padding-block: 0.35rem;
+  cursor: pointer;
+}
+
+.site-status:hover,
+.site-status:focus-visible,
+.mobile-menu__footer a:hover,
+.mobile-menu__footer a:focus-visible {
+  color: var(--accent);
+}
+
+.contact__expectation,
+.case-contact__expectation {
+  max-width: 42rem;
+  color: currentColor;
+  font-size: clamp(0.82rem, 1vw, 0.98rem);
+  line-height: 1.45;
+  letter-spacing: -0.015em;
+  opacity: 0.7;
+}
+
+.contact__expectation {
+  margin-top: clamp(1.35rem, 2.4vw, 2.25rem);
+}
+
+.case-contact__expectation {
+  margin-top: 1.25rem;
+}
+
+.case-contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem 1.2rem;
+}
+
+.case-contact__actions > button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  text-transform: uppercase;
+  font-size: 0.64rem;
+  font-weight: 740;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.case-contact__actions > button.is-copied {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .hero__actions {
+    font-size: 0.64rem;
+  }
+
+  .hero__actions a,
+  .text-link,
+  .contact__email,
+  .contact-channels a,
+  .case-contact__actions > a,
+  .case-contact__actions > button {
+    min-height: 2.25rem;
+  }
+
+  .hero__actions a,
+  .contact__email,
+  .case-contact__actions > a {
+    padding-block: 0.5rem;
+  }
+
+  .contact-channels__label,
+  .contact-channels__display,
+  .case-live-link,
+  .case-next a {
+    font-size: max(0.64rem, 10px);
+  }
+}

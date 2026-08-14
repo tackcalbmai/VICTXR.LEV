@@ -7,7 +7,7 @@ export const siteCopy = {
     alternateHref: '/lv/',
     alternateLabel: 'LV',
     seo: {
-      title: 'VICTXR.LEV — Web design & development from Latvia',
+      title: 'XO WEB — Web design & development from Latvia | VICTXR.LEV',
       description: 'Distinctive websites designed and built around real business problems — not around templates.',
     },
     nav: {
@@ -101,11 +101,13 @@ export const siteCopy = {
     contact: {
       label: 'Contact / 06',
       title: ['Let’s make', 'something', 'worth looking at.'],
+      status: 'Available for projects',
       availability: 'Latvia / Available worldwide',
+      expectation: 'Tell me the short version. You do not need a perfect brief.',
       emailLabel: 'Start with an email',
       copy: 'Copy email',
       copied: 'Copied',
-      subject: 'New project for VICTXR.LEV',
+      subject: 'New project — XO WEB',
     },
     footer: {
       note: 'Designed and built in Latvia.',
@@ -118,7 +120,7 @@ export const siteCopy = {
     alternateHref: '/',
     alternateLabel: 'EN',
     seo: {
-      title: 'VICTXR.LEV — Mājaslapu dizains un izstrāde Latvijā',
+      title: 'XO WEB — Mājaslapu dizains un izstrāde Latvijā | VICTXR.LEV',
       description: 'Atšķirīgas mājaslapas, kas veidotas reālām uzņēmumu vajadzībām — nevis pēc veidnēm.',
     },
     nav: {
@@ -212,11 +214,13 @@ export const siteCopy = {
     contact: {
       label: 'Kontakti / 06',
       title: ['Uztaisīsim', 'ko tādu,', 'uz ko ir vērts skatīties.'],
+      status: 'Pieejams jauniem projektiem',
       availability: 'Latvija / Pieejams visā pasaulē',
+      expectation: 'Īsi pastāsti par projektu — perfekts tehniskais uzdevums nav vajadzīgs.',
       emailLabel: 'Sāc ar e-pastu',
       copy: 'Kopēt e-pastu',
       copied: 'Nokopēts',
-      subject: 'Jauns projekts VICTXR.LEV',
+      subject: 'Jauns projekts — XO WEB',
     },
     footer: {
       note: 'Veidots un izstrādāts Latvijā.',

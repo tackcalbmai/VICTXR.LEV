@@ -15,7 +15,7 @@ const browser = await chromium.launch({
   } : {}),
 });
 
-async function waitPhase(page, phase, timeout = 7500) {
+async function waitPhase(page, phase, timeout = 6500) {
   await page.waitForFunction((expected) => document.querySelector('[data-cinematic-intro]')?.getAttribute('data-cinematic-phase') === expected, phase, { timeout });
 }
 
@@ -68,14 +68,14 @@ async function assertCinematicIntro(name, viewport) {
   await waitPhase(page, 'assemble');
   stamp('assemble');
   if (await page.locator('[data-cinematic-slice]').count() !== 3) throw new Error(`${name} opening assembly must use three controlled slices`);
-  await page.waitForTimeout(260);
+  await page.waitForTimeout(220);
   const sliceOpacities = await page.locator('[data-cinematic-slice]').evaluateAll((elements) => elements.map((element) => Number.parseFloat(getComputedStyle(element).opacity)));
   if (sliceOpacities.filter((opacity) => opacity > 0.15).length < 2) throw new Error(`${name} opening assembly is not visibly building the wordmark`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-assemble.png`, fullPage: false });
 
   await waitPhase(page, 'logo');
   stamp('logo');
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(230);
   const descriptor = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
   if (descriptor !== 'XO·WEB BY VICTXR.LEV') throw new Error(`${name} XO WEB descriptor is malformed: ${descriptor}`);
   if (descriptor.includes('WEB DESIGN')) throw new Error(`${name} obsolete WEB DESIGN descriptor is still rendered`);
@@ -98,22 +98,22 @@ async function assertCinematicIntro(name, viewport) {
 
   await waitPhase(page, 'x-to-o');
   stamp('x-to-o');
-  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'O', undefined, { timeout: 1400 });
+  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'O', undefined, { timeout: 1200 });
 
   await waitPhase(page, 'o-rest');
   stamp('o-rest');
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(100);
   const oText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (oText !== 'VICTOR.LEV') throw new Error(`${name} X→O cycle did not settle on VICTOR.LEV: ${oText}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-o-rest.png`, fullPage: false });
 
   await waitPhase(page, 'o-to-x');
   stamp('o-to-x');
-  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'X', undefined, { timeout: 1400 });
+  await page.waitForFunction(() => document.querySelector('[data-cinematic-letter]')?.textContent === 'X', undefined, { timeout: 1200 });
 
   await waitPhase(page, 'x-rest');
   stamp('x-rest');
-  await page.waitForTimeout(120);
+  await page.waitForTimeout(100);
   const xText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (xText !== 'VICTXR.LEV') throw new Error(`${name} full X/O cycle did not resolve on VICTXR.LEV: ${xText}`);
   const descriptorAfterCycle = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
@@ -125,17 +125,19 @@ async function assertCinematicIntro(name, viewport) {
 
   await waitPhase(page, 'handoff');
   stamp('handoff');
-  await page.waitForTimeout(520);
+  await page.waitForTimeout(360);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-handoff.png`, fullPage: false });
 
   await waitPhase(page, 'reveal');
   stamp('reveal');
+  const introReady = await page.evaluate(() => performance.getEntriesByName('xoweb:intro-ready').at(-1)?.startTime ?? 0);
+  if (introReady < 3600 || introReady > 4700) throw new Error(`${name} introReadyMs ${introReady.toFixed(0)}ms is outside the intended handoff window`);
   const backdrop = page.locator('[data-cinematic-backdrop]');
   if (!await backdrop.count()) throw new Error(`${name} cinematic field disappeared before reveal`);
   await page.waitForFunction(() => {
     const element = document.querySelector('[data-cinematic-backdrop]');
     return element && Number.parseFloat(getComputedStyle(element).opacity) < 0.78;
-  }, undefined, { timeout: 1000 });
+  }, undefined, { timeout: 900 });
   await page.screenshot({ path: `${outDir}/${name}-cinematic-reveal.png`, fullPage: false });
 
   await waitPhase(page, 'landed');
@@ -153,28 +155,31 @@ async function assertCinematicIntro(name, viewport) {
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed-slot.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    ['assemble', 'logo', 550],
-    ['logo', 'x-to-o', 550],
-    ['x-to-o', 'o-rest', 900],
-    ['o-rest', 'o-to-x', 350],
-    ['o-to-x', 'x-rest', 900],
-    ['x-rest', 'handoff', 180],
+    // Playwright can attach after the assemble phase has already begun, so the
+    // observed assemble→logo interval is allowed a small instrumentation margin.
+    // The production GSAP timeline itself still keeps the phase at ~620ms.
+    ['assemble', 'logo', 380],
+    ['logo', 'x-to-o', 360],
+    ['x-to-o', 'o-rest', 820],
+    ['o-rest', 'o-to-x', 180],
+    ['o-to-x', 'x-rest', 820],
+    ['x-rest', 'handoff', 150],
   ];
   for (const [from, to, minimum] of minimumBeatSpacing) {
     const spacing = phases[to] - phases[from];
     if (spacing < minimum) throw new Error(`${name} ${from}→${to} beat is rushed (${spacing}ms < ${minimum}ms)`);
   }
 
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 7500 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 2500 });
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 6000 });
+  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 1800 });
 
   const duration = Date.now() - startedAt;
-  if (duration < 5000 || duration > 6800) throw new Error(`${name} intro duration ${duration}ms is outside the intended premium hook window`);
+  if (duration < 4700 || duration > 5600) throw new Error(`${name} intro duration ${duration}ms is outside the intended five-second hook window`);
 
   const stillLocked = await page.evaluate(() => document.documentElement.classList.contains('is-cinematic-intro'));
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
 
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(500);
   const headerSubmark = (await page.locator('[data-xo-submark]').innerText()).replace(/\s+/g, '').trim();
   if (headerSubmark !== 'XO·WEB') throw new Error(`${name} landed XO WEB header signature is malformed: ${headerSubmark}`);
   const submarkOpacity = Number(await page.locator('[data-xo-submark]').evaluate((element) => getComputedStyle(element).opacity));
@@ -191,6 +196,11 @@ async function assertCinematicIntro(name, viewport) {
     throw new Error(`${name} did not run exactly one controlled hero lock (${heroAnimationStarts.join(', ')})`);
   }
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed.png`, fullPage: false });
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 1200 });
+  if (await page.locator('[data-cinematic-intro]').count()) throw new Error(`${name} replayed the full cinematic within the same browser session`);
+  if (await page.evaluate(() => sessionStorage.getItem('xoweb:intro-seen')) !== '1') throw new Error(`${name} did not persist the session intro state`);
 
   if (errors.length) throw new Error(`${name} runtime errors:\n${errors.join('\n')}`);
   await context.close();
@@ -211,4 +221,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Premium sliced logo intro lands exactly in the real header slot (${desktop.duration}ms / ${mobile.duration}ms).`);
+console.log(`Premium XO WEB intro lands in the real header slot once per session (${desktop.duration}ms / ${mobile.duration}ms).`);
