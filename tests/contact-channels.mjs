@@ -37,6 +37,9 @@ async function assertChannels(page, scope, expectedMessage) {
   assert(whatsappUrl.searchParams.get('text') === expectedMessage, `${scope} lost the localized WhatsApp opening message`);
   assert(new URL(instagramHref).hostname.replace(/^www\./, '') === 'instagram.com', `${scope} built an invalid Instagram link: ${instagramHref}`);
 
+  const whatsappDisplay = (await whatsapp.locator('.contact-channels__display').innerText()).trim();
+  assert(whatsappDisplay === '+371 20 000 000', `${scope} did not format the Latvian WhatsApp number for reading: ${whatsappDisplay}`);
+
   const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
   assert(overflow <= 2, `${scope} enabled contact state causes ${overflow}px horizontal overflow`);
 }
@@ -45,7 +48,7 @@ async function assertChannels(page, scope, expectedMessage) {
   const { context, page } = await openHome('/', { width: 1366, height: 768 });
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '#contact', 'Hey. I have a project in mind.');
+  await assertChannels(page, '#contact', 'Hi! I visited xoweb.lv and would like to discuss a website project.');
   await page.screenshot({ path: `${outDir}/future-contacts-en-desktop.png`, fullPage: false });
   await context.close();
 }
@@ -54,14 +57,14 @@ async function assertChannels(page, scope, expectedMessage) {
   const { context, page } = await openHome('/lv/', { width: 393, height: 852 });
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '#contact', 'Sveiki! Man padomā ir projekts.');
+  await assertChannels(page, '#contact', 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas projektu.');
   await page.screenshot({ path: `${outDir}/future-contacts-lv-mobile.png`, fullPage: false });
 
   await page.evaluate(() => window.scrollTo(0, 0));
   const toggle = page.locator('[data-menu-toggle]');
   await toggle.click();
   await page.waitForTimeout(540);
-  await assertChannels(page, '[data-mobile-menu]', 'Sveiki! Man padomā ir projekts.');
+  await assertChannels(page, '[data-mobile-menu]', 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas projektu.');
   await page.screenshot({ path: `${outDir}/future-contacts-lv-menu.png`, fullPage: false });
   await context.close();
 }
@@ -72,7 +75,7 @@ async function assertChannels(page, scope, expectedMessage) {
   const response = await page.goto(new URL('/work/catrin/', baseURL).toString(), { waitUntil: 'load' });
   assert(response?.ok(), `CATRIN returned ${response?.status()} in enabled-contact QA`);
   await page.locator('.case-contact').scrollIntoViewIfNeeded();
-  await assertChannels(page, '.case-contact', 'Hey. I have a project in mind.');
+  await assertChannels(page, '.case-contact', 'Hi! I visited xoweb.lv and would like to discuss a website project.');
   await page.screenshot({ path: `${outDir}/future-contacts-catrin-mobile.png`, fullPage: false });
   await context.close();
 }
