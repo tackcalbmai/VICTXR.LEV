@@ -31,6 +31,34 @@ html[lang='lv'] .about__statement span:nth-child(3) {
   text-align: left;
 }
 
+/* SERVICES
+ * The shared service grid still reserves a leading column for an old numeric
+ * label that the current markup no longer renders. Short English labels can
+ * disguise that mismatch; Latvian titles immediately overflow into the copy.
+ * Collapse the unused column for LV and give title/copy real, separate tracks.
+ */
+@media (min-width: 761px) {
+  html[lang='lv'] .service-row {
+    grid-template-columns: minmax(17rem, 0.95fr) minmax(20rem, 1.05fr) 2rem;
+    column-gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: center;
+  }
+
+  html[lang='lv'] .service-row h3 {
+    grid-column: 1;
+    max-width: 18ch;
+  }
+
+  html[lang='lv'] .service-row p {
+    grid-column: 2;
+    max-width: 38rem;
+  }
+
+  html[lang='lv'] .service-row__mark {
+    grid-column: 3;
+  }
+}
+
 @media (max-width: 760px) {
   html[lang='lv'] .hero__line:nth-child(3) {
     padding-left: 0;
@@ -50,5 +78,28 @@ html[lang='lv'] .about__statement span:nth-child(3) {
     padding-left: 11vw;
     font-size: 0.82em;
     text-align: left;
+  }
+
+  html[lang='lv'] .service-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.65rem 1rem;
+    align-items: start;
+  }
+
+  html[lang='lv'] .service-row h3 {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 18ch;
+  }
+
+  html[lang='lv'] .service-row p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 34rem;
+  }
+
+  html[lang='lv'] .service-row__mark {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
