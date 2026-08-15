@@ -1,0 +1,9 @@
+/* Optical corrections for internal-page display typography.
+ * These are phrase-specific composition adjustments, not global type scaling.
+ */
+@media (max-width: 760px) {
+  html[lang='lv'] .mp-work__hero h1 > .is-muted {
+    font-size: 0.95em;
+    letter-spacing: -0.08em;
+  }
+}
