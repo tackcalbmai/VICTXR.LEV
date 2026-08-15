@@ -7,19 +7,20 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
-<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 20 20" aria-hidden="true">
-  <path class="brand-arrow__rail brand-arrow__rail--start" d="M1.8 10H7.15" />
-  <path class="brand-arrow__notch" d="M8.05 12L9.25 8" />
-  <path class="brand-arrow__rail brand-arrow__rail--end" d="M10.25 10H16.45" />
-  <path class="brand-arrow__head" d="M12.05 5.8L16.35 10L12.05 14.2" />
+<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 24 20" aria-hidden="true">
+  <path class="brand-arrow__spine" d="M1.6 10H14.95" />
+  <path class="brand-arrow__blade brand-arrow__blade--top" d="M10.9 4.7L19.3 10" />
+  <path class="brand-arrow__blade brand-arrow__blade--bottom" d="M10.9 15.3L19.3 10" />
 </svg>
 
 <style>
   .brand-arrow {
     --brand-arrow-angle: 0deg;
-    width: 1.12rem;
-    height: 1.12rem;
-    stroke-width: 1.28;
+    width: 1.22rem;
+    height: 1.22rem;
+    stroke-width: 1.48;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
     transform: rotate(var(--brand-arrow-angle));
     transform-origin: 50% 50%;
     transition: transform 360ms var(--ease-out);
@@ -29,47 +30,38 @@ const { direction = 'right', class: className = '' } = Astro.props;
   .brand-arrow--left { --brand-arrow-angle: 180deg; }
   .brand-arrow--up { --brand-arrow-angle: -90deg; }
 
-  .brand-arrow__rail,
-  .brand-arrow__head,
-  .brand-arrow__notch {
+  .brand-arrow__spine,
+  .brand-arrow__blade {
     vector-effect: non-scaling-stroke;
   }
 
-  .brand-arrow__rail,
-  .brand-arrow__head {
+  .brand-arrow__blade {
+    transform-box: fill-box;
+    transform-origin: right center;
     transition: transform 360ms var(--ease-out);
   }
 
-  .brand-arrow__notch {
-    stroke: var(--accent);
-    stroke-width: 1.55;
-    opacity: 1;
-    transition: transform 360ms var(--ease-out), opacity 220ms ease;
+  .brand-arrow__blade--top {
+    transform: scaleX(1);
+  }
+
+  .brand-arrow__blade--bottom {
+    transform: scaleX(0.52);
   }
 
   :global(a:hover) .brand-arrow,
   :global(a:focus-visible) .brand-arrow {
-    transform: rotate(var(--brand-arrow-angle)) translateX(0.16rem);
+    transform: rotate(var(--brand-arrow-angle)) translateX(0.17rem);
   }
 
-  :global(a:hover) .brand-arrow__rail--end,
-  :global(a:focus-visible) .brand-arrow__rail--end,
-  :global(a:hover) .brand-arrow__head,
-  :global(a:focus-visible) .brand-arrow__head {
-    transform: translateX(0.6px);
-  }
-
-  :global(a:hover) .brand-arrow__notch,
-  :global(a:focus-visible) .brand-arrow__notch {
-    transform: translateX(-0.4px);
-    opacity: 0.72;
+  :global(a:hover) .brand-arrow__blade--bottom,
+  :global(a:focus-visible) .brand-arrow__blade--bottom {
+    transform: scaleX(1);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .brand-arrow,
-    .brand-arrow__rail,
-    .brand-arrow__head,
-    .brand-arrow__notch {
+    .brand-arrow__blade {
       transition: none;
     }
   }
