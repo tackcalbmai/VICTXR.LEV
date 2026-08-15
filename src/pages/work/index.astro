@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkIndex from '../../components/WorkIndex.astro';
+import { getMultipageCopy, pageRoutes } from '../../data/multipage';
+
+const copy = getMultipageCopy('en').work;
+---
+
+<BaseLayout title={copy.seoTitle} description={copy.seoDescription} lang="en" canonicalPath={pageRoutes.en.work} alternatePath={pageRoutes.lv.work} preloadSerif>
+  <WorkIndex locale="en" />
+</BaseLayout>
