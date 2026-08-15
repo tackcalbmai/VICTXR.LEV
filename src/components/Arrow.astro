@@ -9,8 +9,8 @@ const { direction = 'right', class: className = '' } = Astro.props;
 
 <svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 32 22" aria-hidden="true" fill="none">
   <g class="brand-arrow__main">
-    <path d="M3 11H23.25" />
-    <path d="M18.2 5.9L23.55 11L18.2 16.1" />
+    <path class="brand-arrow__spine" d="M3 11H23.25" />
+    <path class="brand-arrow__head" d="M18.2 5.9L23.55 11L18.2 16.1" />
   </g>
   <path class="brand-arrow__signal" pathLength="1" d="M3 11H23.25" />
 </svg>
