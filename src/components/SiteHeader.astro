@@ -1,6 +1,7 @@
 ---
 import type { Locale } from '../data/site';
 import { getSiteCopy } from '../data/site';
+import { pageRoutes } from '../data/multipage';
 import ContactChannels from './ContactChannels.astro';
 import '../styles/brand.css';
 import '../styles/no-indexes.css';
@@ -15,6 +16,7 @@ interface Props {
 const { locale, alternateHref, contactHref } = Astro.props;
 const copy = getSiteCopy(locale);
 const home = copy.homeHref;
+const routes = pageRoutes[locale];
 const resolvedContactHref = contactHref ?? `${home}#contact`;
 const available = copy.contact.status;
 const alternateLanguage = locale === 'lv' ? 'en' : 'lv';
@@ -32,9 +34,9 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
   </span>
 
   <nav class="site-nav site-nav--desktop" aria-label={copy.nav.menu}>
-    <a href={`${home}#work`}>{copy.nav.work}</a>
-    <a href={`${home}#about`}>{copy.nav.about}</a>
-    <a href={`${home}#services`}>{copy.nav.services}</a>
+    <a href={routes.work}>{copy.nav.work}</a>
+    <a href={routes.about}>{copy.nav.about}</a>
+    <a href={routes.services}>{copy.nav.services}</a>
     <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
 
@@ -50,9 +52,9 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
 
 <noscript>
   <nav class="no-js-nav" aria-label={copy.nav.menu}>
-    <a href={`${home}#work`}>{copy.nav.work}</a>
-    <a href={`${home}#about`}>{copy.nav.about}</a>
-    <a href={`${home}#services`}>{copy.nav.services}</a>
+    <a href={routes.work}>{copy.nav.work}</a>
+    <a href={routes.about}>{copy.nav.about}</a>
+    <a href={routes.services}>{copy.nav.services}</a>
     <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
 </noscript>
@@ -63,9 +65,9 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
     <span>{copy.hero.meta}</span>
   </div>
   <nav class="mobile-menu__nav" aria-label={copy.nav.menu}>
-    <a href={`${home}#work`}>{copy.nav.work}</a>
-    <a href={`${home}#about`}>{copy.nav.about}</a>
-    <a href={`${home}#services`}>{copy.nav.services}</a>
+    <a href={routes.work}>{copy.nav.work}</a>
+    <a href={routes.about}>{copy.nav.about}</a>
+    <a href={routes.services}>{copy.nav.services}</a>
     <a href={resolvedContactHref}>{copy.nav.contact}</a>
   </nav>
   <div class="mobile-menu__bottom">
