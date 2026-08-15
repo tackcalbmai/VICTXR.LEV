@@ -16,6 +16,32 @@ function boxesOverlap(a, b, gap = 4) {
   );
 }
 
+async function visibleInkBox(locator) {
+  return locator.evaluate((element) => {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      },
+    });
+    const rects = [];
+    let node = walker.nextNode();
+    while (node) {
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 1 && rect.height > 1) rects.push(rect);
+      }
+      node = walker.nextNode();
+    }
+    if (!rects.length) return null;
+    const x = Math.min(...rects.map((rect) => rect.left));
+    const y = Math.min(...rects.map((rect) => rect.top));
+    const right = Math.max(...rects.map((rect) => rect.right));
+    const bottom = Math.max(...rects.map((rect) => rect.bottom));
+    return { x, y, width: right - x, height: bottom - y };
+  });
+}
+
 const cases = [
   { path: '/services/', lang: 'en' },
   { path: '/lv/pakalpojumi/', lang: 'lv' },
@@ -35,10 +61,10 @@ for (const profile of profiles) {
     assert(response?.ok(), `${profile.name} ${current.path} returned ${response?.status()}`);
     await page.evaluate(() => document.fonts.ready);
 
-    const title = await page.locator('.mp-services__hero h1').boundingBox();
-    const intro = await page.locator('.mp-services__intro').boundingBox();
-    const jump = await page.locator('.mp-services__jump').boundingBox();
-    assert(title && intro && jump, `${profile.name} ${current.lang} services hero cannot be measured`);
+    const title = await visibleInkBox(page.locator('.mp-services__hero h1'));
+    const intro = await visibleInkBox(page.locator('.mp-services__intro'));
+    const jump = await visibleInkBox(page.locator('.mp-services__jump'));
+    assert(title && intro && jump, `${profile.name} ${current.lang} services hero visible text cannot be measured`);
     assert(!boxesOverlap(title, intro, 6), `${profile.name} ${current.lang} services hero title overlaps explanatory copy`);
     assert(!boxesOverlap(intro, jump, 4), `${profile.name} ${current.lang} services hero explanatory copy overlaps jump link`);
 
@@ -57,4 +83,4 @@ for (const profile of profiles) {
 }
 
 await browser.close();
-console.log('Multi-page services hero QA passed: title, explanatory copy and jump CTA stay physically separated in EN/LV across desktop, tablet and mobile.');
+console.log('Multi-page services hero QA passed: visible title, explanatory copy and jump CTA stay separated in EN/LV across desktop, tablet and mobile.');
