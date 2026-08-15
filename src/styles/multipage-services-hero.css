@@ -1,0 +1,103 @@
+/* Services hero needs stronger structural separation than the generic internal hero.
+ * The title and explanatory copy must never share the same paint area: long
+ * Latvian display lines make absolute positioning too fragile.
+ */
+.mp-services__hero {
+  grid-template-columns: minmax(0, 1.5fr) minmax(19rem, 0.5fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: clamp(2rem, 5vw, 6rem);
+}
+
+.mp-services__hero .mp-hero__meta {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.mp-services__hero h1 {
+  grid-column: 1;
+  grid-row: 2;
+  max-width: none;
+}
+
+.mp-services__intro {
+  position: static;
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  max-width: 31rem;
+  margin-bottom: clamp(2.8rem, 5.5vh, 4.8rem);
+}
+
+.mp-services__jump {
+  position: static;
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+}
+
+html[lang='lv'] .mp-services__hero h1 {
+  font-size: clamp(4rem, 8.8vw, 9.2rem);
+}
+
+@media (max-width: 1024px) {
+  .mp-services__hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    column-gap: 0;
+  }
+
+  .mp-services__hero .mp-hero__meta {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .mp-services__hero h1,
+  html[lang='lv'] .mp-services__hero h1 {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    max-width: 100%;
+    padding-bottom: clamp(2.4rem, 5vh, 3.5rem);
+  }
+
+  .mp-services__intro {
+    position: static;
+    grid-column: 1;
+    grid-row: 3;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    max-width: 38rem;
+    margin: 0;
+    padding-top: 1rem;
+  }
+
+  .mp-services__jump {
+    position: static;
+    grid-column: 1;
+    grid-row: 4;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    justify-self: end;
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .mp-services__hero h1,
+  html[lang='lv'] .mp-services__hero h1 {
+    padding-bottom: 2.4rem;
+  }
+
+  .mp-services__intro {
+    max-width: none;
+    font-size: 0.96rem;
+  }
+
+  .mp-services__jump {
+    justify-self: start;
+    margin-top: 0.8rem;
+  }
+}
