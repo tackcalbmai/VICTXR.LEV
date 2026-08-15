@@ -1,14 +1,23 @@
-/* Latvian-specific typography guardrails.
+/* Latvian-specific typography and composition.
  *
- * The core art direction intentionally uses very tight oversized type. Latvian
- * uppercase glyphs add macrons, carons and commas above/below the cap height,
- * so the English metrics cannot be reused blindly without clipping or line
- * collisions. Keep these overrides scoped to lang="lv" only.
- *
- * These values intentionally stay close to the English rhythm. The extra
- * leading is only the minimum needed to keep Latvian diacritics clean.
+ * Latvian is not treated as an English skin. Longer words, different phrase
+ * lengths and diacritics need their own line rhythm, scale and responsive
+ * breakpoints. Keep every override scoped to lang="lv" so EN remains untouched.
  */
 
+/* Header: Latvian navigation and availability copy are materially longer. */
+html[lang='lv'] .site-nav--desktop {
+  gap: clamp(0.95rem, 1.7vw, 1.9rem);
+  font-size: 0.61rem;
+  letter-spacing: 0.085em;
+}
+
+html[lang='lv'] .site-header__utility {
+  font-size: 0.59rem;
+  letter-spacing: 0.08em;
+}
+
+/* Hero: preserve the EN attitude, but rebalance the shorter CITĀDI line. */
 html[lang='lv'] .hero__title {
   line-height: 0.8;
   letter-spacing: -0.07em;
@@ -17,6 +26,15 @@ html[lang='lv'] .hero__title {
 html[lang='lv'] .hero__line {
   padding-block: 0.12em;
   margin-block: -0.12em;
+}
+
+html[lang='lv'] .hero__line:nth-child(2) {
+  padding-left: 8.2vw;
+}
+
+html[lang='lv'] .hero__line:nth-child(3) .hero__line-inner {
+  font-size: 1.08em;
+  letter-spacing: -0.075em;
 }
 
 /* The line mask is needed while the entrance animation runs. Once the intro
@@ -40,43 +58,279 @@ html[lang='lv'] .work-heading .display-title {
   overflow-wrap: normal;
 }
 
+html[lang='lv'] .work-heading .section-copy {
+  max-width: 37rem;
+}
+
+/* The second Latvian disruption sentence is much longer than its EN pair. */
 html[lang='lv'] .disruption__line {
+  font-size: clamp(3.55rem, 8vw, 8.4rem);
   line-height: 1.03;
   letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
+html[lang='lv'] .disruption__line--one {
+  top: 20%;
+}
+
+html[lang='lv'] .disruption__line--two {
+  top: 55%;
+  font-size: clamp(3.2rem, 7.1vw, 7.5rem);
+}
+
+html[lang='lv'] .disruption__caption {
+  max-width: 29rem;
+  letter-spacing: 0.065em;
+}
+
+/* Project cards: give longer Latvian summaries and scope labels more room. */
+html[lang='lv'] .project-feature__bottom {
+  grid-template-columns: 5.4fr 3fr 1.8fr;
+}
+
+html[lang='lv'] .project-feature__bottom > p {
+  max-width: 42rem;
+  font-size: clamp(1.02rem, 1.5vw, 1.38rem);
+}
+
+html[lang='lv'] .project-feature__bottom ul {
+  font-size: 0.58rem;
+  letter-spacing: 0.075em;
+}
+
+/* About: the middle Latvian statement is considerably longer than EN. */
 html[lang='lv'] .about__statement {
   overflow: visible;
+  font-size: clamp(3.65rem, 7.8vw, 8.35rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
 }
 
+html[lang='lv'] .about__statement span {
+  white-space: nowrap;
+}
+
+html[lang='lv'] .about__statement span:nth-child(2) {
+  padding-left: 1.8vw;
+}
+
+/* Process: keep each Latvian verb phrase deliberate instead of letting the
+ * longest phrase wrap accidentally. */
 html[lang='lv'] .approach__steps strong {
+  font-size: clamp(3.5rem, 8.6vw, 9.2rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
+  white-space: nowrap;
 }
 
+html[lang='lv'] .approach__steps li:nth-child(3) strong {
+  font-size: clamp(3rem, 7.5vw, 8rem);
+}
+
+/* Services: Latvian service names need more title width and slightly calmer type. */
+html[lang='lv'] .service-row {
+  grid-template-columns: 5vw 1.25fr 1fr 2rem;
+}
+
+html[lang='lv'] .service-row h3 {
+  font-size: clamp(1.3rem, 2.25vw, 2.35rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+html[lang='lv'] .service-row p {
+  line-height: 1.5;
+}
+
+/* X/O: NO X is shorter than FROM X, so it needs its own optical scale. */
+html[lang='lv'] .xo-section h2 span:first-child {
+  font-size: 1.22em;
+}
+
+html[lang='lv'] .xo-section__content > p:last-child {
+  max-width: 38rem;
+}
+
+/* Anti-sales: keep the three authored lines intact in Latvian. */
 html[lang='lv'] .anti-sales__title {
+  font-size: clamp(4.2rem, 10.4vw, 10.9rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
 }
 
+html[lang='lv'] .anti-sales__title span {
+  white-space: nowrap;
+}
+
+html[lang='lv'] .anti-sales__title--first span:first-child {
+  font-size: 0.72em;
+  letter-spacing: -0.025em;
+}
+
+/* Contact: the third Latvian line is far longer than “worth looking at.” */
 html[lang='lv'] .contact__title,
 html[lang='lv'] .case-contact > h2 {
+  font-size: clamp(4.6rem, 10.8vw, 11.4rem);
   line-height: 1.05;
   letter-spacing: -0.045em;
+}
+
+html[lang='lv'] .contact__title span:nth-child(2),
+html[lang='lv'] .case-contact > h2 span:nth-child(2) {
+  padding-left: 4.5vw;
+}
+
+html[lang='lv'] .contact__title span:nth-child(3),
+html[lang='lv'] .case-contact > h2 span:nth-child(3) {
+  font-size: clamp(2.8rem, 6.6vw, 7rem);
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+/* Case-study heroes and narratives use a wider Latvian reading measure. */
+html[lang='lv'] .case-hero__subtitle {
+  grid-column: 1 / span 7;
+  max-width: 48rem;
+  font-size: clamp(1.35rem, 2.35vw, 2.35rem);
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+html[lang='lv'] .case-hero__services {
+  font-size: 0.58rem;
+  letter-spacing: 0.075em;
 }
 
 html[lang='lv'] .case-narrative__row h2 {
-  font-size: clamp(2.15rem, 4.45vw, 4.75rem);
+  max-width: 21ch;
+  font-size: clamp(2.1rem, 4.1vw, 4.4rem);
   line-height: 1.04;
   letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 html[lang='lv'] .case-result p {
-  font-size: clamp(2rem, 4.65vw, 5rem);
+  max-width: 64rem;
+  font-size: clamp(1.95rem, 4.25vw, 4.6rem);
   line-height: 1.04;
   letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+html[lang='lv'] .case-next a {
+  letter-spacing: 0.06em;
+}
+
+/* Latvian 404 copy is longer as well. */
+html[lang='lv'] .not-found h1 span {
+  font-size: clamp(3.4rem, 8.5vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  transform: translateX(-10vw);
+}
+
+html[lang='lv'] .not-found__back {
+  max-width: calc(100vw - (2 * var(--gutter)));
+  line-height: 1.3;
+  letter-spacing: 0.07em;
+}
+
+/* Latvian needs the compact navigation one breakpoint earlier than EN. */
+@media (min-width: 761px) and (max-width: 1024px) {
+  html[lang='lv'] .site-header {
+    grid-template-columns: 1fr auto;
+  }
+
+  html[lang='lv'] .site-nav--desktop,
+  html[lang='lv'] .site-status {
+    display: none;
+  }
+
+  html[lang='lv'] .site-menu-button {
+    display: grid;
+    place-items: center;
+  }
+
+  html[lang='lv'] .site-language {
+    display: grid;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    place-items: center;
+  }
+
+  html[lang='lv'] .mobile-menu__nav a {
+    font-size: clamp(3rem, 7.5vw, 4.8rem);
+  }
+
+  html.no-js[lang='lv'] .no-js-nav {
+    display: flex;
+  }
+
+  html[lang='lv'] .disruption__line {
+    font-size: clamp(3.35rem, 7.3vw, 5.2rem);
+  }
+
+  html[lang='lv'] .disruption__line--two {
+    font-size: clamp(3rem, 6.5vw, 4.7rem);
+  }
+
+  html[lang='lv'] .about__statement {
+    font-size: clamp(3.2rem, 7vw, 5.2rem);
+  }
+
+  html[lang='lv'] .approach__steps strong {
+    font-size: clamp(3.3rem, 7.8vw, 5.8rem);
+  }
+
+  html[lang='lv'] .approach__steps li:nth-child(3) strong {
+    font-size: clamp(2.9rem, 6.6vw, 5rem);
+  }
+
+  html[lang='lv'] .service-row h3 {
+    font-size: clamp(1.15rem, 2.15vw, 1.55rem);
+  }
+
+  html[lang='lv'] .anti-sales__title {
+    font-size: clamp(3.8rem, 9.3vw, 6.7rem);
+  }
+
+  html[lang='lv'] .contact__title span:nth-child(3),
+  html[lang='lv'] .case-contact > h2 span:nth-child(3) {
+    font-size: clamp(2.55rem, 5.8vw, 4.4rem);
+  }
+
+  html[lang='lv'] .case-narrative__row {
+    grid-template-columns: 0.65fr 2fr;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  html[lang='lv'] .case-narrative__row h2,
+  html[lang='lv'] .case-narrative__row p {
+    grid-column: 2;
+  }
+
+  html[lang='lv'] .case-narrative__row h2 {
+    grid-row: 1;
+    font-size: clamp(2.15rem, 5.2vw, 3.6rem);
+  }
+
+  html[lang='lv'] .case-narrative__row p {
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1200px) {
+  html[lang='lv'] .site-status {
+    display: none;
+  }
+
+  html[lang='lv'] .site-nav--desktop {
+    gap: 0.9rem;
+    font-size: 0.58rem;
+  }
 }
 
 @media (max-width: 760px) {
@@ -84,6 +338,15 @@ html[lang='lv'] .case-result p {
     font-size: clamp(3.5rem, 17.5vw, 6.25rem);
     line-height: 0.82;
     letter-spacing: -0.06em;
+  }
+
+  html[lang='lv'] .hero__line:nth-child(2) {
+    padding-left: 0;
+  }
+
+  html[lang='lv'] .hero__line:nth-child(3) .hero__line-inner {
+    font-size: 1.04em;
+    letter-spacing: -0.055em;
   }
 
   html[lang='lv'] .hero__line--compact .hero__line-inner {
@@ -105,41 +368,125 @@ html[lang='lv'] .case-result p {
   }
 
   html[lang='lv'] .disruption__line {
-    font-size: clamp(2.6rem, 11.8vw, 4.5rem);
+    font-size: clamp(2.45rem, 10.9vw, 4.15rem);
     line-height: 1.03;
     letter-spacing: -0.025em;
   }
 
+  html[lang='lv'] .disruption__line--two {
+    font-size: clamp(2.25rem, 9.8vw, 3.8rem);
+  }
+
   html[lang='lv'] .about__statement {
+    font-size: clamp(2.85rem, 12.8vw, 5.7rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
+  }
+
+  html[lang='lv'] .about__statement span:nth-child(2) {
+    padding-left: 0;
   }
 
   html[lang='lv'] .approach__steps strong {
+    font-size: clamp(2.8rem, 13.5vw, 5.3rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
   }
 
+  html[lang='lv'] .approach__steps li:nth-child(3) strong {
+    font-size: clamp(2.3rem, 10.7vw, 4.15rem);
+  }
+
+  html[lang='lv'] .service-row h3 {
+    font-size: clamp(1.15rem, 5.5vw, 1.35rem);
+    line-height: 1.08;
+  }
+
+  html[lang='lv'] .service-row p {
+    font-size: 0.82rem;
+  }
+
+  html[lang='lv'] .xo-section h2 span:first-child {
+    font-size: 1.16em;
+  }
+
   html[lang='lv'] .anti-sales__title {
+    font-size: clamp(2.8rem, 13.8vw, 5.4rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
+  }
+
+  html[lang='lv'] .anti-sales__title--first span:first-child {
+    font-size: 0.78em;
   }
 
   html[lang='lv'] .contact__title,
   html[lang='lv'] .case-contact > h2 {
+    font-size: clamp(3rem, 13.6vw, 6rem);
     line-height: 1.05;
     letter-spacing: -0.04em;
   }
 
+  html[lang='lv'] .contact__title span:nth-child(2),
+  html[lang='lv'] .case-contact > h2 span:nth-child(2) {
+    padding-left: 0;
+  }
+
+  html[lang='lv'] .contact__title span:nth-child(3),
+  html[lang='lv'] .case-contact > h2 span:nth-child(3) {
+    font-size: clamp(1.3rem, 6.6vw, 3.4rem);
+    letter-spacing: -0.025em;
+  }
+
+  html[lang='lv'] .project-feature__bottom {
+    grid-template-columns: 1fr auto;
+  }
+
+  html[lang='lv'] .case-hero__subtitle,
+  html[lang='lv'] .case-hero__services,
+  html[lang='lv'] .case-live-link {
+    grid-column: 1 / -1;
+  }
+
+  html[lang='lv'] .case-hero__subtitle {
+    font-size: clamp(1.15rem, 5.4vw, 1.32rem);
+    line-height: 1.2;
+  }
+
   html[lang='lv'] .case-narrative__row h2 {
-    font-size: clamp(2rem, 10.5vw, 3.35rem);
+    max-width: 100%;
+    font-size: clamp(1.95rem, 9.2vw, 3.25rem);
     line-height: 1.04;
     letter-spacing: -0.025em;
   }
 
   html[lang='lv'] .case-result p {
-    font-size: clamp(1.85rem, 9.4vw, 3rem);
+    font-size: clamp(1.75rem, 8.5vw, 2.8rem);
     line-height: 1.04;
     letter-spacing: -0.02em;
+  }
+
+  html[lang='lv'] .case-next {
+    grid-template-columns: 1fr;
+  }
+
+  html[lang='lv'] .case-next a {
+    min-height: 5.5rem;
+    font-size: 0.62rem;
+  }
+
+  html[lang='lv'] .case-next a:last-child {
+    justify-content: flex-start;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  html[lang='lv'] .not-found h1 span {
+    font-size: clamp(2.65rem, 13.2vw, 4rem);
+    transform: translateX(-7vw);
+  }
+
+  html[lang='lv'] .not-found__back {
+    font-size: 0.58rem;
   }
 }
