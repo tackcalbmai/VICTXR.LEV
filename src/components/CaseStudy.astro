@@ -5,6 +5,7 @@ import ContactChannels from './ContactChannels.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
 import { contacts } from '../data/contacts';
+import { pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import { projects, type ProjectId } from '../data/projects';
 import '../styles/case-study.css';
@@ -20,7 +21,7 @@ const { locale, projectId } = Astro.props;
 const project = projects[projectId];
 const content = project.content[locale];
 const site = getSiteCopy(locale);
-const home = site.homeHref;
+const routes = pageRoutes[locale];
 const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
 const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
 const alternateHref = locale === 'lv' ? `/work/${projectId}/` : `/lv/darbi/${projectId}/`;
@@ -29,7 +30,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
 ---
 
 <div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" />
+  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="case-hero" aria-labelledby="case-title">
       <div class="case-hero__topline"><span>{content.eyebrow}</span><span>{content.location} / {content.year}</span></div>
@@ -75,7 +76,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
     </section>
 
     <nav class="case-next" data-theme="light" aria-label={locale === 'lv' ? 'Projektu navigācija' : 'Project navigation'}>
-      <a href={`${home}#work`}><Arrow direction="left" />{content.backLabel}</a>
+      <a href={routes.work}><Arrow direction="left" />{content.backLabel}</a>
       <a href={nextHref} data-analytics-event="case_study_click" data-project-id={nextId}>{content.nextLabel}<Arrow direction="right" /></a>
     </nav>
 
