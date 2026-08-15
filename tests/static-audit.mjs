@@ -116,10 +116,9 @@ assert(arrowSource.includes('--brand-arrow-angle: 90deg'), 'Down arrows are not 
 assert(arrowSource.includes('--brand-arrow-angle: -90deg'), 'Up arrows are not locked to a true vertical direction');
 assert(arrowSource.includes('--brand-arrow-angle: 180deg'), 'Left arrows are not locked to a true horizontal direction');
 assert(!arrowSource.includes('45deg'), 'The brand arrow component has regressed to a diagonal direction');
-assert(arrowSource.includes('brand-arrow__blade--top') && arrowSource.includes('brand-arrow__blade--bottom'), 'The half-X arrow head is missing');
-assert(arrowSource.includes('transform: scaleX(0.52)'), 'The short half-X blade is missing from the arrow head');
-assert(arrowSource.includes(':global(a:hover) .brand-arrow__blade--bottom'), 'The half-X blade no longer resolves into precision on interaction');
-assert(!arrowSource.includes('brand-arrow__notch'), 'The old decorative notch returned to the arrow glyph');
+assert(arrowSource.includes('brand-arrow__spine') && arrowSource.includes('brand-arrow__head'), 'The restrained editorial arrow geometry is missing');
+assert(arrowSource.includes('stroke-linecap: square') && arrowSource.includes('stroke-linejoin: miter'), 'The premium arrow lost its crisp optical treatment');
+assert(!arrowSource.includes('brand-arrow__blade') && !arrowSource.includes('brand-arrow__notch'), 'Decorative arrow gimmicks returned to the glyph');
 
 const homeSource = await read('src/components/HomePage.astro');
 const heroContactAction = homeSource.match(/<a href="#contact"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';

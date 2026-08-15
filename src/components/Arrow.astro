@@ -7,19 +7,18 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
-<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 24 20" aria-hidden="true">
-  <path class="brand-arrow__spine" d="M1.6 10H14.95" />
-  <path class="brand-arrow__blade brand-arrow__blade--top" d="M10.9 4.7L19.3 10" />
-  <path class="brand-arrow__blade brand-arrow__blade--bottom" d="M10.9 15.3L19.3 10" />
+<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 26 20" aria-hidden="true">
+  <path class="brand-arrow__spine" d="M2 10H20.25" />
+  <path class="brand-arrow__head" d="M16.1 5.75L20.45 10L16.1 14.25" />
 </svg>
 
 <style>
   .brand-arrow {
     --brand-arrow-angle: 0deg;
-    width: 1.22rem;
-    height: 1.22rem;
-    stroke-width: 1.48;
-    stroke-linecap: butt;
+    width: 1.18rem;
+    height: 1.18rem;
+    stroke-width: 1.36;
+    stroke-linecap: square;
     stroke-linejoin: miter;
     transform: rotate(var(--brand-arrow-angle));
     transform-origin: 50% 50%;
@@ -31,37 +30,41 @@ const { direction = 'right', class: className = '' } = Astro.props;
   .brand-arrow--up { --brand-arrow-angle: -90deg; }
 
   .brand-arrow__spine,
-  .brand-arrow__blade {
+  .brand-arrow__head {
     vector-effect: non-scaling-stroke;
   }
 
-  .brand-arrow__blade {
+  .brand-arrow__spine {
     transform-box: fill-box;
-    transform-origin: right center;
+    transform-origin: left center;
     transition: transform 360ms var(--ease-out);
   }
 
-  .brand-arrow__blade--top {
-    transform: scaleX(1);
-  }
-
-  .brand-arrow__blade--bottom {
-    transform: scaleX(0.52);
+  .brand-arrow__head {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 360ms var(--ease-out);
   }
 
   :global(a:hover) .brand-arrow,
   :global(a:focus-visible) .brand-arrow {
-    transform: rotate(var(--brand-arrow-angle)) translateX(0.17rem);
+    transform: rotate(var(--brand-arrow-angle)) translateX(0.14rem);
   }
 
-  :global(a:hover) .brand-arrow__blade--bottom,
-  :global(a:focus-visible) .brand-arrow__blade--bottom {
-    transform: scaleX(1);
+  :global(a:hover) .brand-arrow__spine,
+  :global(a:focus-visible) .brand-arrow__spine {
+    transform: scaleX(1.035);
+  }
+
+  :global(a:hover) .brand-arrow__head,
+  :global(a:focus-visible) .brand-arrow__head {
+    transform: translateX(0.35px);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .brand-arrow,
-    .brand-arrow__blade {
+    .brand-arrow__spine,
+    .brand-arrow__head {
       transition: none;
     }
   }
