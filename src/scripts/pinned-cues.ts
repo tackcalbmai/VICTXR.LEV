@@ -32,10 +32,13 @@ export function initPinnedScrollCues() {
       cue.setAttribute('aria-hidden', 'true');
       cue.innerHTML = `
         <span class="pin-scroll-cue__label">${label}</span>
-        <span class="pin-scroll-cue__motion">
-          <span class="pin-scroll-cue__rail"><span class="pin-scroll-cue__pulse"></span></span>
-          <span class="pin-scroll-cue__chevron"></span>
-        </span>
+        <svg class="pin-scroll-cue__arrow" viewBox="0 0 22 36" aria-hidden="true" fill="none">
+          <g class="pin-scroll-cue__arrow-main">
+            <path d="M11 2.5V27.2" />
+            <path d="M5.8 22.1L11 27.5L16.2 22.1" />
+          </g>
+          <path class="pin-scroll-cue__arrow-signal" pathLength="1" d="M11 2.5V27.2" />
+        </svg>
       `;
       stage.appendChild(cue);
     }
@@ -52,13 +55,28 @@ export function initPinnedScrollCues() {
     const triggers = ScrollTrigger.getAll();
     for (const { section, cue } of pairs) {
       const pin = triggers.find((trigger) => trigger.trigger === section && Boolean(trigger.vars.pin));
-      const visible = Boolean(pin?.isActive && pin.progress >= 0.01 && pin.progress < 0.94);
+      const progress = pin?.progress ?? 0;
+      const fadeEnd = 0.3;
+      const linearFade = Math.max(0, Math.min(1, 1 - (progress / fadeEnd)));
+      const fade = Math.pow(linearFade, 1.35);
+      const visible = Boolean(pin?.isActive && fade > 0.015);
+
       cue.dataset.visible = visible ? 'true' : 'false';
-      cue.style.setProperty('--pin-cue-progress', String(pin?.progress ?? 0));
+      cue.style.setProperty('--pin-cue-opacity', (0.54 * fade).toFixed(3));
+      cue.style.setProperty('--pin-cue-progress', String(progress));
     }
   };
 
-  window.addEventListener('scroll', sync, { passive: true });
+  let syncFrame = 0;
+  const requestSync = () => {
+    if (syncFrame) return;
+    syncFrame = window.requestAnimationFrame(() => {
+      syncFrame = 0;
+      sync();
+    });
+  };
+
+  window.addEventListener('scroll', requestSync, { passive: true });
   ScrollTrigger.addEventListener('refresh', sync);
 
   let retryCount = 0;
@@ -74,8 +92,9 @@ export function initPinnedScrollCues() {
   window.requestAnimationFrame(() => window.requestAnimationFrame(settle));
 
   return () => {
-    window.removeEventListener('scroll', sync);
+    window.removeEventListener('scroll', requestSync);
     ScrollTrigger.removeEventListener('refresh', sync);
+    if (syncFrame) window.cancelAnimationFrame(syncFrame);
     pairs.forEach(({ cue }) => cue.remove());
     delete root.dataset.pinnedCuesInitialized;
   };
