@@ -22,12 +22,12 @@
 
 /* ABOUT STATEMENT
  * Keep the three Latvian lines connected instead of inheriting the English
- * last-line edge anchor. On narrow screens the two longer phrases also need
- * their own optical scale so nowrap never turns into horizontal clipping.
+ * last-line edge anchor. “DIEZGAN LABI.” is much wider than CITĀDI, so its
+ * optical offset is intentionally shallower rather than copying the hero.
  */
 html[lang='lv'] .about__statement span:nth-child(3) {
   box-sizing: border-box;
-  padding-left: clamp(12rem, 46vw, 52rem);
+  padding-left: clamp(8rem, 24vw, 27rem);
   text-align: left;
 }
 
