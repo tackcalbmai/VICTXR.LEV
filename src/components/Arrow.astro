@@ -7,65 +7,115 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
-<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 26 20" aria-hidden="true">
-  <path class="brand-arrow__spine" d="M2 10H20.25" />
-  <path class="brand-arrow__head" d="M16.1 5.75L20.45 10L16.1 14.25" />
+<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 30 22" aria-hidden="true" fill="none">
+  <path class="brand-arrow__echo" d="M2.6 13.75H10.45" />
+  <g class="brand-arrow__main">
+    <path class="brand-arrow__spine" d="M2.6 9.35H22.15" />
+    <path class="brand-arrow__head" d="M17.15 4.45L22.35 9.35L17.15 14.25" />
+  </g>
+  <path class="brand-arrow__signal" pathLength="1" d="M2.6 9.35H22.15" />
 </svg>
 
 <style>
   .brand-arrow {
     --brand-arrow-angle: 0deg;
-    width: 1.18rem;
-    height: 1.18rem;
-    stroke-width: 1.36;
-    stroke-linecap: square;
-    stroke-linejoin: miter;
+    width: 1.28rem;
+    height: 1.28rem;
+    overflow: visible;
     transform: rotate(var(--brand-arrow-angle));
     transform-origin: 50% 50%;
-    transition: transform 360ms var(--ease-out);
+    transition: transform 420ms var(--ease-out);
   }
 
   .brand-arrow--down { --brand-arrow-angle: 90deg; }
   .brand-arrow--left { --brand-arrow-angle: 180deg; }
   .brand-arrow--up { --brand-arrow-angle: -90deg; }
 
-  .brand-arrow__spine,
-  .brand-arrow__head {
+  .brand-arrow__main,
+  .brand-arrow__echo,
+  .brand-arrow__signal {
     vector-effect: non-scaling-stroke;
   }
 
-  .brand-arrow__spine {
-    transform-box: fill-box;
-    transform-origin: left center;
-    transition: transform 360ms var(--ease-out);
-  }
-
-  .brand-arrow__head {
+  .brand-arrow__main {
+    stroke: currentColor;
+    stroke-width: 1.62;
+    stroke-linecap: square;
+    stroke-linejoin: miter;
     transform-box: fill-box;
     transform-origin: center;
-    transition: transform 360ms var(--ease-out);
+    transition: transform 420ms var(--ease-out);
+  }
+
+  .brand-arrow__echo {
+    stroke: currentColor;
+    stroke-width: 1.22;
+    stroke-linecap: square;
+    opacity: 0.28;
+    transform-box: fill-box;
+    transform-origin: left center;
+    transition:
+      transform 460ms var(--ease-out),
+      opacity 320ms ease;
+  }
+
+  .brand-arrow__signal {
+    stroke: var(--accent);
+    stroke-width: 1.72;
+    stroke-linecap: square;
+    stroke-dasharray: 0.13 0.87;
+    stroke-dashoffset: 0.78;
+    opacity: 0.72;
   }
 
   :global(a:hover) .brand-arrow,
   :global(a:focus-visible) .brand-arrow {
-    transform: rotate(var(--brand-arrow-angle)) translateX(0.14rem);
+    transform: rotate(var(--brand-arrow-angle)) translateX(0.17rem);
   }
 
-  :global(a:hover) .brand-arrow__spine,
-  :global(a:focus-visible) .brand-arrow__spine {
-    transform: scaleX(1.035);
+  :global(a:hover) .brand-arrow__main,
+  :global(a:focus-visible) .brand-arrow__main {
+    transform: translateX(0.45px);
   }
 
-  :global(a:hover) .brand-arrow__head,
-  :global(a:focus-visible) .brand-arrow__head {
-    transform: translateX(0.35px);
+  :global(a:hover) .brand-arrow__echo,
+  :global(a:focus-visible) .brand-arrow__echo {
+    opacity: 0.5;
+    transform: translateX(3.1px) scaleX(0.9);
+  }
+
+  :global(a:hover) .brand-arrow__signal,
+  :global(a:focus-visible) .brand-arrow__signal {
+    animation: brand-arrow-signal 620ms var(--ease-out) both;
+  }
+
+  @keyframes brand-arrow-signal {
+    0% {
+      stroke-dashoffset: 0.78;
+      opacity: 0.4;
+    }
+    18% {
+      opacity: 1;
+    }
+    78% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -0.18;
+      opacity: 0;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .brand-arrow,
-    .brand-arrow__spine,
-    .brand-arrow__head {
+    .brand-arrow__main,
+    .brand-arrow__echo {
       transition: none;
+    }
+
+    :global(a:hover) .brand-arrow__signal,
+    :global(a:focus-visible) .brand-arrow__signal {
+      animation: none;
     }
   }
 </style>
