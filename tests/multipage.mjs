@@ -122,12 +122,16 @@ for (const profile of profiles) {
     const desktopLinks = await page.locator('.site-nav--desktop a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
     assert(JSON.stringify(desktopLinks) === JSON.stringify(route.nav), `${label} primary navigation is not route-based: ${desktopLinks.join(', ')}`);
 
-    if (profile.viewport.width <= 768) {
-      const toggle = page.locator('[data-menu-toggle]');
+    const expectsCompactNavigation = profile.viewport.width <= 760 || (route.lang === 'lv' && profile.viewport.width <= 1024);
+    const toggle = page.locator('[data-menu-toggle]');
+    if (expectsCompactNavigation) {
       assert(await toggle.isVisible(), `${label} should expose compact navigation`);
       await toggle.click();
       assert(await toggle.getAttribute('aria-expanded') === 'true', `${label} compact navigation did not open`);
       await toggle.click();
+    } else {
+      assert(!(await toggle.isVisible()), `${label} unexpectedly exposes compact navigation`);
+      assert(await page.locator('.site-nav--desktop').isVisible(), `${label} should expose desktop navigation`);
     }
 
     await assertNoHorizontalOverflow(page, label);
