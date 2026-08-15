@@ -8,9 +8,9 @@ const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
 <svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 24 20" aria-hidden="true">
-  <path class="brand-arrow__spine" d="M1.6 10H15.35" />
-  <path class="brand-arrow__blade brand-arrow__blade--top" d="M12.55 4.75L19.35 10" />
-  <path class="brand-arrow__blade brand-arrow__blade--bottom" d="M12.55 15.25L19.35 10" />
+  <path class="brand-arrow__spine" d="M1.6 10H14.95" />
+  <path class="brand-arrow__blade brand-arrow__blade--top" d="M10.9 4.7L19.3 10" />
+  <path class="brand-arrow__blade brand-arrow__blade--bottom" d="M10.9 15.3L19.3 10" />
 </svg>
 
 <style>
@@ -42,11 +42,11 @@ const { direction = 'right', class: className = '' } = Astro.props;
   }
 
   .brand-arrow__blade--top {
-    transform: scaleX(0.955);
+    transform: scaleX(1);
   }
 
   .brand-arrow__blade--bottom {
-    transform: scaleX(1.045);
+    transform: scaleX(0.52);
   }
 
   :global(a:hover) .brand-arrow,
@@ -54,8 +54,8 @@ const { direction = 'right', class: className = '' } = Astro.props;
     transform: rotate(var(--brand-arrow-angle)) translateX(0.17rem);
   }
 
-  :global(a:hover) .brand-arrow__blade,
-  :global(a:focus-visible) .brand-arrow__blade {
+  :global(a:hover) .brand-arrow__blade--bottom,
+  :global(a:focus-visible) .brand-arrow__blade--bottom {
     transform: scaleX(1);
   }
 
