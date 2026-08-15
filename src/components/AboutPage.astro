@@ -18,7 +18,7 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
 ---
 
 <div class="mp-page mp-about" id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" />
+  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="mp-hero mp-about__hero" aria-labelledby="about-page-title">
       <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>{locale === 'lv' ? 'Neatkarīgs / Latvija' : 'Independent / Latvia'}</span></div>
