@@ -34,6 +34,7 @@ export function initPinnedScrollCues() {
         <span class="pin-scroll-cue__label">${label}</span>
         <span class="pin-scroll-cue__motion">
           <span class="pin-scroll-cue__rail"><span class="pin-scroll-cue__pulse"></span></span>
+          <span class="pin-scroll-cue__chevron"></span>
         </span>
       `;
       stage.appendChild(cue);
@@ -49,16 +50,21 @@ export function initPinnedScrollCues() {
 
   const sync = () => {
     const triggers = ScrollTrigger.getAll();
+    const scrollY = window.scrollY;
+
     for (const { section, cue } of pairs) {
       const pin = triggers.find((trigger) => trigger.trigger === section && Boolean(trigger.vars.pin));
-      const progress = pin?.progress ?? 0;
-      const fadeEnd = 0.28;
-      const fade = Math.max(0, Math.min(1, 1 - progress / fadeEnd));
+      const start = typeof pin?.start === 'number' ? pin.start : scrollY;
+      const end = typeof pin?.end === 'number' ? pin.end : start + window.innerHeight;
+      const pinDistance = Math.max(1, end - start);
+      const fadeDistance = Math.min(360, Math.max(220, pinDistance * 0.16));
+      const travelled = Math.max(0, scrollY - start);
+      const fade = Math.max(0, Math.min(1, 1 - travelled / fadeDistance));
       const visible = Boolean(pin?.isActive && fade > 0.01);
 
       cue.dataset.visible = visible ? 'true' : 'false';
       cue.style.setProperty('--pin-cue-opacity', (0.52 * fade).toFixed(3));
-      cue.style.setProperty('--pin-cue-progress', String(progress));
+      cue.style.setProperty('--pin-cue-progress', String(pin?.progress ?? 0));
     }
   };
 
@@ -67,6 +73,7 @@ export function initPinnedScrollCues() {
     if (syncFrame) return;
     syncFrame = window.requestAnimationFrame(() => {
       syncFrame = 0;
+      ScrollTrigger.update();
       sync();
     });
   };
