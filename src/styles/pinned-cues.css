@@ -12,12 +12,12 @@
   pointer-events: none;
   transform: translate(-50%, 0.7rem);
   transition:
-    opacity 420ms ease,
+    opacity 90ms linear,
     transform 520ms var(--ease-out);
 }
 
 .pin-scroll-cue[data-visible='true'] {
-  opacity: 0.52;
+  opacity: var(--pin-cue-opacity, 0.52);
   transform: translate(-50%, 0);
 }
 
@@ -41,6 +41,7 @@
   width: 2px;
   height: 1.72rem;
   background: #77756f;
+  opacity: 0.78;
 }
 
 .pin-scroll-cue__rail::after {
@@ -74,17 +75,21 @@
 @keyframes pin-cue-flow {
   0% {
     opacity: 0;
-    transform: translateY(0);
+    transform: translateY(0) scaleY(0.72);
   }
   16% {
+    opacity: 0.2;
+  }
+  36% {
     opacity: 1;
+    transform: translateY(0.52rem) scaleY(1);
   }
   76% {
-    opacity: 1;
+    opacity: 0.72;
   }
   100% {
     opacity: 0;
-    transform: translateY(2.02rem);
+    transform: translateY(2.02rem) scaleY(0.76);
   }
 }
 
