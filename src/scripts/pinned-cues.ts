@@ -58,7 +58,7 @@ export function initPinnedScrollCues() {
     }
   };
 
-  ScrollTrigger.addEventListener('update', sync);
+  window.addEventListener('scroll', sync, { passive: true });
   ScrollTrigger.addEventListener('refresh', sync);
 
   let retryCount = 0;
@@ -74,7 +74,7 @@ export function initPinnedScrollCues() {
   window.requestAnimationFrame(() => window.requestAnimationFrame(settle));
 
   return () => {
-    ScrollTrigger.removeEventListener('update', sync);
+    window.removeEventListener('scroll', sync);
     ScrollTrigger.removeEventListener('refresh', sync);
     pairs.forEach(({ cue }) => cue.remove());
     delete root.dataset.pinnedCuesInitialized;
