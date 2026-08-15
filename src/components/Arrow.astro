@@ -7,18 +7,26 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 const instanceId = Math.random().toString(36).slice(2, 10);
 const gradientId = `brand-arrow-gradient-${instanceId}`;
+const pulseGradientId = `brand-arrow-pulse-gradient-${instanceId}`;
 const clipId = `brand-arrow-clip-${instanceId}`;
 ---
 
 <svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 30 22" aria-hidden="true" fill="none">
   <defs>
     <linearGradient id={gradientId} x1="2.6" y1="10.45" x2="22.35" y2="10.45" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="currentColor" stop-opacity="0.24" />
-      <stop offset="46%" stop-color="currentColor" stop-opacity="0.48" />
-      <stop offset="100%" stop-color="currentColor" stop-opacity="0.86" />
+      <stop class="brand-arrow__base-stop" offset="0%" stop-opacity="0.22" />
+      <stop class="brand-arrow__base-stop" offset="48%" stop-opacity="0.58" />
+      <stop class="brand-arrow__base-stop" offset="100%" stop-opacity="0.96" />
     </linearGradient>
-    <clipPath id={clipId}>
-      <rect x="2.6" y="8.55" width="19.75" height="3.8" />
+    <linearGradient id={pulseGradientId} x1="2.75" y1="10.45" x2="8.25" y2="10.45" gradientUnits="userSpaceOnUse">
+      <stop class="brand-arrow__pulse-stop" offset="0%" stop-opacity="0" />
+      <stop class="brand-arrow__pulse-stop" offset="22%" stop-opacity="0.32" />
+      <stop class="brand-arrow__pulse-stop" offset="52%" stop-opacity="1" />
+      <stop class="brand-arrow__pulse-stop" offset="78%" stop-opacity="0.34" />
+      <stop class="brand-arrow__pulse-stop" offset="100%" stop-opacity="0" />
+    </linearGradient>
+    <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+      <rect x="2.6" y="9.25" width="19.55" height="2.4" />
     </clipPath>
   </defs>
 
@@ -26,23 +34,44 @@ const clipId = `brand-arrow-clip-${instanceId}`;
     <path class="brand-arrow__spine" d="M2.6 10.45H22.15" />
     <path class="brand-arrow__head" d="M17.15 5.55L22.35 10.45L17.15 15.35" />
   </g>
-  <path class="brand-arrow__pulse" clip-path={`url(#${clipId})`} d="M2.6 10.45H8.35" />
+  <path class="brand-arrow__pulse" stroke={`url(#${pulseGradientId})`} clip-path={`url(#${clipId})`} d="M2.75 10.45H8.25" />
 </svg>
 
 <style>
   .brand-arrow {
     --brand-arrow-angle: 0deg;
+    --brand-arrow-base: 18 18 16;
     width: 1.3rem;
     height: 1.3rem;
-    overflow: visible;
+    overflow: hidden;
     transform: rotate(var(--brand-arrow-angle));
     transform-origin: 50% 50%;
     transition: transform 420ms var(--ease-out);
   }
 
+  :global([data-theme='dark']) .brand-arrow,
+  :global([data-theme='catrin']) .brand-arrow,
+  :global([data-theme='anelika']) .brand-arrow,
+  :global(.project-feature--catrin) .brand-arrow,
+  :global(.project-feature--anelika) .brand-arrow {
+    --brand-arrow-base: 150 149 144;
+  }
+
+  :global([data-theme='light']) .brand-arrow {
+    --brand-arrow-base: 18 18 16;
+  }
+
   .brand-arrow--down { --brand-arrow-angle: 90deg; }
   .brand-arrow--left { --brand-arrow-angle: 180deg; }
   .brand-arrow--up { --brand-arrow-angle: -90deg; }
+
+  .brand-arrow__base-stop {
+    stop-color: rgb(var(--brand-arrow-base));
+  }
+
+  .brand-arrow__pulse-stop {
+    stop-color: var(--accent);
+  }
 
   .brand-arrow__main,
   .brand-arrow__pulse {
@@ -50,7 +79,7 @@ const clipId = `brand-arrow-clip-${instanceId}`;
   }
 
   .brand-arrow__main {
-    stroke-width: 2.02;
+    stroke-width: 2.05;
     stroke-linecap: square;
     stroke-linejoin: miter;
     transform-box: fill-box;
@@ -59,9 +88,8 @@ const clipId = `brand-arrow-clip-${instanceId}`;
   }
 
   .brand-arrow__pulse {
-    stroke: var(--accent);
-    stroke-width: 2.08;
-    stroke-linecap: square;
+    stroke-width: 2.18;
+    stroke-linecap: butt;
     opacity: 0;
     transform-box: fill-box;
     transform-origin: left center;
@@ -81,17 +109,29 @@ const clipId = `brand-arrow-clip-${instanceId}`;
   @keyframes brand-arrow-pulse {
     0% {
       opacity: 0;
-      transform: translateX(-5.75px);
+      transform: translateX(-5.45px);
     }
-    18% {
+    16% {
+      opacity: 0.16;
+    }
+    34% {
+      opacity: 0.62;
+    }
+    48% {
+      opacity: 1;
+    }
+    58% {
       opacity: 1;
     }
     76% {
-      opacity: 1;
+      opacity: 0.54;
+    }
+    90% {
+      opacity: 0.14;
     }
     100% {
       opacity: 0;
-      transform: translateX(19.55px);
+      transform: translateX(19.35px);
     }
   }
 
