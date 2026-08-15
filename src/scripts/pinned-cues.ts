@@ -51,13 +51,27 @@ export function initPinnedScrollCues() {
     const triggers = ScrollTrigger.getAll();
     for (const { section, cue } of pairs) {
       const pin = triggers.find((trigger) => trigger.trigger === section && Boolean(trigger.vars.pin));
-      const visible = Boolean(pin?.isActive && pin.progress >= 0.01 && pin.progress < 0.94);
+      const progress = pin?.progress ?? 0;
+      const fadeEnd = 0.28;
+      const fade = Math.max(0, Math.min(1, 1 - progress / fadeEnd));
+      const visible = Boolean(pin?.isActive && fade > 0.01);
+
       cue.dataset.visible = visible ? 'true' : 'false';
-      cue.style.setProperty('--pin-cue-progress', String(pin?.progress ?? 0));
+      cue.style.setProperty('--pin-cue-opacity', (0.52 * fade).toFixed(3));
+      cue.style.setProperty('--pin-cue-progress', String(progress));
     }
   };
 
-  window.addEventListener('scroll', sync, { passive: true });
+  let syncFrame = 0;
+  const requestSync = () => {
+    if (syncFrame) return;
+    syncFrame = window.requestAnimationFrame(() => {
+      syncFrame = 0;
+      sync();
+    });
+  };
+
+  window.addEventListener('scroll', requestSync, { passive: true });
   ScrollTrigger.addEventListener('refresh', sync);
 
   let retryCount = 0;
@@ -73,8 +87,9 @@ export function initPinnedScrollCues() {
   window.requestAnimationFrame(() => window.requestAnimationFrame(settle));
 
   return () => {
-    window.removeEventListener('scroll', sync);
+    window.removeEventListener('scroll', requestSync);
     ScrollTrigger.removeEventListener('refresh', sync);
+    if (syncFrame) window.cancelAnimationFrame(syncFrame);
     pairs.forEach(({ cue }) => cue.remove());
     delete root.dataset.pinnedCuesInitialized;
   };
