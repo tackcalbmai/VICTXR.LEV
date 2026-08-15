@@ -1,0 +1,114 @@
+.pin-scroll-cue {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: max(1.15rem, calc(env(safe-area-inset-bottom, 0px) + 0.65rem));
+  display: grid;
+  width: max-content;
+  justify-items: center;
+  gap: 0.38rem;
+  color: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0.7rem);
+  transition:
+    opacity 420ms ease,
+    transform 520ms var(--ease-out);
+}
+
+.pin-scroll-cue[data-visible='true'] {
+  opacity: 0.48;
+  transform: translate(-50%, 0);
+}
+
+.pin-scroll-cue__label {
+  text-transform: uppercase;
+  font-size: 0.5rem;
+  font-weight: 720;
+  line-height: 1;
+  letter-spacing: 0.17em;
+  white-space: nowrap;
+}
+
+.pin-scroll-cue__motion {
+  display: grid;
+  justify-items: center;
+  gap: 0.22rem;
+}
+
+.pin-scroll-cue__rail {
+  position: relative;
+  width: 1px;
+  height: 1.6rem;
+  overflow: hidden;
+  background: currentColor;
+  opacity: 0.34;
+}
+
+.pin-scroll-cue__pulse {
+  position: absolute;
+  top: -0.55rem;
+  left: 0;
+  width: 1px;
+  height: 0.55rem;
+  background: var(--accent);
+}
+
+.pin-scroll-cue[data-visible='true'] .pin-scroll-cue__pulse {
+  animation: pin-cue-flow 1.55s var(--ease-in-out) infinite;
+}
+
+.pin-scroll-cue__chevron {
+  width: 0.36rem;
+  height: 0.36rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.72;
+  transform: rotate(45deg);
+}
+
+@keyframes pin-cue-flow {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  18% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(2.15rem);
+  }
+}
+
+@media (max-width: 760px) {
+  [data-disruption] .pin-scroll-cue {
+    bottom: max(5rem, calc(env(safe-area-inset-bottom, 0px) + 4.35rem));
+  }
+
+  [data-anti-sales] .pin-scroll-cue {
+    bottom: max(6.4rem, calc(env(safe-area-inset-bottom, 0px) + 5.75rem));
+  }
+
+  .pin-scroll-cue__label {
+    font-size: 0.44rem;
+    letter-spacing: 0.16em;
+  }
+
+  .pin-scroll-cue__rail {
+    height: 1.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-scroll-cue {
+    display: none;
+  }
+
+  .pin-scroll-cue__pulse {
+    animation: none !important;
+  }
+}
