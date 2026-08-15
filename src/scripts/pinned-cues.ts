@@ -34,7 +34,6 @@ export function initPinnedScrollCues() {
         <span class="pin-scroll-cue__label">${label}</span>
         <span class="pin-scroll-cue__motion">
           <span class="pin-scroll-cue__rail"><span class="pin-scroll-cue__pulse"></span></span>
-          <span class="pin-scroll-cue__chevron"></span>
         </span>
       `;
       stage.appendChild(cue);
