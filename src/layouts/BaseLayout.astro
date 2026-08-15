@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/pinned-cues.css';
 import { contacts, getSocialContactLinks } from '../data/contacts';
 
 interface Props {
@@ -134,8 +135,10 @@ const schema = {
     <a class="skip-link" href="#main-content">{skipLabel}</a>
     <slot />
     <script>
+      import { initPinnedScrollCues } from '../scripts/pinned-cues';
       import { initSiteUI } from '../scripts/site';
       initSiteUI();
+      initPinnedScrollCues();
     </script>
   </body>
 </html>
