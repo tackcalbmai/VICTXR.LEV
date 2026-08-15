@@ -5,14 +5,28 @@ interface Props {
 }
 
 const { direction = 'right', class: className = '' } = Astro.props;
+const instanceId = Math.random().toString(36).slice(2, 10);
+const gradientId = `brand-arrow-gradient-${instanceId}`;
+const clipId = `brand-arrow-clip-${instanceId}`;
 ---
 
 <svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 30 22" aria-hidden="true" fill="none">
-  <g class="brand-arrow__main">
+  <defs>
+    <linearGradient id={gradientId} x1="2.6" y1="10.45" x2="22.35" y2="10.45" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="currentColor" stop-opacity="0.24" />
+      <stop offset="46%" stop-color="currentColor" stop-opacity="0.48" />
+      <stop offset="100%" stop-color="currentColor" stop-opacity="0.86" />
+    </linearGradient>
+    <clipPath id={clipId}>
+      <rect x="2.6" y="8.55" width="19.75" height="3.8" />
+    </clipPath>
+  </defs>
+
+  <g class="brand-arrow__main" stroke={`url(#${gradientId})`}>
     <path class="brand-arrow__spine" d="M2.6 10.45H22.15" />
     <path class="brand-arrow__head" d="M17.15 5.55L22.35 10.45L17.15 15.35" />
   </g>
-  <path class="brand-arrow__pulse" d="M2.6 10.45H8.35" />
+  <path class="brand-arrow__pulse" clip-path={`url(#${clipId})`} d="M2.6 10.45H8.35" />
 </svg>
 
 <style>
@@ -36,26 +50,22 @@ const { direction = 'right', class: className = '' } = Astro.props;
   }
 
   .brand-arrow__main {
-    stroke: currentColor;
     stroke-width: 2.02;
     stroke-linecap: square;
     stroke-linejoin: miter;
-    opacity: 0.48;
     transform-box: fill-box;
     transform-origin: left center;
-    transition:
-      opacity 320ms ease,
-      transform 420ms var(--ease-out);
+    transition: transform 420ms var(--ease-out);
   }
 
   .brand-arrow__pulse {
     stroke: var(--accent);
     stroke-width: 2.08;
-    stroke-linecap: round;
+    stroke-linecap: square;
     opacity: 0;
     transform-box: fill-box;
     transform-origin: left center;
-    animation: brand-arrow-pulse 1.58s var(--ease-in-out) infinite;
+    animation: brand-arrow-pulse 1.55s var(--ease-in-out) infinite;
   }
 
   :global(a:hover) .brand-arrow,
@@ -65,33 +75,23 @@ const { direction = 'right', class: className = '' } = Astro.props;
 
   :global(a:hover) .brand-arrow__main,
   :global(a:focus-visible) .brand-arrow__main {
-    opacity: 0.68;
     transform: scaleX(1.025);
-  }
-
-  :global(a:hover) .brand-arrow__pulse,
-  :global(a:focus-visible) .brand-arrow__pulse {
-    animation-duration: 1.02s;
   }
 
   @keyframes brand-arrow-pulse {
     0% {
       opacity: 0;
-      transform: translateX(-1px) scaleX(0.72);
+      transform: translateX(-5.75px);
     }
-    15% {
-      opacity: 0.18;
+    18% {
+      opacity: 1;
     }
-    34% {
-      opacity: 0.96;
-      transform: translateX(3.8px) scaleX(1);
-    }
-    72% {
-      opacity: 0.72;
+    76% {
+      opacity: 1;
     }
     100% {
       opacity: 0;
-      transform: translateX(13.8px) scaleX(0.76);
+      transform: translateX(19.55px);
     }
   }
 
