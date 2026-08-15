@@ -1,0 +1,66 @@
+---
+import Arrow from './Arrow.astro';
+import PageContact from './PageContact.astro';
+import SiteHeader from './SiteHeader.astro';
+import { getMultipageCopy, pageRoutes } from '../data/multipage';
+import { getSiteCopy, type Locale } from '../data/site';
+import '../styles/multipage.css';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = getMultipageCopy(locale).about;
+const site = getSiteCopy(locale);
+const routes = pageRoutes[locale];
+const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.about;
+---
+
+<div class="mp-page mp-about" id="top">
+  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" />
+  <main id="main-content" tabindex="-1">
+    <section class="mp-hero mp-about__hero" aria-labelledby="about-page-title">
+      <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>{locale === 'lv' ? 'Neatkarīgs / Latvija' : 'Independent / Latvia'}</span></div>
+      <div class="about-identity-mark" aria-hidden="true"><span class="is-x">X</span><span class="is-o">O</span></div>
+      <h1 id="about-page-title">{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted']}>{line}</span>)}</h1>
+      <p class="mp-about__lead">{page.lead}</p>
+    </section>
+
+    <section class="about-definition section-pad" aria-labelledby="about-definition-title">
+      <p class="mp-kicker">XO / AUTHORSHIP</p>
+      <h2 id="about-definition-title">{page.identityTitle.map((line) => <span>{line}</span>)}</h2>
+      <p>{page.identityText}</p>
+    </section>
+
+    <section class="about-principles" aria-label={locale === 'lv' ? 'Darba principi' : 'Working principles'}>
+      {page.principles.map((principle, index) => (
+        <article class:list={['about-principle', index % 2 === 1 && 'is-offset']}>
+          <span class="about-principle__index">{principle.index}</span>
+          <h2>{principle.title}</h2>
+          <p>{principle.text}</p>
+          <span class="about-principle__glyph" aria-hidden="true">{index % 2 === 0 ? 'X' : 'O'}</span>
+        </article>
+      ))}
+    </section>
+
+    <section class="about-standard" data-theme="dark" aria-labelledby="about-standard-title">
+      <div class="about-standard__inner">
+        <p class="mp-kicker">DIFFERENT PERSPECTIVE</p>
+        <h2 id="about-standard-title">{page.standardTitle.map((line, index) => <span class:list={[index === 2 && 'is-accent']}>{line}</span>)}</h2>
+        <p>{page.standardText}</p>
+      </div>
+    </section>
+
+    <section class="about-bridge section-pad">
+      <p class="mp-kicker">{page.bridgeLabel}</p>
+      <p class="about-bridge__statement">{page.bridgeText}</p>
+      <div class="about-bridge__links">
+        <a class="mp-text-link" href={routes.work}>{site.nav.work}<Arrow direction="right" /></a>
+        <a class="mp-text-link" href={routes.services}>{site.nav.services}<Arrow direction="right" /></a>
+      </div>
+    </section>
+
+    <PageContact locale={locale} />
+  </main>
+</div>
