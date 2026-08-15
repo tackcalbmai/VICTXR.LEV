@@ -91,7 +91,7 @@ async function assertLineHeight(page, selector, floor, label) {
   }
 }
 
-async function assertServiceSeparation(page, mobile, label) {
+async function assertServiceSeparation(page, stacked, label) {
   const rows = page.locator('.service-row');
   const count = await rows.count();
   assert(count > 0, `${label} service rows are missing`);
@@ -101,7 +101,7 @@ async function assertServiceSeparation(page, mobile, label) {
     const copy = await textBounds(row.locator('p'));
     assert(title.left !== null && title.right !== null && title.top !== null && title.bottom !== null, `${label} service title cannot be measured`);
     assert(copy.left !== null && copy.right !== null && copy.top !== null && copy.bottom !== null, `${label} service copy cannot be measured`);
-    if (mobile) {
+    if (stacked) {
       assert(copy.top >= title.bottom + 4, `${label} service copy collides vertically with “${title.text}”`);
     } else {
       assert(copy.left >= title.right + 12, `${label} service copy collides horizontally with “${title.text}”`);
@@ -125,6 +125,7 @@ const profiles = [
 
 for (const profile of profiles) {
   const mobile = profile.viewport.width <= 760;
+  const stackedServices = profile.viewport.width <= 960;
   const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
   const page = await context.newPage();
   await openReadyPage(page, '/lv/');
@@ -175,7 +176,7 @@ for (const profile of profiles) {
   await assertNoDetachedShortLines(page, '.about__statement span', `${profile.name} about composition`);
   await assertNoDetachedShortLines(page, '.anti-sales__title span', `${profile.name} anti-sales composition`);
   await assertNoDetachedShortLines(page, '.contact__title span', `${profile.name} contact composition`);
-  await assertServiceSeparation(page, mobile, profile.name);
+  await assertServiceSeparation(page, stackedServices, profile.name);
 
   for (const [selector, suffix] of [
     ['.hero', 'hero'], ['#work', 'work'], ['#about', 'about'], ['#approach', 'approach'],
