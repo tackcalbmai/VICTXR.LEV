@@ -1,0 +1,72 @@
+/* Home-page services grid.
+ * The service index column was removed from the markup, but the old four-column
+ * CSS remained. That left each heading trapped in the former index column and
+ * allowed the description to paint over it. Keep the three real children in
+ * three explicit tracks: title, description, mark.
+ */
+.home-shell .services__list .service-row {
+  grid-template-columns: minmax(20rem, 28rem) minmax(0, 1fr) 2rem;
+  align-items: start;
+  column-gap: clamp(1.75rem, 3vw, 3.5rem);
+  row-gap: 0.75rem;
+  min-height: 0;
+  padding-block: clamp(1.55rem, 2.2vw, 2.35rem);
+}
+
+.home-shell .services__list .service-row h3 {
+  grid-column: 1;
+  min-width: 0;
+  margin: 0;
+  align-self: start;
+  overflow-wrap: normal;
+}
+
+.home-shell .services__list .service-row p {
+  grid-column: 2;
+  min-width: 0;
+  margin: 0;
+  align-self: start;
+  padding-top: 0.18em;
+}
+
+.home-shell .services__list .service-row .service-row__mark {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  justify-self: end;
+}
+
+/* Tablet: long translated/service names need their own row instead of forcing
+ * the copy into a narrow side column. The mark stays anchored top-right.
+ */
+@media (max-width: 960px) {
+  .home-shell .services__list .service-row {
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    column-gap: 1rem;
+    row-gap: 0.8rem;
+  }
+
+  .home-shell .services__list .service-row h3 {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 30rem;
+  }
+
+  .home-shell .services__list .service-row p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: 42rem;
+    padding-top: 0;
+  }
+
+  .home-shell .services__list .service-row .service-row__mark {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .home-shell .services__list .service-row {
+    padding-block: 1.35rem;
+  }
+}
