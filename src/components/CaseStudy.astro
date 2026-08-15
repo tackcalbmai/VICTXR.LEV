@@ -36,7 +36,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
       <h1 id="case-title">{content.title}</h1>
       <p class="case-hero__subtitle">{content.subtitle}</p>
       <ul class="case-hero__services">{content.services.map((service) => <li>{service}</li>)}</ul>
-      <a class="case-live-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={projectId}>{content.liveLabel}<Arrow direction="up" /></a>
+      <a class="case-live-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={projectId}>{content.liveLabel}<Arrow direction="right" /></a>
     </section>
 
     <figure class="case-browser reveal" data-reveal>
@@ -71,7 +71,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
 
     <section class="case-result section-pad" data-theme="dark">
       <p>{content.resultNote}</p>
-      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={projectId}>{content.liveLabel}<Arrow direction="up" /></a>
+      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={projectId}>{content.liveLabel}<Arrow direction="right" /></a>
     </section>
 
     <nav class="case-next" data-theme="light" aria-label={locale === 'lv' ? 'Projektu navigācija' : 'Project navigation'}>
@@ -85,7 +85,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
       <p class="case-contact__expectation">{site.contact.expectation}</p>
       {contactEmail && (
         <div class="case-contact__actions">
-          <a href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email">{contactEmail}<Arrow direction="up" /></a>
+          <a href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email">{contactEmail}<Arrow direction="right" /></a>
           <button type="button" data-copy-email data-email={contactEmail} data-copy-label={site.contact.copy} data-copied-label={site.contact.copied} data-analytics-event="copy_email_click"><span data-copy-text>{site.contact.copy}</span></button>
           <p class="sr-only" aria-live="polite" data-copy-status></p>
         </div>

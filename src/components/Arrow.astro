@@ -7,6 +7,70 @@ interface Props {
 const { direction = 'right', class: className = '' } = Astro.props;
 ---
 
-<svg class:list={['ui-arrow', `ui-arrow--${direction}`, className]} viewBox="0 0 18 18" aria-hidden="true">
-  <path d="M3 9h11M10 5l4 4-4 4" />
+<svg class:list={['ui-arrow', 'brand-arrow', `brand-arrow--${direction}`, className]} viewBox="0 0 20 20" aria-hidden="true">
+  <path class="brand-arrow__rail brand-arrow__rail--start" d="M1.8 10H7.15" />
+  <path class="brand-arrow__notch" d="M8.05 12L9.25 8" />
+  <path class="brand-arrow__rail brand-arrow__rail--end" d="M10.25 10H16.45" />
+  <path class="brand-arrow__head" d="M12.05 5.8L16.35 10L12.05 14.2" />
 </svg>
+
+<style>
+  .brand-arrow {
+    --brand-arrow-angle: 0deg;
+    width: 1.12rem;
+    height: 1.12rem;
+    stroke-width: 1.28;
+    transform: rotate(var(--brand-arrow-angle));
+    transform-origin: 50% 50%;
+    transition: transform 360ms var(--ease-out);
+  }
+
+  .brand-arrow--down { --brand-arrow-angle: 90deg; }
+  .brand-arrow--left { --brand-arrow-angle: 180deg; }
+  .brand-arrow--up { --brand-arrow-angle: -90deg; }
+
+  .brand-arrow__rail,
+  .brand-arrow__head,
+  .brand-arrow__notch {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .brand-arrow__rail,
+  .brand-arrow__head {
+    transition: transform 360ms var(--ease-out);
+  }
+
+  .brand-arrow__notch {
+    stroke: var(--accent);
+    stroke-width: 1.55;
+    opacity: 1;
+    transition: transform 360ms var(--ease-out), opacity 220ms ease;
+  }
+
+  :global(a:hover) .brand-arrow,
+  :global(a:focus-visible) .brand-arrow {
+    transform: rotate(var(--brand-arrow-angle)) translateX(0.16rem);
+  }
+
+  :global(a:hover) .brand-arrow__rail--end,
+  :global(a:focus-visible) .brand-arrow__rail--end,
+  :global(a:hover) .brand-arrow__head,
+  :global(a:focus-visible) .brand-arrow__head {
+    transform: translateX(0.6px);
+  }
+
+  :global(a:hover) .brand-arrow__notch,
+  :global(a:focus-visible) .brand-arrow__notch {
+    transform: translateX(-0.4px);
+    opacity: 0.72;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-arrow,
+    .brand-arrow__rail,
+    .brand-arrow__head,
+    .brand-arrow__notch {
+      transition: none;
+    }
+  }
+</style>
