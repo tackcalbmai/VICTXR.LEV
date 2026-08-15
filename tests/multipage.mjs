@@ -102,12 +102,20 @@ async function assertServiceGeometry(page, label) {
   }
 }
 
-async function captureCheckpoint(page, selector, fileName) {
+async function captureElement(page, selector, fileName) {
   const locator = page.locator(selector).first();
   assert(await locator.count(), `${selector} is missing for screenshot`);
   await locator.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(60);
+  await page.waitForTimeout(50);
   await locator.screenshot({ path: `${outDir}/${fileName}` });
+}
+
+async function captureViewport(page, selector, fileName) {
+  const locator = page.locator(selector).first();
+  assert(await locator.count(), `${selector} is missing for screenshot`);
+  await locator.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(50);
+  await page.screenshot({ path: `${outDir}/${fileName}`, fullPage: false });
 }
 
 for (const profile of profiles) {
@@ -159,9 +167,9 @@ for (const profile of profiles) {
       assert(!brokenImages.length, `${label} has broken work images: ${brokenImages.join(', ')}`);
     }
 
-    await captureCheckpoint(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
-    await captureCheckpoint(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
-    await captureCheckpoint(page, '.page-contact', `multipage-${route.key}-${profile.name}-contact.png`);
+    await captureElement(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
+    await captureViewport(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
+    await captureElement(page, '.page-contact', `multipage-${route.key}-${profile.name}-contact.png`);
 
     assert(!runtimeErrors.length, `${label} runtime errors:\n${runtimeErrors.join('\n')}`);
     await page.close();
