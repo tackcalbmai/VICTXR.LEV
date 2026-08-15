@@ -86,10 +86,60 @@ async function assertLineHeightFloor(page, selector, floor, label) {
   }
 }
 
-for (const profile of [
+async function assertTextWithinViewport(page, selector, label, tolerance = 2) {
+  const locators = page.locator(selector);
+  const count = await locators.count();
+  assert(count > 0, `${label} is missing`);
+
+  for (let index = 0; index < count; index += 1) {
+    const locator = locators.nth(index);
+    await locator.scrollIntoViewIfNeeded();
+    const geometry = await locator.evaluate((element) => {
+      const viewportWidth = document.documentElement.clientWidth;
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          return node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        },
+      });
+      const rects = [];
+      let textNode = walker.nextNode();
+      while (textNode) {
+        const range = document.createRange();
+        range.selectNodeContents(textNode);
+        for (const rect of range.getClientRects()) {
+          if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right });
+        }
+        textNode = walker.nextNode();
+      }
+      return {
+        viewportWidth,
+        text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+        left: rects.length ? Math.min(...rects.map((rect) => rect.left)) : null,
+        right: rects.length ? Math.max(...rects.map((rect) => rect.right)) : null,
+      };
+    });
+
+    assert(geometry.left !== null && geometry.right !== null, `${label} has no measurable text in “${geometry.text}”`);
+    assert(geometry.left >= -tolerance, `${label} escapes left (${geometry.left.toFixed(1)}px) in “${geometry.text}”`);
+    assert(geometry.right <= geometry.viewportWidth + tolerance, `${label} escapes right (${geometry.right.toFixed(1)}px > ${geometry.viewportWidth}px) in “${geometry.text}”`);
+  }
+}
+
+async function screenshotSection(page, selector, path) {
+  const locator = page.locator(selector).first();
+  assert(await locator.count(), `${selector} is missing for screenshot`);
+  await locator.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(60);
+  await locator.screenshot({ path: `${outDir}/${path}` });
+}
+
+const profiles = [
   { name: 'lv-typography-desktop', viewport: { width: 1366, height: 768 } },
+  { name: 'lv-typography-tablet', viewport: { width: 768, height: 1024 } },
   { name: 'lv-typography-mobile', viewport: { width: 393, height: 852 } },
-]) {
+];
+
+for (const profile of profiles) {
   const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
   const page = await context.newPage();
   await openReadyPage(page, '/lv/');
@@ -108,34 +158,56 @@ for (const profile of [
   const lastLine = await lineGeometry(heroLines.nth(2));
   assert(lastLine.overflowY === 'visible' || lastLine.overflow === 'visible', `${profile.name} can still clip CITĀDI diacritics after intro`);
 
+  if (profile.viewport.width === 768) {
+    assert(await page.locator('[data-menu-toggle]').isVisible(), `${profile.name} should use compact navigation`);
+    assert(!(await page.locator('.site-nav--desktop').isVisible()), `${profile.name} still shows the long desktop navigation`);
+    assert(!(await page.locator('.site-status').isVisible()), `${profile.name} still shows the long availability status`);
+  }
+
   // Range client rectangles describe the font line box, not literal black pixels.
-  // For Latvian display type we therefore lock the rendered baseline/row rhythm
-  // instead of requiring those invisible boxes never to overlap. This keeps the
-  // typography close to the English art direction while preventing accidental
-  // compression below the visually reviewed safe values. A tiny epsilon absorbs
-  // browser rounding when CSS line-height is converted to device pixels.
+  // For Latvian display type we lock the rendered baseline/row rhythm and the
+  // visible text bounds. This keeps the EN art direction while allowing LV its
+  // own scale, wrapping and optical alignment.
   await assertLineHeightFloor(page, '.work-heading .display-title', 1.02, `${profile.name} selected-work title`);
   await assertLineHeightFloor(page, '.disruption__line', 1.03, `${profile.name} disruption title`);
-
-  // These art-directed headings use explicit block lines, so guard their spacing directly.
   await assertLineHeightFloor(page, '.about .display-title, .about__statement', 1.05, `${profile.name} about typography`);
   await assertLineHeightFloor(page, '.approach__steps strong', 1.05, `${profile.name} process typography`);
   await assertLineHeightFloor(page, '.anti-sales__title', 1.05, `${profile.name} anti-sales typography`);
   await assertLineHeightFloor(page, '.contact__title', 1.05, `${profile.name} contact typography`);
 
-  await page.locator('#work').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(80);
-  await page.screenshot({ path: `${outDir}/${profile.name}-work.png`, fullPage: false });
+  await assertTextWithinViewport(page, '.hero__line-inner', `${profile.name} hero`);
+  await assertTextWithinViewport(page, '.work-heading .display-title', `${profile.name} selected-work title`);
+  await assertTextWithinViewport(page, '.disruption__line', `${profile.name} disruption title`);
+  await assertTextWithinViewport(page, '.about__statement span', `${profile.name} about statement`);
+  await assertTextWithinViewport(page, '.approach__steps strong', `${profile.name} process title`);
+  await assertTextWithinViewport(page, '.service-row h3', `${profile.name} service title`);
+  await assertTextWithinViewport(page, '.xo-section h2 span', `${profile.name} X/O title`);
+  await assertTextWithinViewport(page, '.anti-sales__title span', `${profile.name} anti-sales title`);
+  await assertTextWithinViewport(page, '.contact__title span', `${profile.name} contact title`);
+
+  await screenshotSection(page, '.hero', `${profile.name}-hero.png`);
+  await screenshotSection(page, '#work', `${profile.name}-work.png`);
+  await screenshotSection(page, '#services', `${profile.name}-services.png`);
+  await screenshotSection(page, '#contact', `${profile.name}-contact.png`);
 
   for (const project of ['catrin', 'anelika']) {
     await openReadyPage(page, `/lv/darbi/${project}/`);
     await assertLineHeightFloor(page, '.case-narrative__row h2', 1.04, `${profile.name} ${project} narrative headings`);
     await assertLineHeightFloor(page, '.case-result p', 1.04, `${profile.name} ${project} result`);
     await assertLineHeightFloor(page, '.case-contact h2', 1.05, `${profile.name} ${project} contact heading`);
+
+    await assertTextWithinViewport(page, '.case-hero__subtitle', `${profile.name} ${project} hero subtitle`);
+    await assertTextWithinViewport(page, '.case-narrative__row h2', `${profile.name} ${project} narrative headings`);
+    await assertTextWithinViewport(page, '.case-result p', `${profile.name} ${project} result`);
+    await assertTextWithinViewport(page, '.case-contact h2 span', `${profile.name} ${project} contact heading`);
+
+    await screenshotSection(page, '.case-hero', `${profile.name}-${project}-hero.png`);
+    await screenshotSection(page, '.case-narrative', `${profile.name}-${project}-narrative.png`);
+    await screenshotSection(page, '.case-contact', `${profile.name}-${project}-contact.png`);
   }
 
   await context.close();
 }
 
 await browser.close();
-console.log('Latvian typography QA passed: diacritics remain visible and reviewed display-line rhythm stays within safe desktop/mobile bounds.');
+console.log('Latvian typography QA passed: LV-specific desktop/tablet/mobile composition, diacritics, line rhythm and viewport bounds are safe across the home page and both case studies.');
