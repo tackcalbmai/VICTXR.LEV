@@ -1,0 +1,44 @@
+---
+import Arrow from './Arrow.astro';
+import ContactChannels from './ContactChannels.astro';
+import { contacts } from '../data/contacts';
+import { getSiteCopy, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+}
+
+const { locale, compact = false } = Astro.props;
+const copy = getSiteCopy(locale);
+const contactEmail = contacts.email;
+const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(copy.contact.subject)}`;
+---
+
+<section class:list={['page-contact', compact && 'page-contact--compact']} id="contact" data-theme="dark" aria-labelledby="page-contact-title">
+  <div class="page-contact__topline">
+    <span>{copy.contact.status}</span>
+    <span>{copy.contact.availability}</span>
+  </div>
+  <h2 id="page-contact-title">{copy.contact.title.map((line) => <span>{line}</span>)}</h2>
+  <p class="page-contact__expectation">{copy.contact.expectation}</p>
+  {contactEmail && (
+    <div class="page-contact__actions">
+      <a class="page-contact__email" href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email">
+        <span>{copy.contact.emailLabel}</span>
+        <strong>{contactEmail}</strong>
+        <Arrow direction="right" />
+      </a>
+      <button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied} data-analytics-event="copy_email_click">
+        <span data-copy-text>{copy.contact.copy}</span>
+      </button>
+      <p class="sr-only" aria-live="polite" data-copy-status></p>
+    </div>
+  )}
+  <ContactChannels locale={locale} />
+  <footer class="page-contact__footer">
+    <span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span>
+    <span>{copy.footer.note}</span>
+    <a href="#top">{copy.footer.backToTop}<Arrow direction="up" /></a>
+  </footer>
+</section>

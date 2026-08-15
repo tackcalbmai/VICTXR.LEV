@@ -27,6 +27,12 @@ async function sourceFiles(directory) {
 const pages = {
   homeEn: await readFile(new URL('index.html', dist), 'utf8'),
   homeLv: await readFile(new URL('lv/index.html', dist), 'utf8'),
+  workEn: await readFile(new URL('work/index.html', dist), 'utf8'),
+  workLv: await readFile(new URL('lv/darbi/index.html', dist), 'utf8'),
+  aboutEn: await readFile(new URL('about/index.html', dist), 'utf8'),
+  aboutLv: await readFile(new URL('lv/par-mani/index.html', dist), 'utf8'),
+  servicesEn: await readFile(new URL('services/index.html', dist), 'utf8'),
+  servicesLv: await readFile(new URL('lv/pakalpojumi/index.html', dist), 'utf8'),
   catrinEn: await readFile(new URL('work/catrin/index.html', dist), 'utf8'),
   catrinLv: await readFile(new URL('lv/darbi/catrin/index.html', dist), 'utf8'),
   anelikaEn: await readFile(new URL('work/anelika/index.html', dist), 'utf8'),
@@ -38,6 +44,12 @@ const pages = {
 const routablePages = {
   '/': pages.homeEn,
   '/lv/': pages.homeLv,
+  '/work/': pages.workEn,
+  '/lv/darbi/': pages.workLv,
+  '/about/': pages.aboutEn,
+  '/lv/par-mani/': pages.aboutLv,
+  '/services/': pages.servicesEn,
+  '/lv/pakalpojumi/': pages.servicesLv,
   '/work/catrin/': pages.catrinEn,
   '/lv/darbi/catrin/': pages.catrinLv,
   '/work/anelika/': pages.anelikaEn,
@@ -94,7 +106,7 @@ assert(pages.catrinLv.includes('class="site-language" href="/work/catrin/"'), 'L
 assert(pages.anelikaEn.includes('class="site-language" href="/lv/darbi/anelika/"'), 'English ANELIKA language switch loses case context');
 assert(pages.anelikaLv.includes('class="site-language" href="/work/anelika/"'), 'Latvian ANELIKA language switch loses case context');
 assert(pages.notFoundEn.includes('<html lang="en"') && pages.notFoundEn.includes('Something looks wrong.'), 'English 404 is not natively rendered in English');
-assert(pages.notFoundLv.includes('<html lang="lv"') && pages.notFoundLv.includes('Kaut kas nav pareizi.'), 'Latvian 404 is not natively rendered in Latvian');
+assert(pages.notFoundLv.includes('<html lang="lv"') && pages.notFoundLv.includes('Kaut kas nav pareizi.'), 'Latvian 404 did not set localized content');
 assert(pages.notFoundLv.includes('Šī lapa neeksistē.'), 'Latvian 404 metadata is not localized');
 assert(!pages.notFoundEn.includes("location.pathname.startsWith('/lv/')"), '404 localization still depends on client-side path mutation');
 
@@ -155,4 +167,4 @@ const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');
 assert(robots.includes('Sitemap: https://'), 'robots.txt does not advertise the sitemap over HTTPS');
 assert(sitemap.includes('<sitemapindex'), 'The sitemap index was not generated');
 
-console.log('Static production audit passed: contacts, directional arrows, localized 404s, content, metadata, assets and security headers are consistent.');
+console.log('Static production audit passed: all indexable EN/LV routes, internal links, contacts, localized 404s, metadata, assets and security headers are consistent.');

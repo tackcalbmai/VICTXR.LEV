@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ServicesPage from '../../components/ServicesPage.astro';
+import { getMultipageCopy, pageRoutes } from '../../data/multipage';
+import '../../styles/lv-typography.css';
+import '../../styles/lv-composition.css';
+
+const copy = getMultipageCopy('lv').services;
+---
+
+<BaseLayout title={copy.seoTitle} description={copy.seoDescription} lang="lv" canonicalPath={pageRoutes.lv.services} alternatePath={pageRoutes.en.services}>
+  <ServicesPage locale="lv" />
+</BaseLayout>
