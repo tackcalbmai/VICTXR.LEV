@@ -41,10 +41,12 @@ for (const current of cases) {
   const homeNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
   assert(JSON.stringify(homeNav) === JSON.stringify(current.nav), `${current.lang} homepage header still uses old anchor navigation: ${homeNav.join(', ')}`);
 
-  const heroActionLinks = page.locator('main .hero .hero__actions > a');
-  assert(await heroActionLinks.count() === 2, `${current.lang} homepage should expose exactly two real hero actions`);
-  const heroActions = await heroActionLinks.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  assert(heroActions[0] === '#work' && heroActions[1] === '#contact', `${current.lang} homepage hero journey should remain local: ${heroActions.join(', ')}`);
+  const workActions = page.locator('main .hero a[data-analytics-event="view_work_click"]');
+  const startActions = page.locator('main .hero a[data-analytics-event="start_project_click"]');
+  assert(await workActions.count() >= 1, `${current.lang} homepage is missing the Work hero action`);
+  assert(await startActions.count() >= 1, `${current.lang} homepage is missing the Start project hero action`);
+  assert(await workActions.first().getAttribute('href') === '#work', `${current.lang} homepage Work hero action no longer points to #work`);
+  assert(await startActions.first().getAttribute('href') === '#contact', `${current.lang} homepage Start project hero action no longer points to #contact`);
 
   response = await page.goto(new URL(current.casePath, baseURL).toString(), { waitUntil: 'load' });
   assert(response?.ok(), `${current.casePath} returned ${response?.status()}`);
@@ -58,4 +60,4 @@ for (const current of cases) {
 }
 
 await browser.close();
-console.log('Multi-page navigation QA passed: homepage headers, case headers and case back-links use real pages while the homepage hero journey remains local.');
+console.log('Multi-page navigation QA passed: homepage headers, case headers and case back-links use real pages while the homepage hero CTAs keep their local scroll journey.');
