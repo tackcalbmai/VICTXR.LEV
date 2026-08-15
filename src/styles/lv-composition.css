@@ -1,0 +1,54 @@
+/* Optical composition corrections for the Latvian locale.
+ *
+ * The English layout deliberately uses several right-aligned final lines.
+ * That geometry cannot be copied blindly to shorter Latvian phrases: a short
+ * line can remain technically inside the viewport while looking detached from
+ * the rest of the heading. These overrides keep the same art direction while
+ * positioning the actual Latvian phrases as a coherent composition.
+ */
+
+/* HERO
+ * EN's long “DIFFERENTLY.” can anchor to the right edge. “CITĀDI.” cannot:
+ * right-aligning it leaves an accidental void through the middle of the hero.
+ * Give the Latvian third line an authored starting point instead.
+ */
+@media (min-width: 761px) {
+  html[lang='lv'] .hero__line:nth-child(3) {
+    box-sizing: border-box;
+    padding-left: clamp(17rem, 46vw, 56rem);
+    text-align: left;
+  }
+}
+
+/* ABOUT STATEMENT
+ * Keep the three Latvian lines connected instead of inheriting the English
+ * last-line edge anchor. On narrow screens the two longer phrases also need
+ * their own optical scale so nowrap never turns into horizontal clipping.
+ */
+html[lang='lv'] .about__statement span:nth-child(3) {
+  box-sizing: border-box;
+  padding-left: clamp(12rem, 46vw, 52rem);
+  text-align: left;
+}
+
+@media (max-width: 760px) {
+  html[lang='lv'] .hero__line:nth-child(3) {
+    padding-left: 0;
+    text-align: left;
+  }
+
+  html[lang='lv'] .about__statement {
+    font-size: clamp(2.55rem, 12vw, 4.8rem);
+  }
+
+  html[lang='lv'] .about__statement span:nth-child(2) {
+    padding-left: 0;
+    font-size: 0.82em;
+  }
+
+  html[lang='lv'] .about__statement span:nth-child(3) {
+    padding-left: 11vw;
+    font-size: 0.82em;
+    text-align: left;
+  }
+}
