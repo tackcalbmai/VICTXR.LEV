@@ -119,13 +119,17 @@ assert(!arrowSource.includes('45deg'), 'The brand arrow component has regressed 
 assert(arrowSource.includes('brand-arrow__notch'), 'The branded cut/notch detail is missing from the arrow glyph');
 
 const homeSource = await read('src/components/HomePage.astro');
-assert(/href="#contact"[^>]*>[\s\S]*?<Arrow direction="down" \/>/.test(homeSource), 'Homepage contact CTA does not point down toward its target');
-assert(/class="contact__email"[\s\S]*?<Arrow direction="right" \/>/.test(homeSource), 'Homepage email action does not use a forward arrow');
+const heroContactAction = homeSource.match(/<a href="#contact"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
+const homeEmailAction = homeSource.match(/<a class="contact__email"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
+assert(heroContactAction.includes('<Arrow direction="down" />'), 'Homepage contact CTA does not point down toward its target');
+assert(homeEmailAction.includes('<Arrow direction="right" />'), 'Homepage email action does not use a forward arrow');
 
 const caseSource = await read('src/components/CaseStudy.astro');
-assert(!/case-live-link[\s\S]*?<Arrow direction="up" \/>/.test(caseSource), 'Case-study outbound link still uses an upward/diagonal arrow');
-assert(/case-live-link[\s\S]*?<Arrow direction="right" \/>/.test(caseSource), 'Case-study outbound link does not use a forward arrow');
-assert(/href="#top">[\s\S]*?<Arrow direction="up" \/>/.test(caseSource), 'Back-to-top action does not point up');
+const caseLiveAction = caseSource.match(/<a class="case-live-link"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
+const caseFooter = caseSource.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0] ?? '';
+assert(caseLiveAction.includes('<Arrow direction="right" />'), 'Case-study outbound link does not use a forward arrow');
+assert(!caseLiveAction.includes('<Arrow direction="up" />'), 'Case-study outbound link still uses an upward/diagonal arrow');
+assert(caseFooter.includes('<Arrow direction="up" />'), 'Back-to-top action does not point up');
 
 const channelsSource = await read('src/components/ContactChannels.astro');
 assert(channelsSource.includes('<Arrow direction="right" />'), 'Outbound social channels do not use a forward arrow');
