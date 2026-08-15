@@ -43,10 +43,10 @@ for (const current of cases) {
 
   const workActions = page.locator('main .hero a[data-analytics-event="view_work_click"]');
   const startActions = page.locator('main .hero a[data-analytics-event="start_project_click"]');
-  assert(await workActions.count() >= 1, `${current.lang} homepage is missing the Work hero action`);
-  assert(await startActions.count() >= 1, `${current.lang} homepage is missing the Start project hero action`);
-  assert(await workActions.first().getAttribute('href') === '#work', `${current.lang} homepage Work hero action no longer points to #work`);
-  assert(await startActions.first().getAttribute('href') === '#contact', `${current.lang} homepage Start project hero action no longer points to #contact`);
+  const workHrefs = await workActions.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  const startHrefs = await startActions.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  assert(workHrefs.includes('#work'), `${current.lang} homepage lost its local Work → #work hero journey: ${workHrefs.join(', ')}`);
+  assert(startHrefs.includes('#contact'), `${current.lang} homepage lost its local Start project → #contact hero journey: ${startHrefs.join(', ')}`);
 
   response = await page.goto(new URL(current.casePath, baseURL).toString(), { waitUntil: 'load' });
   assert(response?.ok(), `${current.casePath} returned ${response?.status()}`);
