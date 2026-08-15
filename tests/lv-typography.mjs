@@ -72,14 +72,45 @@ async function lineGeometry(locator) {
   });
 }
 
-async function assertLineHeightFloor(page, selector, floor, label) {
+async function textBounds(locator) {
+  return locator.evaluate((element) => {
+    const viewportWidth = document.documentElement.clientWidth;
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        return node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      },
+    });
+    const rects = [];
+    let textNode = walker.nextNode();
+    while (textNode) {
+      const range = document.createRange();
+      range.selectNodeContents(textNode);
+      for (const rect of range.getClientRects()) {
+        if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right });
+      }
+      textNode = walker.nextNode();
+    }
+
+    const left = rects.length ? Math.min(...rects.map((rect) => rect.left)) : null;
+    const right = rects.length ? Math.max(...rects.map((rect) => rect.right)) : null;
+    return {
+      viewportWidth,
+      text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      left,
+      right,
+      width: left !== null && right !== null ? right - left : null,
+    };
+  });
+}
+
+async function assertLineHeightFloor(page, selector, floor, label, { checkRenderedRows = true } = {}) {
   const locators = page.locator(selector);
   const count = await locators.count();
   assert(count > 0, `${label} is missing`);
   for (let index = 0; index < count; index += 1) {
     const geometry = await lineGeometry(locators.nth(index));
     assert(geometry.ratio + ratioEpsilon >= floor, `${label} line-height is too tight (${geometry.ratio.toFixed(3)}) in “${geometry.text}”`);
-    if (geometry.rows.length > 1 && geometry.minRowAdvance !== null) {
+    if (checkRenderedRows && geometry.rows.length > 1 && geometry.minRowAdvance !== null) {
       const advanceRatio = geometry.minRowAdvance / geometry.fontSize;
       assert(advanceRatio + ratioEpsilon >= floor - 0.015, `${label} rendered row advance is too tight (${advanceRatio.toFixed(3)}) in “${geometry.text}”`);
     }
@@ -94,34 +125,27 @@ async function assertTextWithinViewport(page, selector, label, tolerance = 2) {
   for (let index = 0; index < count; index += 1) {
     const locator = locators.nth(index);
     await locator.scrollIntoViewIfNeeded();
-    const geometry = await locator.evaluate((element) => {
-      const viewportWidth = document.documentElement.clientWidth;
-      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
-        acceptNode(node) {
-          return node.textContent?.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-        },
-      });
-      const rects = [];
-      let textNode = walker.nextNode();
-      while (textNode) {
-        const range = document.createRange();
-        range.selectNodeContents(textNode);
-        for (const rect of range.getClientRects()) {
-          if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right });
-        }
-        textNode = walker.nextNode();
-      }
-      return {
-        viewportWidth,
-        text: element.textContent?.replace(/\s+/g, ' ').trim() ?? '',
-        left: rects.length ? Math.min(...rects.map((rect) => rect.left)) : null,
-        right: rects.length ? Math.max(...rects.map((rect) => rect.right)) : null,
-      };
-    });
+    const geometry = await textBounds(locator);
 
     assert(geometry.left !== null && geometry.right !== null, `${label} has no measurable text in “${geometry.text}”`);
     assert(geometry.left >= -tolerance, `${label} escapes left (${geometry.left.toFixed(1)}px) in “${geometry.text}”`);
     assert(geometry.right <= geometry.viewportWidth + tolerance, `${label} escapes right (${geometry.right.toFixed(1)}px > ${geometry.viewportWidth}px) in “${geometry.text}”`);
+  }
+}
+
+async function assertNoDetachedShortLines(page, selector, label, { maxWidthRatio = 0.42, maxStartRatio = 0.58 } = {}) {
+  const locators = page.locator(selector);
+  const count = await locators.count();
+  assert(count > 0, `${label} is missing`);
+
+  for (let index = 0; index < count; index += 1) {
+    const geometry = await textBounds(locators.nth(index));
+    assert(geometry.left !== null && geometry.width !== null, `${label} has no measurable text in “${geometry.text}”`);
+    const widthRatio = geometry.width / geometry.viewportWidth;
+    const startRatio = geometry.left / geometry.viewportWidth;
+    if (widthRatio <= maxWidthRatio) {
+      assert(startRatio <= maxStartRatio, `${label} has a detached short line: “${geometry.text}” starts at ${(startRatio * 100).toFixed(1)}% of the viewport while occupying only ${(widthRatio * 100).toFixed(1)}%`);
+    }
   }
 }
 
@@ -158,48 +182,68 @@ for (const profile of profiles) {
   const lastLine = await lineGeometry(heroLines.nth(2));
   assert(lastLine.overflowY === 'visible' || lastLine.overflow === 'visible', `${profile.name} can still clip CITĀDI diacritics after intro`);
 
+  const heroLastBounds = await textBounds(page.locator('.hero__line-inner').nth(2));
+  assert(heroLastBounds.left !== null, `${profile.name} cannot measure CITĀDI`);
+  const heroLastStart = heroLastBounds.left / heroLastBounds.viewportWidth;
+  if (profile.viewport.width > 760) {
+    assert(heroLastStart >= 0.34 && heroLastStart <= 0.58, `${profile.name} CITĀDI optical start is wrong: ${(heroLastStart * 100).toFixed(1)}%`);
+  } else {
+    assert(heroLastStart <= 0.16, `${profile.name} CITĀDI should stay connected to the left-side mobile composition: ${(heroLastStart * 100).toFixed(1)}%`);
+  }
+
   if (profile.viewport.width === 768) {
     assert(await page.locator('[data-menu-toggle]').isVisible(), `${profile.name} should use compact navigation`);
     assert(!(await page.locator('.site-nav--desktop').isVisible()), `${profile.name} still shows the long desktop navigation`);
     assert(!(await page.locator('.site-status').isVisible()), `${profile.name} still shows the long availability status`);
   }
 
-  // Range client rectangles describe the font line box, not literal black pixels.
-  // For Latvian display type we lock the rendered baseline/row rhythm and the
-  // visible text bounds. This keeps the EN art direction while allowing LV its
-  // own scale, wrapping and optical alignment.
+  // Lock line rhythm where every authored line uses the same optical scale.
+  // Anti-sales deliberately scales its first Latvian line down, so checking the
+  // parent's rendered row advance against one parent font-size would be invalid.
   await assertLineHeightFloor(page, '.work-heading .display-title', 1.02, `${profile.name} selected-work title`);
   await assertLineHeightFloor(page, '.disruption__line', 1.03, `${profile.name} disruption title`);
   await assertLineHeightFloor(page, '.about .display-title, .about__statement', 1.05, `${profile.name} about typography`);
   await assertLineHeightFloor(page, '.approach__steps strong', 1.05, `${profile.name} process typography`);
-  await assertLineHeightFloor(page, '.anti-sales__title', 1.05, `${profile.name} anti-sales typography`);
+  await assertLineHeightFloor(page, '.anti-sales__title', 1.05, `${profile.name} anti-sales typography`, { checkRenderedRows: false });
   await assertLineHeightFloor(page, '.contact__title', 1.05, `${profile.name} contact typography`);
 
+  // Bounds checks catch literal clipping. Composition checks also catch a line
+  // that is technically on-screen but stranded against the opposite edge — the
+  // exact regression that previously affected CITĀDI.
   await assertTextWithinViewport(page, '.hero__line-inner', `${profile.name} hero`);
   await assertTextWithinViewport(page, '.work-heading .display-title', `${profile.name} selected-work title`);
   await assertTextWithinViewport(page, '.disruption__line', `${profile.name} disruption title`);
-  await assertTextWithinViewport(page, '.about__statement span', `${profile.name} about statement`);
+  await assertTextWithinViewport(page, '.about .display-title span, .about__statement span', `${profile.name} about typography`);
   await assertTextWithinViewport(page, '.approach__steps strong', `${profile.name} process title`);
   await assertTextWithinViewport(page, '.service-row h3', `${profile.name} service title`);
   await assertTextWithinViewport(page, '.xo-section h2 span', `${profile.name} X/O title`);
   await assertTextWithinViewport(page, '.anti-sales__title span', `${profile.name} anti-sales title`);
   await assertTextWithinViewport(page, '.contact__title span', `${profile.name} contact title`);
 
+  await assertNoDetachedShortLines(page, '.hero__line-inner', `${profile.name} hero composition`);
+  await assertNoDetachedShortLines(page, '.about__statement span', `${profile.name} about composition`);
+  await assertNoDetachedShortLines(page, '.anti-sales__title span', `${profile.name} anti-sales composition`);
+  await assertNoDetachedShortLines(page, '.contact__title span', `${profile.name} contact composition`);
+
   await screenshotSection(page, '.hero', `${profile.name}-hero.png`);
   await screenshotSection(page, '#work', `${profile.name}-work.png`);
+  await screenshotSection(page, '#about', `${profile.name}-about.png`);
+  await screenshotSection(page, '#approach', `${profile.name}-approach.png`);
   await screenshotSection(page, '#services', `${profile.name}-services.png`);
+  await screenshotSection(page, '[data-anti-sales]', `${profile.name}-anti-sales.png`);
   await screenshotSection(page, '#contact', `${profile.name}-contact.png`);
 
   for (const project of ['catrin', 'anelika']) {
     await openReadyPage(page, `/lv/darbi/${project}/`);
     await assertLineHeightFloor(page, '.case-narrative__row h2', 1.04, `${profile.name} ${project} narrative headings`);
     await assertLineHeightFloor(page, '.case-result p', 1.04, `${profile.name} ${project} result`);
-    await assertLineHeightFloor(page, '.case-contact h2', 1.05, `${profile.name} ${project} contact heading`);
+    await assertLineHeightFloor(page, '.case-contact h2', 1.05, `${profile.name} ${project} contact heading`, { checkRenderedRows: false });
 
     await assertTextWithinViewport(page, '.case-hero__subtitle', `${profile.name} ${project} hero subtitle`);
     await assertTextWithinViewport(page, '.case-narrative__row h2', `${profile.name} ${project} narrative headings`);
     await assertTextWithinViewport(page, '.case-result p', `${profile.name} ${project} result`);
     await assertTextWithinViewport(page, '.case-contact h2 span', `${profile.name} ${project} contact heading`);
+    await assertNoDetachedShortLines(page, '.case-contact h2 span', `${profile.name} ${project} contact composition`);
 
     await screenshotSection(page, '.case-hero', `${profile.name}-${project}-hero.png`);
     await screenshotSection(page, '.case-narrative', `${profile.name}-${project}-narrative.png`);
@@ -210,4 +254,4 @@ for (const profile of profiles) {
 }
 
 await browser.close();
-console.log('Latvian typography QA passed: LV-specific desktop/tablet/mobile composition, diacritics, line rhythm and viewport bounds are safe across the home page and both case studies.');
+console.log('Latvian typography QA passed: LV-specific desktop/tablet/mobile composition, diacritics, line rhythm, viewport bounds and optical line placement are safe across the home page and both case studies.');
