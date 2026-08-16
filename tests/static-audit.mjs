@@ -143,6 +143,7 @@ const heroWorkAction = homeSource.match(/<a href=\{routes\.work\}[^>]*data-analy
 const heroContactAction = homeSource.match(/<a href=\{contactHref\}[^>]*data-analytics-event="start_project_click"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
 assert(heroWorkAction.includes('<Arrow direction="right" />'), 'Homepage Work CTA does not point forward to the Work page');
 assert(heroContactAction.includes('<Arrow direction="right" />'), 'Homepage Contact CTA does not point forward to the Contact page');
+assert(homeSource.includes("buildContactHref(locale, 'home'"), 'Homepage Contact actions do not preserve Home as their source context');
 assert(homeSource.includes('class="home-v2-work"') && homeSource.includes('class="home-v2-perspective"') && homeSource.includes('class="home-v2-close"'), 'Homepage trailer architecture is incomplete');
 assert(!homeSource.includes('class="about section-pad"') && !homeSource.includes('class="services section-pad"') && !homeSource.includes('class="anti-sales"'), 'Homepage still contains full duplicated landing sections');
 
@@ -151,14 +152,24 @@ const caseLiveAction = caseSource.match(/<a class="case-live-link"[^>]*>[\s\S]*?
 assert(caseLiveAction.includes('<Arrow direction="right" />'), 'Case-study outbound link does not use a forward arrow');
 assert(!caseLiveAction.includes('<Arrow direction="up" />'), 'Case-study outbound link still uses an upward/diagonal arrow');
 assert(caseSource.includes('<PageContactCTA'), 'Case studies do not end with the compact dedicated-Contact transition');
+assert(caseSource.includes('source={`case-${projectId}`}'), 'Case-study Contact exits do not preserve the project source context');
 
 const pageContactCtaSource = await read('src/components/PageContactCTA.astro');
-assert(pageContactCtaSource.includes('contactRoutes[locale]'), 'Compact contact CTA does not use the localized Contact route');
+assert(pageContactCtaSource.includes('buildContactHref(locale'), 'Compact contact CTA does not use the localized context-aware Contact route builder');
+assert(pageContactCtaSource.includes("undefined, 'start'"), 'Compact contact CTA does not land at the Contact starting-point router');
+assert(pageContactCtaSource.includes('data-contact-context='), 'Compact contact CTA does not expose source context for analytics and QA');
 assert(pageContactCtaSource.includes('<Arrow direction="up" />'), 'Compact contact footer back-to-top action does not point up');
 
 const contactPageSource = await read('src/components/ContactPage.astro');
 assert(contactPageSource.includes('data-contact-intent') && contactPageSource.includes('data-contact-email'), 'Dedicated Contact page lost its starting-point interaction');
-assert(contactPageSource.includes('getContactPageCopy(locale)'), 'Dedicated Contact page is not localized through shared copy');
+assert(contactPageSource.includes('data-contact-brief') && contactPageSource.includes('data-router-whatsapp') && contactPageSource.includes('data-router-email'), 'Dedicated Contact page lost the short-brief channel router');
+assert(contactPageSource.includes('getContactPageCopy(locale)') && contactPageSource.includes('getContactRouterCopy(locale)'), 'Dedicated Contact page is not localized through shared copy');
+
+const dockSource = await read('src/components/ContactDock.astro');
+const layoutSource = await read('src/layouts/BaseLayout.astro');
+assert(layoutSource.includes('<ContactDock locale={lang} canonicalPath={canonicalPath} />'), 'The global Contact dock is not mounted from the base layout');
+assert(dockSource.includes('buildContactHref(locale, source') && dockSource.includes('data-contact-dock-toggle'), 'The global Contact dock lost contextual routing or its interaction hook');
+assert(dockSource.includes('isContactPage') && dockSource.includes('{!isContactPage && ('), 'The Contact page would duplicate the global Contact dock');
 
 const channelsSource = await read('src/components/ContactChannels.astro');
 assert(channelsSource.includes('<Arrow direction="right" />'), 'Outbound social channels do not use a forward arrow');
@@ -182,4 +193,4 @@ const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');
 assert(robots.includes('Sitemap: https://'), 'robots.txt does not advertise the sitemap over HTTPS');
 assert(sitemap.includes('<sitemapindex'), 'The sitemap index was not generated');
 
-console.log('Static production audit passed: Home trailer, dedicated Contact, all indexable EN/LV routes, internal links, metadata, contacts and security headers are consistent.');
+console.log('Static production audit passed: Home trailer, contextual Contact router, all indexable EN/LV routes, internal links, metadata, contacts and security headers are consistent.');
