@@ -1,6 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
-import PageContact from './PageContact.astro';
+import PageContactCTA from './PageContactCTA.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
@@ -22,11 +22,11 @@ const projectIds = ['catrin', 'anelika'] as const;
 ---
 
 <div class="mp-page mp-work" id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
+  <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="mp-hero mp-work__hero" aria-labelledby="work-index-title">
       <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>XO WEB / VICTXR LEV</span></div>
-      <h1 id="work-index-title">{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted', index === 2 && 'is-muted']}>{line}</span>)}</h1>
+      <h1 id="work-index-title" data-motion-shift>{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted', index === 2 && 'is-muted']}>{line}</span>)}</h1>
       <div class="mp-hero__bottom">
         <p>{page.intro}</p>
         <p class="mp-hero__proof">{page.proof}</p>
@@ -41,14 +41,14 @@ const projectIds = ['catrin', 'anelika'] as const;
         const caseCopy = project.content[locale];
         const projectTransitionName = `xo-project-${projectId}`;
         return (
-          <article class:list={['work-exhibit', `work-exhibit--${projectId}`]} data-theme={projectId === 'catrin' ? 'dark' : 'anelika'}>
+          <article class:list={['work-exhibit', `work-exhibit--${projectId}`]} data-theme={projectId === 'catrin' ? 'dark' : 'anelika'} data-takeover-zone>
             <a class="work-exhibit__link" href={card.href} data-analytics-event="case_study_click" data-project-id={projectId}>
               <div class="work-exhibit__topline">
                 <span>0{index + 1} / 02</span>
                 <span>{card.sector}</span>
               </div>
               <div class="work-exhibit__name" aria-hidden="true">{caseCopy.title}</div>
-              <figure class="work-exhibit__media" style={`view-transition-name: ${projectTransitionName};`}>
+              <figure class="work-exhibit__media" data-takeover-layer style={`view-transition-name: ${projectTransitionName};`}>
                 <ResponsiveProjectImage class="work-exhibit__image" desktop={project.hero} mobile={project.mobile} alt={`${caseCopy.title} ${locale === 'lv' ? 'mājaslapas skats' : 'website view'}`} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} quality={88} sizes="(max-width: 760px) calc(100vw - 2rem), 70vw" />
               </figure>
               <div class="work-exhibit__caption">
@@ -63,13 +63,13 @@ const projectIds = ['catrin', 'anelika'] as const;
       })}
     </section>
 
-    <section class="mp-closing mp-closing--work section-pad">
+    <section class="mp-closing mp-closing--work section-pad" data-motion-reveal>
       <p class="mp-kicker">XO / DIFFERENT PERSPECTIVE</p>
       <h2>{page.closing.map((line, index) => <span class:list={[index === 1 && 'is-accent']}>{line}</span>)}</h2>
       <p>{page.closingText}</p>
       <a class="mp-text-link" href={routes.about}>{site.nav.about}<Arrow direction="right" /></a>
     </section>
 
-    <PageContact locale={locale} />
+    <PageContactCTA locale={locale} />
   </main>
 </div>

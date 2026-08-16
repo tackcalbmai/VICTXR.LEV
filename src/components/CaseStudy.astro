@@ -1,12 +1,11 @@
 ---
 import { Image } from 'astro:assets';
 import Arrow from './Arrow.astro';
-import ContactChannels from './ContactChannels.astro';
+import PageContactCTA from './PageContactCTA.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
-import { contacts } from '../data/contacts';
 import { pageRoutes } from '../data/multipage';
-import { getSiteCopy, type Locale } from '../data/site';
+import type { Locale } from '../data/site';
 import { projects, type ProjectId } from '../data/projects';
 import '../styles/case-study.css';
 import '../styles/no-indexes.css';
@@ -20,18 +19,15 @@ interface Props {
 const { locale, projectId } = Astro.props;
 const project = projects[projectId];
 const content = project.content[locale];
-const site = getSiteCopy(locale);
 const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
 const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
 const alternateHref = locale === 'lv' ? `/work/${projectId}/` : `/lv/darbi/${projectId}/`;
 const workHref = `${pageRoutes[locale].work}#work`;
-const contactEmail = contacts.email;
-const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact.subject)}`;
 const projectTransitionName = `xo-project-${projectId}`;
 ---
 
 <div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
+  <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="case-hero" aria-labelledby="case-title">
       <div class="case-hero__topline"><span>{content.eyebrow}</span><span>{content.location} / {content.year}</span></div>
@@ -81,19 +77,6 @@ const projectTransitionName = `xo-project-${projectId}`;
       <a href={nextHref} data-analytics-event="case_study_click" data-project-id={nextId}>{content.nextLabel}<Arrow direction="right" /></a>
     </nav>
 
-    <section class="case-contact section-pad" id="contact" data-theme="dark" aria-labelledby="case-contact-title">
-      <p>{site.contact.availability}</p>
-      <h2 id="case-contact-title">{site.contact.title.map((line) => <span>{line}</span>)}</h2>
-      <p class="case-contact__expectation">{site.contact.expectation}</p>
-      {contactEmail && (
-        <div class="case-contact__actions">
-          <a href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email">{contactEmail}<Arrow direction="right" /></a>
-          <button type="button" data-copy-email data-email={contactEmail} data-copy-label={site.contact.copy} data-copied-label={site.contact.copied} data-analytics-event="copy_email_click"><span data-copy-text>{site.contact.copy}</span></button>
-          <p class="sr-only" aria-live="polite" data-copy-status></p>
-        </div>
-      )}
-      <ContactChannels locale={locale} />
-      <footer class="site-footer"><span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span><span>{site.footer.note}</span><a href="#top">{site.footer.backToTop}<Arrow direction="up" /></a></footer>
-    </section>
+    <PageContactCTA locale={locale} label={locale === 'lv' ? 'Pēc projekta' : 'After the work'} />
   </main>
 </div>

@@ -11,8 +11,6 @@ async function openReady(page, path) {
   const response = await page.goto(new URL(path, baseURL).toString(), { waitUntil: 'domcontentloaded' });
   assert(response?.ok(), `${path} returned ${response?.status()}`);
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 }).catch(() => {});
 }
 
 async function rect(locator) {
@@ -43,41 +41,39 @@ const profiles = [
   { name: 'mobile', viewport: { width: 393, height: 852 } },
 ];
 
-for (const path of ['/', '/lv/']) {
+for (const path of ['/services/', '/lv/pakalpojumi/']) {
   for (const profile of profiles) {
     const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
     const page = await context.newPage();
     await openReady(page, path);
 
-    const rows = page.locator('.services__list .service-row');
+    const rows = page.locator('.services-decision .service-decision');
     const count = await rows.count();
-    assert(count >= 5, `${path} ${profile.name} is missing service rows`);
+    assert(count === 6, `${path} ${profile.name} should expose six service decisions, got ${count}`);
 
     for (let index = 0; index < count; index += 1) {
       const row = rows.nth(index);
       await row.scrollIntoViewIfNeeded();
-      const title = row.locator('h3');
-      const copy = row.locator('p');
-      const mark = row.locator('.service-row__mark');
-      const [titleBox, copyBox, markBox] = await Promise.all([rect(title), rect(copy), rect(mark)]);
+      const title = row.locator('h2');
+      const body = row.locator('.service-decision__body');
+      const mark = row.locator('.service-decision__mark');
+      const [titleBox, bodyBox, markBox] = await Promise.all([rect(title), rect(body), rect(mark)]);
       const titleText = (await title.textContent())?.replace(/\s+/g, ' ').trim() ?? `row ${index + 1}`;
 
-      assert(!overlaps(titleBox, copyBox), `${path} ${profile.name} service title overlaps its description: “${titleText}”`);
-      assert(!overlaps(titleBox, markBox), `${path} ${profile.name} service title overlaps the X mark: “${titleText}”`);
-      assert(!overlaps(copyBox, markBox), `${path} ${profile.name} service description overlaps the X mark: “${titleText}”`);
+      assert(!overlaps(titleBox, bodyBox), `${path} ${profile.name} service title overlaps its descriptive body: “${titleText}”`);
+      assert(!overlaps(titleBox, markBox), `${path} ${profile.name} service title overlaps the X/O focus mark: “${titleText}”`);
+      assert(!overlaps(bodyBox, markBox), `${path} ${profile.name} service body overlaps the X/O focus mark: “${titleText}”`);
 
-      if (profile.viewport.width > 960) {
-        const horizontalGap = copyBox.left - titleBox.right;
-        assert(horizontalGap >= 20, `${path} ${profile.name} service columns are too tight (${horizontalGap.toFixed(1)}px): “${titleText}”`);
-      } else {
-        const verticalGap = copyBox.top - titleBox.bottom;
-        assert(verticalGap >= 6, `${path} ${profile.name} stacked service copy is too tight (${verticalGap.toFixed(1)}px): “${titleText}”`);
-      }
+      const x = mark.locator('i');
+      const o = mark.locator('b');
+      assert(await x.count() === 1 && await o.count() === 1, `${path} ${profile.name} service ${index + 1} lost the semantic X → O focus mechanism`);
     }
 
+    const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
+    assert(overflow <= 2, `${path} ${profile.name} has ${overflow}px horizontal overflow`);
     await context.close();
   }
 }
 
 await browser.close();
-console.log('Services layout QA passed: titles, descriptions and marks do not overlap on EN/LV desktop, tablet or mobile.');
+console.log('Services layout QA passed: six EN/LV decisions stay geometrically clean and preserve the X → O focus mechanism across desktop, tablet and mobile.');

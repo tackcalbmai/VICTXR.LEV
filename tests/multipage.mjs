@@ -12,12 +12,12 @@ function assert(condition, message) {
 }
 
 const routes = [
-  { key: 'work-en', path: '/work/', lang: 'en', alternate: '/lv/darbi/', nav: ['/work/', '/about/', '/services/'], section: '.work-exhibition' },
-  { key: 'about-en', path: '/about/', lang: 'en', alternate: '/lv/par-mani/', nav: ['/work/', '/about/', '/services/'], section: '.about-principles' },
-  { key: 'services-en', path: '/services/', lang: 'en', alternate: '/lv/pakalpojumi/', nav: ['/work/', '/about/', '/services/'], section: '.services-decision' },
-  { key: 'work-lv', path: '/lv/darbi/', lang: 'lv', alternate: '/work/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/'], section: '.work-exhibition' },
-  { key: 'about-lv', path: '/lv/par-mani/', lang: 'lv', alternate: '/about/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/'], section: '.about-principles' },
-  { key: 'services-lv', path: '/lv/pakalpojumi/', lang: 'lv', alternate: '/services/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/'], section: '.services-decision' },
+  { key: 'work-en', path: '/work/', lang: 'en', alternate: '/lv/darbi/', nav: ['/work/', '/about/', '/services/', '/contact/'], section: '.work-exhibition' },
+  { key: 'about-en', path: '/about/', lang: 'en', alternate: '/lv/par-mani/', nav: ['/work/', '/about/', '/services/', '/contact/'], section: '.about-principles' },
+  { key: 'services-en', path: '/services/', lang: 'en', alternate: '/lv/pakalpojumi/', nav: ['/work/', '/about/', '/services/', '/contact/'], section: '.services-decision' },
+  { key: 'work-lv', path: '/lv/darbi/', lang: 'lv', alternate: '/work/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/', '/lv/kontakti/'], section: '.work-exhibition' },
+  { key: 'about-lv', path: '/lv/par-mani/', lang: 'lv', alternate: '/about/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/', '/lv/kontakti/'], section: '.about-principles' },
+  { key: 'services-lv', path: '/lv/pakalpojumi/', lang: 'lv', alternate: '/services/', nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/', '/lv/kontakti/'], section: '.services-decision' },
 ];
 
 const profiles = [
@@ -102,6 +102,25 @@ async function assertServiceGeometry(page, label) {
   }
 }
 
+async function assertWorkImagesLoaded(page, label) {
+  const images = page.locator('.work-exhibit img');
+  const count = await images.count();
+  assert(count === 2, `${label} should expose two project images, got ${count}`);
+  for (let i = 0; i < count; i += 1) {
+    const image = images.nth(i);
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate(async (element) => {
+      if (!element.complete || element.naturalWidth === 0) {
+        await element.decode().catch(() => {});
+      }
+    });
+  }
+  const brokenImages = await images.evaluateAll((elements) => elements
+    .filter((image) => !image.complete || image.naturalWidth === 0)
+    .map((image) => image.currentSrc || image.src));
+  assert(!brokenImages.length, `${label} has broken work images: ${brokenImages.join(', ')}`);
+}
+
 async function captureElement(page, selector, fileName) {
   const locator = page.locator(selector).first();
   assert(await locator.count(), `${selector} is missing for screenshot`);
@@ -135,7 +154,7 @@ for (const profile of profiles) {
     assert(await page.locator(`link[rel="alternate"][href$="${route.alternate}"]`).count() >= 1, `${label} is missing page-preserving hreflang alternate`);
     assert(await page.locator(`.site-language[href="${route.alternate}"]`).count() === 1, `${label} language switch loses page context`);
 
-    const desktopLinks = await page.locator('.site-nav--desktop a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
+    const desktopLinks = await page.locator('.site-nav--desktop a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
     assert(JSON.stringify(desktopLinks) === JSON.stringify(route.nav), `${label} primary navigation is not route-based: ${desktopLinks.join(', ')}`);
 
     const expectsCompactNavigation = profile.viewport.width <= 760 || (route.lang === 'lv' && profile.viewport.width <= 1024);
@@ -152,7 +171,7 @@ for (const profile of profiles) {
 
     await assertNoHorizontalOverflow(page, label);
     await assertTextInside(page, '.mp-hero h1 span', `${label} hero`);
-    await assertTextInside(page, '.page-contact h2 span', `${label} contact title`);
+    await assertTextInside(page, '.page-contact-cta h2 span', `${label} contact transition title`);
 
     if (route.key.startsWith('about-')) {
       await assertTextInside(page, '.about-definition h2 span, .about-principle h2, .about-standard h2 span', `${label} about display type`);
@@ -163,13 +182,15 @@ for (const profile of profiles) {
     }
     if (route.key.startsWith('work-')) {
       assert(await page.locator('.work-exhibit').count() === 2, `${label} should expose two finished projects`);
-      const brokenImages = await page.locator('.work-exhibit img').evaluateAll((images) => images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.currentSrc));
-      assert(!brokenImages.length, `${label} has broken work images: ${brokenImages.join(', ')}`);
+      await assertWorkImagesLoaded(page, label);
     }
+
+    const expectedContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
+    assert(await page.locator(`.page-contact-cta a[href="${expectedContact}"]`).count() === 1, `${label} compact exit does not route to ${expectedContact}`);
 
     await captureElement(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
     await captureViewport(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
-    await captureElement(page, '.page-contact', `multipage-${route.key}-${profile.name}-contact.png`);
+    await captureElement(page, '.page-contact-cta', `multipage-${route.key}-${profile.name}-contact.png`);
 
     assert(!runtimeErrors.length, `${label} runtime errors:\n${runtimeErrors.join('\n')}`);
     await page.close();
@@ -178,4 +199,4 @@ for (const profile of profiles) {
 }
 
 await browser.close();
-console.log('Multi-page QA passed: EN/LV Work, About and Services routes are structurally sound, route-aware, overflow-safe and visually bounded across desktop, tablet and mobile.');
+console.log('Multi-page QA passed: EN/LV Work, About and Services are route-aware, overflow-safe, visually bounded and exit through dedicated Contact pages.');

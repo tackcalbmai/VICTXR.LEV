@@ -1,0 +1,72 @@
+html:not(.no-js) [data-motion-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+html:not(.no-js) [data-motion-reveal] > * {
+  opacity: 1;
+  transform: translateY(var(--xo-reveal-y, 1.15rem));
+  transition: transform 850ms var(--ease-out);
+}
+
+html:not(.no-js) [data-motion-reveal].is-xo-visible > * {
+  transform: translateY(0);
+}
+
+/* Contrast is a hard invariant. These selectors intentionally live outside
+ * the layered global stylesheet so later component chunks cannot darken the
+ * header while it is sampled over a dark scene. */
+.site-header[data-over-theme='dark'],
+.site-header[data-over-theme='anelika'] {
+  color: var(--paper) !important;
+}
+
+[data-motion-shift] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
+  will-change: transform;
+}
+
+.home-v2-projects,
+.home-v2-project {
+  pointer-events: auto;
+}
+
+.home-v2-work__title {
+  pointer-events: none;
+}
+
+.work-exhibit__media[data-takeover-layer] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
+  will-change: transform;
+}
+
+.work-exhibit__link:hover .work-exhibit__media[data-takeover-layer],
+.work-exhibit__link:focus-visible .work-exhibit__media[data-takeover-layer] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0) perspective(1200px) rotateX(0.5deg) scale(1.006);
+}
+
+/* Latvian needs slightly more horizontal room for MĀJASLAPU on narrow screens.
+ * Preserve the scale of the scene, but relax the optical indent and type size
+ * just enough to keep the full word inside the viewport. */
+@media (max-width: 760px) {
+  html[lang='lv'] .home-v2-perspective h2 {
+    font-size: clamp(3.2rem, 15.5vw, 5.9rem);
+  }
+
+  html[lang='lv'] .home-v2-perspective h2 span:nth-child(2) {
+    padding-left: 3vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.no-js) [data-motion-reveal] > * {
+    transform: none;
+    transition: none;
+  }
+
+  [data-motion-shift],
+  .work-exhibit__media[data-takeover-layer] {
+    transform: none !important;
+    will-change: auto;
+  }
+}

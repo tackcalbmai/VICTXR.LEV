@@ -50,19 +50,21 @@ const enMessage = 'Hi! I visited xoweb.lv and would like to discuss a website pr
 const lvMessage = 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas projektu.';
 
 {
-  const { context, page } = await openPage('/', { width: 1366, height: 768 }, { waitForHomeIntro: true });
-  await page.locator('#contact').scrollIntoViewIfNeeded();
+  const { context, page } = await openPage('/contact/', { width: 1366, height: 768 });
+  await page.locator('.contact-direct').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '#contact', enMessage);
+  await assertChannels(page, '.contact-direct', enMessage);
+  const intentCount = await page.locator('[data-contact-intent]').count();
+  assert(intentCount === 3, `English Contact should expose three starting points, got ${intentCount}`);
   await page.screenshot({ path: `${outDir}/future-contacts-en-desktop.png`, fullPage: false });
   await context.close();
 }
 
 {
-  const { context, page } = await openPage('/lv/', { width: 393, height: 852 }, { waitForHomeIntro: true });
-  await page.locator('#contact').scrollIntoViewIfNeeded();
+  const { context, page } = await openPage('/lv/kontakti/', { width: 393, height: 852 });
+  await page.locator('.contact-direct').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '#contact', lvMessage);
+  await assertChannels(page, '.contact-direct', lvMessage);
   await page.screenshot({ path: `${outDir}/future-contacts-lv-mobile.png`, fullPage: false });
 
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -74,33 +76,24 @@ const lvMessage = 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas 
   await context.close();
 }
 
-{
-  const { context, page } = await openPage('/work/catrin/', { width: 393, height: 852 });
-  await page.locator('.case-contact').scrollIntoViewIfNeeded();
-  await assertChannels(page, '.case-contact', enMessage);
-  await page.screenshot({ path: `${outDir}/future-contacts-catrin-mobile.png`, fullPage: false });
-  await context.close();
-}
-
-const multipageContactRoutes = [
-  ['/work/', 'en-work', enMessage],
-  ['/about/', 'en-about', enMessage],
-  ['/services/', 'en-services', enMessage],
-  ['/lv/darbi/', 'lv-work', lvMessage],
-  ['/lv/par-mani/', 'lv-about', lvMessage],
-  ['/lv/pakalpojumi/', 'lv-services', lvMessage],
+const ctaRoutes = [
+  ['/work/', '/contact/'],
+  ['/about/', '/contact/'],
+  ['/services/', '/contact/'],
+  ['/work/catrin/', '/contact/'],
+  ['/lv/darbi/', '/lv/kontakti/'],
+  ['/lv/par-mani/', '/lv/kontakti/'],
+  ['/lv/pakalpojumi/', '/lv/kontakti/'],
+  ['/lv/darbi/catrin/', '/lv/kontakti/'],
 ];
 
-for (const [path, slug, message] of multipageContactRoutes) {
+for (const [path, expectedContact] of ctaRoutes) {
   const { context, page } = await openPage(path, { width: 393, height: 852 });
-  const contact = page.locator('#contact');
-  assert(await contact.count() === 1, `${path} is missing the shared PageContact section`);
-  await contact.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(80);
-  await assertChannels(page, '#contact', message);
-  await page.screenshot({ path: `${outDir}/future-contacts-${slug}-mobile.png`, fullPage: false });
+  const cta = page.locator('.page-contact-cta a[data-analytics-event="contact_page_click"]');
+  assert(await cta.count() === 1, `${path} is missing the compact contact transition`);
+  assert(await cta.getAttribute('href') === expectedContact, `${path} contact transition should route to ${expectedContact}`);
   await context.close();
 }
 
 await browser.close();
-console.log('Enabled contact QA passed across home, mobile menu, case study and all EN/LV multipage contact surfaces.');
+console.log('Enabled contact QA passed on dedicated EN/LV Contact pages, mobile menu and compact cross-page exits.');

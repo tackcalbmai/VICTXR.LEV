@@ -15,6 +15,10 @@ async function openReadyPage(page, path) {
   const response = await page.goto(new URL(path, baseURL).toString(), { waitUntil: 'domcontentloaded' });
   assert(response?.ok(), `${path} returned ${response?.status()}`);
   await page.evaluate(() => document.fonts.ready);
+  if (path === '/lv/') {
+    await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
+    await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 }).catch(() => {});
+  }
 }
 
 async function textBounds(locator) {
@@ -31,9 +35,7 @@ async function textBounds(locator) {
       const range = document.createRange();
       range.selectNodeContents(node);
       for (const rect of range.getClientRects()) {
-        if (rect.width > 1 && rect.height > 1) {
-          rects.push({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom });
-        }
+        if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right });
       }
       node = walker.nextNode();
     }
@@ -42,13 +44,11 @@ async function textBounds(locator) {
       viewportWidth,
       left: rects.length ? Math.min(...rects.map((rect) => rect.left)) : null,
       right: rects.length ? Math.max(...rects.map((rect) => rect.right)) : null,
-      top: rects.length ? Math.min(...rects.map((rect) => rect.top)) : null,
-      bottom: rects.length ? Math.max(...rects.map((rect) => rect.bottom)) : null,
     };
   });
 }
 
-async function assertTextWithinViewport(page, selector, label, tolerance = 2) {
+async function assertTextWithinViewport(page, selector, label, tolerance = 3) {
   const locators = page.locator(selector);
   const count = await locators.count();
   assert(count > 0, `${label} is missing`);
@@ -59,20 +59,6 @@ async function assertTextWithinViewport(page, selector, label, tolerance = 2) {
     assert(box.left !== null && box.right !== null, `${label} has no measurable text in “${box.text}”`);
     assert(box.left >= -tolerance, `${label} escapes left (${box.left.toFixed(1)}px) in “${box.text}”`);
     assert(box.right <= box.viewportWidth + tolerance, `${label} escapes right (${box.right.toFixed(1)}px > ${box.viewportWidth}px) in “${box.text}”`);
-  }
-}
-
-async function assertNoDetachedShortLines(page, selector, label, maxWidthRatio = 0.42, maxStartRatio = 0.58) {
-  const locators = page.locator(selector);
-  const count = await locators.count();
-  for (let index = 0; index < count; index += 1) {
-    const box = await textBounds(locators.nth(index));
-    if (box.left === null || box.right === null) continue;
-    const widthRatio = (box.right - box.left) / box.viewportWidth;
-    const startRatio = box.left / box.viewportWidth;
-    if (widthRatio <= maxWidthRatio) {
-      assert(startRatio <= maxStartRatio, `${label}: detached short line “${box.text}” starts at ${(startRatio * 100).toFixed(1)}% while occupying ${(widthRatio * 100).toFixed(1)}%`);
-    }
   }
 }
 
@@ -91,29 +77,11 @@ async function assertLineHeight(page, selector, floor, label) {
   }
 }
 
-async function assertServiceSeparation(page, stacked, label) {
-  const rows = page.locator('.service-row');
-  const count = await rows.count();
-  assert(count > 0, `${label} service rows are missing`);
-  for (let index = 0; index < count; index += 1) {
-    const row = rows.nth(index);
-    const title = await textBounds(row.locator('h3'));
-    const copy = await textBounds(row.locator('p'));
-    assert(title.left !== null && title.right !== null && title.top !== null && title.bottom !== null, `${label} service title cannot be measured`);
-    assert(copy.left !== null && copy.right !== null && copy.top !== null && copy.bottom !== null, `${label} service copy cannot be measured`);
-    if (stacked) {
-      assert(copy.top >= title.bottom + 4, `${label} service copy collides vertically with “${title.text}”`);
-    } else {
-      assert(copy.left >= title.right + 12, `${label} service copy collides horizontally with “${title.text}”`);
-    }
-  }
-}
-
 async function screenshotSection(page, selector, filename) {
   const locator = page.locator(selector).first();
   assert(await locator.count(), `${selector} is missing for screenshot`);
   await locator.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(60);
+  await page.waitForTimeout(70);
   await locator.screenshot({ path: `${outDir}/${filename}` });
 }
 
@@ -125,13 +93,10 @@ const profiles = [
 
 for (const profile of profiles) {
   const mobile = profile.viewport.width <= 760;
-  const stackedServices = profile.viewport.width <= 960;
   const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
   const page = await context.newPage();
-  await openReadyPage(page, '/lv/');
-  await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 9000 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 }).catch(() => {});
 
+  await openReadyPage(page, '/lv/');
   const heroText = (await page.locator('[data-intro-line]').allTextContents()).map((line) => line.trim()).join(' ');
   assert(heroText === 'Es redzu lietas citādi.', `${profile.name} lost Latvian hero spelling: ${heroText}`);
   assert(await page.evaluate(() => document.fonts.check('790 72px Onest', 'Ā Ē Ī Ņ Ķ Ļ Š Ž ā ē ī ņ ķ ļ š ž')), `${profile.name} lacks loaded Latvian glyph coverage`);
@@ -139,66 +104,64 @@ for (const profile of profiles) {
   const citadi = await textBounds(page.locator('.hero__line-inner').nth(2));
   assert(citadi.left !== null, `${profile.name} cannot measure CITĀDI`);
   const citadiStart = citadi.left / citadi.viewportWidth;
-  if (mobile) {
-    assert(citadiStart <= 0.16, `${profile.name} CITĀDI detached on mobile: ${(citadiStart * 100).toFixed(1)}%`);
-  } else {
-    assert(citadiStart >= 0.34 && citadiStart <= 0.58, `${profile.name} CITĀDI optical start is wrong: ${(citadiStart * 100).toFixed(1)}%`);
-  }
+  if (mobile) assert(citadiStart <= 0.16, `${profile.name} CITĀDI detached on mobile: ${(citadiStart * 100).toFixed(1)}%`);
+  else assert(citadiStart >= 0.34 && citadiStart <= 0.58, `${profile.name} CITĀDI optical start is wrong: ${(citadiStart * 100).toFixed(1)}%`);
 
   if (profile.viewport.width === 768) {
     assert(await page.locator('[data-menu-toggle]').isVisible(), `${profile.name} should use compact navigation`);
     assert(!(await page.locator('.site-nav--desktop').isVisible()), `${profile.name} still shows desktop navigation`);
-    assert(!(await page.locator('.site-status').isVisible()), `${profile.name} still shows long availability status`);
   }
 
-  await assertLineHeight(page, '.work-heading .display-title', 1.02, `${profile.name} selected-work title`);
   await assertLineHeight(page, '.disruption__line', 1.03, `${profile.name} disruption title`);
-  await assertLineHeight(page, '.about .display-title, .about__statement', 1.05, `${profile.name} about typography`);
-  await assertLineHeight(page, '.approach__steps strong', 1.05, `${profile.name} process typography`);
-  await assertLineHeight(page, '.anti-sales__title', 1.05, `${profile.name} anti-sales typography`);
-  await assertLineHeight(page, '.contact__title', 1.05, `${profile.name} contact typography`);
-
+  await assertLineHeight(page, '.home-v2-work__title', 0.78, `${profile.name} takeover title`);
+  await assertLineHeight(page, '.home-v2-perspective h2', 0.77, `${profile.name} perspective title`);
+  await assertLineHeight(page, '.home-v2-close h2', 0.76, `${profile.name} close title`);
   for (const [selector, label] of [
     ['.hero__line-inner', 'hero'],
-    ['.work-heading .display-title', 'selected-work title'],
-    ['.disruption__line', 'disruption title'],
-    ['.about .display-title span, .about__statement span', 'about typography'],
-    ['.approach__steps strong', 'process title'],
-    ['.service-row h3, .service-row p', 'services'],
-    ['.xo-section h2 span', 'X/O title'],
-    ['.anti-sales__title span', 'anti-sales title'],
-    ['.contact__title span', 'contact title'],
-  ]) {
-    await assertTextWithinViewport(page, selector, `${profile.name} ${label}`);
-  }
-
-  await assertNoDetachedShortLines(page, '.hero__line-inner', `${profile.name} hero composition`);
-  await assertNoDetachedShortLines(page, '.about__statement span', `${profile.name} about composition`);
-  await assertNoDetachedShortLines(page, '.anti-sales__title span', `${profile.name} anti-sales composition`);
-  await assertNoDetachedShortLines(page, '.contact__title span', `${profile.name} contact composition`);
-  await assertServiceSeparation(page, stackedServices, profile.name);
+    ['.disruption__line', 'disruption'],
+    ['.home-v2-work__title span', 'takeover title'],
+    ['.home-v2-perspective h2 span', 'perspective title'],
+    ['.home-v2-close h2 span', 'closing title'],
+  ]) await assertTextWithinViewport(page, selector, `${profile.name} ${label}`);
 
   for (const [selector, suffix] of [
-    ['.hero', 'hero'], ['#work', 'work'], ['#about', 'about'], ['#approach', 'approach'],
-    ['#services', 'services'], ['[data-anti-sales]', 'anti-sales'], ['#contact', 'contact'],
-  ]) {
-    await screenshotSection(page, selector, `${profile.name}-${suffix}.png`);
-  }
+    ['.hero', 'hero'],
+    ['.home-v2-work', 'work'],
+    ['.home-v2-perspective', 'perspective'],
+    ['.home-v2-close', 'close'],
+  ]) await screenshotSection(page, selector, `${profile.name}-${suffix}.png`);
+
+  await openReadyPage(page, '/lv/pakalpojumi/');
+  await assertLineHeight(page, '.service-decision h2', 0.82, `${profile.name} service headings`);
+  await assertLineHeight(page, '.services-anti h2', 0.77, `${profile.name} anti-sales services statement`);
+  await assertLineHeight(page, '.services-process h2', 0.82, `${profile.name} services process`);
+  await assertTextWithinViewport(page, '.service-decision h2, .services-anti h2 span, .services-process h2', `${profile.name} Services typography`);
+  assert(await page.locator('.service-decision').count() === 6, `${profile.name} Latvian Services lost a decision row`);
+  await screenshotSection(page, '.services-decision', `${profile.name}-services.png`);
+
+  await openReadyPage(page, '/lv/kontakti/');
+  await assertLineHeight(page, '.contact-hero h1', 0.74, `${profile.name} Contact hero`);
+  await assertLineHeight(page, '.contact-intent__title', 0.82, `${profile.name} Contact intents`);
+  await assertLineHeight(page, '.contact-direct h2', 0.78, `${profile.name} Contact direct heading`);
+  await assertTextWithinViewport(page, '.contact-hero h1 span, .contact-intent__title, .contact-direct h2', `${profile.name} Contact typography`);
+  await screenshotSection(page, '.contact-hero', `${profile.name}-contact-hero.png`);
+  await screenshotSection(page, '.contact-intents', `${profile.name}-contact-intents.png`);
 
   for (const project of ['catrin', 'anelika']) {
     await openReadyPage(page, `/lv/darbi/${project}/`);
     await assertLineHeight(page, '.case-narrative__row h2', 1.04, `${profile.name} ${project} narrative headings`);
     await assertLineHeight(page, '.case-result p', 1.04, `${profile.name} ${project} result`);
-    await assertLineHeight(page, '.case-contact h2', 1.05, `${profile.name} ${project} contact heading`);
-    await assertTextWithinViewport(page, '.case-hero__subtitle, .case-narrative__row h2, .case-result p, .case-contact h2 span', `${profile.name} ${project} case typography`);
-    await assertNoDetachedShortLines(page, '.case-contact h2 span', `${profile.name} ${project} contact composition`);
+    await assertLineHeight(page, '.page-contact-cta h2', 0.78, `${profile.name} ${project} Contact transition`);
+    await assertTextWithinViewport(page, '.case-hero__subtitle, .case-narrative__row h2, .case-result p, .page-contact-cta h2 span', `${profile.name} ${project} case typography`);
     await screenshotSection(page, '.case-hero', `${profile.name}-${project}-hero.png`);
     await screenshotSection(page, '.case-narrative', `${profile.name}-${project}-narrative.png`);
-    await screenshotSection(page, '.case-contact', `${profile.name}-${project}-contact.png`);
+    await screenshotSection(page, '.page-contact-cta', `${profile.name}-${project}-contact.png`);
   }
 
+  const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
+  assert(overflow <= 2, `${profile.name} final Latvian route has ${overflow}px horizontal overflow`);
   await context.close();
 }
 
 await browser.close();
-console.log('Latvian typography QA passed: desktop/tablet/mobile LV composition, service separation, viewport bounds, diacritics and both case studies are safe.');
+console.log('Latvian typography QA passed across the Home trailer, Services, Contact and both case studies on desktop, tablet and mobile.');

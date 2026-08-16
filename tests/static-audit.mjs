@@ -33,6 +33,8 @@ const pages = {
   aboutLv: await readFile(new URL('lv/par-mani/index.html', dist), 'utf8'),
   servicesEn: await readFile(new URL('services/index.html', dist), 'utf8'),
   servicesLv: await readFile(new URL('lv/pakalpojumi/index.html', dist), 'utf8'),
+  contactEn: await readFile(new URL('contact/index.html', dist), 'utf8'),
+  contactLv: await readFile(new URL('lv/kontakti/index.html', dist), 'utf8'),
   catrinEn: await readFile(new URL('work/catrin/index.html', dist), 'utf8'),
   catrinLv: await readFile(new URL('lv/darbi/catrin/index.html', dist), 'utf8'),
   anelikaEn: await readFile(new URL('work/anelika/index.html', dist), 'utf8'),
@@ -50,6 +52,8 @@ const routablePages = {
   '/lv/par-mani/': pages.aboutLv,
   '/services/': pages.servicesEn,
   '/lv/pakalpojumi/': pages.servicesLv,
+  '/contact/': pages.contactEn,
+  '/lv/kontakti/': pages.contactLv,
   '/work/catrin/': pages.catrinEn,
   '/lv/darbi/catrin/': pages.catrinLv,
   '/work/anelika/': pages.anelikaEn,
@@ -105,6 +109,8 @@ assert(pages.catrinEn.includes('class="site-language" href="/lv/darbi/catrin/"')
 assert(pages.catrinLv.includes('class="site-language" href="/work/catrin/"'), 'Latvian CATRIN language switch loses case context');
 assert(pages.anelikaEn.includes('class="site-language" href="/lv/darbi/anelika/"'), 'English ANELIKA language switch loses case context');
 assert(pages.anelikaLv.includes('class="site-language" href="/work/anelika/"'), 'Latvian ANELIKA language switch loses case context');
+assert(pages.contactEn.includes('class="site-language" href="/lv/kontakti/"'), 'English Contact language switch loses contact context');
+assert(pages.contactLv.includes('class="site-language" href="/contact/"'), 'Latvian Contact language switch loses contact context');
 assert(pages.notFoundEn.includes('<html lang="en"') && pages.notFoundEn.includes('Something looks wrong.'), 'English 404 is not natively rendered in English');
 assert(pages.notFoundLv.includes('<html lang="lv"') && pages.notFoundLv.includes('Kaut kas nav pareizi.'), 'Latvian 404 did not set localized content');
 assert(pages.notFoundLv.includes('Šī lapa neeksistē.'), 'Latvian 404 metadata is not localized');
@@ -133,17 +139,26 @@ assert(arrowSource.includes('stroke-linecap: square') && arrowSource.includes('s
 assert(!arrowSource.includes('brand-arrow__blade') && !arrowSource.includes('brand-arrow__notch'), 'Decorative arrow gimmicks returned to the glyph');
 
 const homeSource = await read('src/components/HomePage.astro');
-const heroContactAction = homeSource.match(/<a href="#contact"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
-const homeEmailAction = homeSource.match(/<a class="contact__email"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
-assert(heroContactAction.includes('<Arrow direction="down" />'), 'Homepage contact CTA does not point down toward its target');
-assert(homeEmailAction.includes('<Arrow direction="right" />'), 'Homepage email action does not use a forward arrow');
+const heroWorkAction = homeSource.match(/<a href=\{routes\.work\}[^>]*data-analytics-event="view_work_click"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
+const heroContactAction = homeSource.match(/<a href=\{contactHref\}[^>]*data-analytics-event="start_project_click"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
+assert(heroWorkAction.includes('<Arrow direction="right" />'), 'Homepage Work CTA does not point forward to the Work page');
+assert(heroContactAction.includes('<Arrow direction="right" />'), 'Homepage Contact CTA does not point forward to the Contact page');
+assert(homeSource.includes('class="home-v2-work"') && homeSource.includes('class="home-v2-perspective"') && homeSource.includes('class="home-v2-close"'), 'Homepage trailer architecture is incomplete');
+assert(!homeSource.includes('class="about section-pad"') && !homeSource.includes('class="services section-pad"') && !homeSource.includes('class="anti-sales"'), 'Homepage still contains full duplicated landing sections');
 
 const caseSource = await read('src/components/CaseStudy.astro');
 const caseLiveAction = caseSource.match(/<a class="case-live-link"[^>]*>[\s\S]*?<\/a>/)?.[0] ?? '';
-const caseFooter = caseSource.match(/<footer class="site-footer">[\s\S]*?<\/footer>/)?.[0] ?? '';
 assert(caseLiveAction.includes('<Arrow direction="right" />'), 'Case-study outbound link does not use a forward arrow');
 assert(!caseLiveAction.includes('<Arrow direction="up" />'), 'Case-study outbound link still uses an upward/diagonal arrow');
-assert(caseFooter.includes('<Arrow direction="up" />'), 'Back-to-top action does not point up');
+assert(caseSource.includes('<PageContactCTA'), 'Case studies do not end with the compact dedicated-Contact transition');
+
+const pageContactCtaSource = await read('src/components/PageContactCTA.astro');
+assert(pageContactCtaSource.includes('contactRoutes[locale]'), 'Compact contact CTA does not use the localized Contact route');
+assert(pageContactCtaSource.includes('<Arrow direction="up" />'), 'Compact contact footer back-to-top action does not point up');
+
+const contactPageSource = await read('src/components/ContactPage.astro');
+assert(contactPageSource.includes('data-contact-intent') && contactPageSource.includes('data-contact-email'), 'Dedicated Contact page lost its starting-point interaction');
+assert(contactPageSource.includes('getContactPageCopy(locale)'), 'Dedicated Contact page is not localized through shared copy');
 
 const channelsSource = await read('src/components/ContactChannels.astro');
 assert(channelsSource.includes('<Arrow direction="right" />'), 'Outbound social channels do not use a forward arrow');
@@ -167,4 +182,4 @@ const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');
 assert(robots.includes('Sitemap: https://'), 'robots.txt does not advertise the sitemap over HTTPS');
 assert(sitemap.includes('<sitemapindex'), 'The sitemap index was not generated');
 
-console.log('Static production audit passed: all indexable EN/LV routes, internal links, contacts, localized 404s, metadata, assets and security headers are consistent.');
+console.log('Static production audit passed: Home trailer, dedicated Contact, all indexable EN/LV routes, internal links, metadata, contacts and security headers are consistent.');

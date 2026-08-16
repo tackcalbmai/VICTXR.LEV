@@ -2,6 +2,7 @@
 import type { Locale } from '../data/site';
 import { getSiteCopy } from '../data/site';
 import { pageRoutes } from '../data/multipage';
+import { contactRoutes } from '../data/architecture';
 import ContactChannels from './ContactChannels.astro';
 import '../styles/brand.css';
 import '../styles/no-indexes.css';
@@ -18,7 +19,7 @@ const { locale, alternateHref, contactHref, multipageNavigation = false } = Astr
 const copy = getSiteCopy(locale);
 const home = copy.homeHref;
 const routes = pageRoutes[locale];
-const resolvedContactHref = contactHref ?? `${home}#contact`;
+const resolvedContactHref = contactHref ?? (multipageNavigation ? contactRoutes[locale] : `${home}#contact`);
 const navHrefs = multipageNavigation
   ? { work: routes.work, about: routes.about, services: routes.services }
   : { work: `${home}#work`, about: `${home}#about`, services: `${home}#services` };

@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactPage from '../../components/ContactPage.astro';
+import { contactRoutes, getContactPageCopy } from '../../data/architecture';
+
+const copy = getContactPageCopy('lv');
+---
+
+<BaseLayout title={copy.seoTitle} description={copy.seoDescription} lang="lv" canonicalPath={contactRoutes.lv} alternatePath={contactRoutes.en}>
+  <ContactPage locale="lv" />
+</BaseLayout>

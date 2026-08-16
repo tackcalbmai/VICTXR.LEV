@@ -1,0 +1,105 @@
+---
+import Arrow from './Arrow.astro';
+import ContactChannels from './ContactChannels.astro';
+import SiteHeader from './SiteHeader.astro';
+import { contacts } from '../data/contacts';
+import { contactRoutes, getContactPageCopy } from '../data/architecture';
+import { getSiteCopy, type Locale } from '../data/site';
+import '../styles/architecture-v2.css';
+import '../styles/contact-lv-optical.css';
+import '../styles/motion-bindings.css';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const page = getContactPageCopy(locale);
+const site = getSiteCopy(locale);
+const alternateHref = locale === 'lv' ? contactRoutes.en : contactRoutes.lv;
+const defaultSubject = page.options[2].subject;
+const defaultMailto = `mailto:${contacts.email}?subject=${encodeURIComponent(defaultSubject)}`;
+---
+
+<div class="contact-page" id="top" data-contact-page>
+  <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
+  <main id="main-content" tabindex="-1">
+    <section class="contact-hero" aria-labelledby="contact-page-title" data-motion-zone="order">
+      <div class="contact-hero__meta"><span>{page.eyebrow}</span><span>XO WEB / VICTXR LEV</span></div>
+      <div class="contact-focus-mark" aria-hidden="true" data-xo-focus><span>O</span><i>X</i></div>
+      <h1 id="contact-page-title" data-motion-shift>{page.title.map((line, index) => <span class:list={[index === 1 && 'is-accent', index === 2 && 'is-muted']}>{line}</span>)}</h1>
+      <p class="contact-hero__intro">{page.intro}</p>
+    </section>
+
+    <section class="contact-intents" aria-labelledby="contact-intents-title" data-contact-intents>
+      <div class="contact-intents__heading">
+        <p class="mp-kicker">XO / FOCUS</p>
+        <h2 id="contact-intents-title">{page.chooseLabel}</h2>
+      </div>
+      <div class="contact-intents__list">
+        {page.options.map((option, index) => (
+          <button
+            class:list={['contact-intent', index === 2 && 'is-active']}
+            type="button"
+            data-contact-intent={option.id}
+            data-contact-subject={option.subject}
+            aria-pressed={index === 2 ? 'true' : 'false'}
+          >
+            <span class="contact-intent__index">{option.index}</span>
+            <span class="contact-intent__title">{option.title}</span>
+            <span class="contact-intent__text">{option.text}</span>
+            <span class="contact-intent__mark" aria-hidden="true"><i>X</i><b>O</b></span>
+          </button>
+        ))}
+      </div>
+    </section>
+
+    <section class="contact-direct" data-theme="dark" aria-labelledby="contact-direct-title" data-motion-reveal>
+      <div class="contact-direct__topline"><span>{page.directLabel}</span><span data-contact-selection>{page.options[2].title}</span></div>
+      <div class="contact-direct__body">
+        <div>
+          <p class="mp-kicker">{page.selectedLabel}</p>
+          <h2 id="contact-direct-title">{page.emailCta}</h2>
+          <p>{page.expectation}</p>
+        </div>
+        <div class="contact-direct__actions">
+          {contacts.email && <a class="contact-direct__email" href={defaultMailto} data-contact-email data-analytics-event="contact_click" data-analytics-channel="email"><span>Email</span><strong>{contacts.email}</strong><Arrow direction="right" /></a>}
+          <ContactChannels locale={locale} />
+        </div>
+      </div>
+      <p class="contact-direct__note">{page.note}</p>
+      <footer class="contact-direct__footer">
+        <span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span>
+        <span>{site.footer.note}</span>
+        <a href="#top">{site.footer.backToTop}<Arrow direction="up" /></a>
+      </footer>
+    </section>
+  </main>
+</div>
+
+<script is:inline define:vars={{ email: contacts.email }}>
+  const root = document.querySelector('[data-contact-page]');
+  if (root) {
+    const buttons = Array.from(root.querySelectorAll('[data-contact-intent]'));
+    const emailLink = root.querySelector('[data-contact-email]');
+    const selection = root.querySelector('[data-contact-selection]');
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        buttons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        const subject = button.getAttribute('data-contact-subject') || 'Website project';
+        const label = button.querySelector('.contact-intent__title')?.textContent?.trim() || subject;
+        if (selection) selection.textContent = label;
+        if (emailLink && email) emailLink.setAttribute('href', `mailto:${email}?subject=${encodeURIComponent(subject)}`);
+      });
+    });
+  }
+</script>
+
+<script>
+  import { initArchitectureMotion } from '../scripts/architecture-motion';
+  initArchitectureMotion();
+</script>
