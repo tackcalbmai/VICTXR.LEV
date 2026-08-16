@@ -1,0 +1,619 @@
+/* Commercial Density Pass
+ * Goal: increase information per viewport without flattening XO WEB into a generic site.
+ * Preserve the hero, one disruptive act and one takeover act; compress everything else.
+ */
+
+/* HOME ---------------------------------------------------------------- */
+.home-shell .hero {
+  min-height: 92svh;
+}
+
+.home-shell .hero__title {
+  padding-block: clamp(2.5rem, 6vh, 5rem) clamp(1.5rem, 2.8vh, 2.6rem);
+  font-size: clamp(4.3rem, 10.3vw, 9.8rem);
+  line-height: 0.78;
+}
+
+.home-shell .disruption,
+.home-shell .disruption__stage {
+  min-height: 56svh;
+}
+
+.home-shell .disruption__stage {
+  padding-block: clamp(3.5rem, 6vw, 5.5rem);
+}
+
+.home-shell .disruption__line {
+  font-size: clamp(3.2rem, 7.4vw, 7.4rem);
+  line-height: 0.88;
+}
+
+.home-shell .disruption__line--one { top: 19%; }
+.home-shell .disruption__line--two { top: 53%; }
+.home-shell .disruption__x { font-size: clamp(10rem, 25vw, 25rem); }
+
+.home-shell .home-v2-work {
+  min-height: 118svh;
+}
+
+.home-shell .home-v2-work__title {
+  margin-top: clamp(2rem, 4vw, 4rem);
+  font-size: clamp(3.7rem, 7.3vw, 7.6rem);
+  line-height: 0.82;
+}
+
+.home-shell .home-v2-projects {
+  inset: clamp(7.7rem, 13vh, 10.5rem) 0 0;
+}
+
+.home-shell .home-v2-project {
+  pointer-events: auto;
+}
+
+.home-shell .home-v2-project--catrin {
+  top: 18%;
+  width: min(52vw, 51rem);
+}
+
+.home-shell .home-v2-project--anelika {
+  bottom: 4%;
+  width: min(56vw, 57rem);
+}
+
+.home-shell .home-v2-project__summary {
+  position: absolute;
+  z-index: 4;
+  right: 0.85rem;
+  bottom: 0.8rem;
+  max-width: min(25rem, 66%);
+  padding: 0.65rem 0.75rem;
+  background: rgb(10 10 9 / 84%);
+  color: #d8d5cf;
+  font-size: clamp(0.72rem, 0.82vw, 0.82rem);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(10px);
+}
+
+.home-shell .home-v2-work__bottom p {
+  max-width: 48rem;
+}
+
+.home-shell .home-v2-capabilities {
+  padding: clamp(4.5rem, 7vw, 7rem) var(--gutter);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.home-shell .home-v2-capabilities__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+}
+
+.home-shell .home-v2-capabilities__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.55fr);
+  gap: 2rem 7vw;
+  align-items: end;
+  padding-block: clamp(2.8rem, 5vw, 5rem);
+}
+
+.home-shell .home-v2-capabilities__head h2 {
+  max-width: 10ch;
+  text-transform: uppercase;
+  font-size: clamp(3.3rem, 6.6vw, 6.8rem);
+  font-weight: 810;
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+}
+
+.home-shell .home-v2-capabilities__head p {
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: clamp(0.98rem, 1.2vw, 1.12rem);
+  line-height: 1.45;
+}
+
+.home-shell .home-v2-capabilities__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.home-shell .home-v2-capability {
+  display: grid;
+  min-height: 12.5rem;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  padding: 1.35rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.home-shell .home-v2-capability__index {
+  font-size: 0.58rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+}
+
+.home-shell .home-v2-capability h3 {
+  max-width: 13ch;
+  text-transform: uppercase;
+  font-size: clamp(1.55rem, 2.5vw, 2.7rem);
+  font-weight: 790;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.home-shell .home-v2-capability p {
+  max-width: 29rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+
+.home-shell .home-v2-capabilities__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.2rem;
+}
+
+.home-shell .home-v2-perspective {
+  min-height: 78svh;
+  padding-block: clamp(4.5rem, 7vw, 7rem);
+}
+
+.home-shell .home-v2-perspective h2 {
+  max-width: 11ch;
+  margin-top: clamp(2.8rem, 5vw, 5rem);
+  font-size: clamp(3.5rem, 7.2vw, 7.5rem);
+  line-height: 0.82;
+}
+
+.home-shell .home-v2-perspective__bottom {
+  margin-top: clamp(2.8rem, 5vw, 5rem);
+}
+
+.home-shell .home-v2-perspective__xo {
+  width: min(43vw, 38rem);
+  height: min(43vw, 38rem);
+}
+
+.home-shell .home-v2-perspective__xo span {
+  font-size: min(37vw, 33rem);
+}
+
+.home-shell .home-v2-close {
+  min-height: 66svh;
+  padding-block: clamp(4.5rem, 7vw, 7rem) 1.25rem;
+}
+
+.home-shell .home-v2-close h2 {
+  font-size: clamp(3.7rem, 7.4vw, 7.8rem);
+  line-height: 0.82;
+}
+
+.home-shell .home-v2-close__footer {
+  margin-top: clamp(2.6rem, 4vw, 4rem);
+}
+
+/* SHARED INTERNAL PAGES ------------------------------------------------ */
+.mp-page .mp-hero {
+  min-height: 74svh;
+}
+
+.mp-page .mp-hero h1 {
+  padding-block: clamp(2.8rem, 6vh, 5rem) clamp(2rem, 4vh, 3.5rem);
+  font-size: clamp(4rem, 8.2vw, 8.5rem);
+  line-height: 0.82;
+}
+
+.mp-page .mp-closing {
+  min-height: 62svh;
+}
+
+.mp-page .mp-closing h2 {
+  font-size: clamp(3.6rem, 6.7vw, 6.8rem);
+  line-height: 0.84;
+}
+
+.page-contact-cta {
+  min-height: 50svh;
+  padding-top: clamp(2rem, 3vw, 3rem);
+}
+
+.page-contact-cta .page-contact-cta__body {
+  min-height: 32svh;
+  gap: clamp(2rem, 5vw, 5rem);
+  padding-block: clamp(3rem, 5vw, 5rem) clamp(2.5rem, 4vw, 4rem);
+}
+
+.page-contact-cta h2 {
+  font-size: clamp(3.2rem, 7vw, 7rem);
+  line-height: 0.84;
+}
+
+/* WORK ---------------------------------------------------------------- */
+.mp-work .work-exhibit,
+.mp-work .work-exhibit__link {
+  min-height: 92svh;
+}
+
+.mp-work .work-exhibit__name {
+  font-size: clamp(7rem, 18vw, 18rem);
+}
+
+.mp-work .work-exhibit__media {
+  grid-column: 3 / span 8;
+  max-height: 58svh;
+}
+
+.mp-work .work-exhibit__caption h2 {
+  font-size: clamp(2.2rem, 4.1vw, 4.4rem);
+}
+
+/* ABOUT --------------------------------------------------------------- */
+.mp-about .about-definition {
+  min-height: 68svh;
+}
+
+.mp-about .about-definition h2 {
+  font-size: clamp(3.2rem, 6.5vw, 6.6rem);
+  line-height: 0.86;
+}
+
+.mp-about .about-principle {
+  min-height: 38svh;
+  padding-block: clamp(2.8rem, 4.5vw, 4.5rem);
+}
+
+.mp-about .about-principle h2 {
+  font-size: clamp(2.7rem, 5vw, 5.2rem);
+  line-height: 0.88;
+}
+
+.mp-about .about-principle__glyph {
+  font-size: clamp(11rem, 25vw, 25rem);
+}
+
+.mp-about .about-standard,
+.mp-about .about-standard__inner {
+  min-height: 70svh;
+}
+
+.mp-about .about-standard__inner {
+  padding-block: clamp(4.5rem, 7vw, 7rem);
+}
+
+.mp-about .about-standard h2 {
+  margin-top: clamp(2.6rem, 4vw, 4rem);
+  font-size: clamp(3.4rem, 6.4vw, 6.6rem);
+}
+
+/* SERVICES ------------------------------------------------------------ */
+.mp-services .mp-services__hero {
+  min-height: 68svh;
+}
+
+.mp-services .service-decision__head {
+  min-height: clamp(7.2rem, 11vw, 9.5rem);
+}
+
+.mp-services .service-decision__head h2 {
+  font-size: clamp(2.4rem, 4.6vw, 4.8rem);
+}
+
+.mp-services .service-decision__body {
+  padding-bottom: clamp(1.5rem, 2.5vw, 2.4rem);
+}
+
+.mp-services .services-anti,
+.mp-services .services-process {
+  min-height: auto;
+}
+
+.mp-services .services-anti__inner,
+.mp-services .services-process {
+  padding-block: clamp(4.5rem, 7vw, 7rem);
+}
+
+.mp-services .services-anti h2,
+.mp-services .services-process h2 {
+  font-size: clamp(3.2rem, 6.1vw, 6.3rem);
+  line-height: 0.85;
+}
+
+/* CONTACT ------------------------------------------------------------- */
+.contact-page .contact-hero {
+  min-height: 72svh;
+}
+
+.contact-page .contact-hero h1 {
+  max-width: 10ch;
+  padding-block: clamp(2.8rem, 6vh, 5rem) clamp(2rem, 4vh, 3.5rem);
+  font-size: clamp(4rem, 8.3vw, 8.6rem);
+  line-height: 0.82;
+}
+
+.contact-page .contact-focus-mark {
+  width: min(36vw, 32rem);
+}
+
+.contact-page .contact-focus-mark span,
+.contact-page .contact-focus-mark i {
+  font-size: min(31vw, 28rem);
+}
+
+.contact-page .contact-intents {
+  padding-block: clamp(4rem, 6vw, 6rem);
+}
+
+.contact-page .contact-intents__heading {
+  padding-bottom: clamp(2rem, 3.5vw, 3.5rem);
+}
+
+.contact-page .contact-intents__heading h2 {
+  font-size: clamp(2.8rem, 5.2vw, 5.3rem);
+}
+
+.contact-page .contact-intent {
+  min-height: clamp(9rem, 14vw, 12rem);
+}
+
+.contact-page .contact-intent__title {
+  font-size: clamp(2.1rem, 4.2vw, 4.4rem);
+}
+
+.contact-page .contact-talk,
+.contact-page .contact-brief {
+  padding-block: clamp(4.5rem, 7vw, 7rem);
+}
+
+.contact-page .contact-talk__heading h2,
+.contact-page .contact-brief__head h2 {
+  font-size: clamp(3.2rem, 6.2vw, 6.4rem);
+  line-height: 0.84;
+}
+
+/* CASE STUDIES -------------------------------------------------------- */
+.case-page .case-hero {
+  min-height: 82svh;
+}
+
+.case-page .case-hero h1 {
+  font-size: clamp(7rem, 19vw, 19rem);
+}
+
+.case-page .case-hero__subtitle {
+  font-size: clamp(1.3rem, 2.1vw, 2.1rem);
+}
+
+.case-page .case-narrative__row {
+  padding-block: clamp(2.5rem, 4vw, 4rem);
+}
+
+.case-page .case-narrative__row h2 {
+  font-size: clamp(2.1rem, 4vw, 4.2rem);
+}
+
+.case-page .case-result p {
+  font-size: clamp(1.9rem, 4.3vw, 4.5rem);
+}
+
+.case-page .case-next a {
+  min-height: 7rem;
+}
+
+/* TABLET + MOBILE ----------------------------------------------------- */
+@media (max-width: 900px) {
+  .home-shell .home-v2-capabilities__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-shell .hero {
+    min-height: 92svh;
+  }
+
+  .home-shell .hero__title {
+    font-size: clamp(3.7rem, 17vw, 5.8rem);
+    line-height: 0.8;
+  }
+
+  .home-shell .disruption,
+  .home-shell .disruption__stage {
+    min-height: 64svh;
+  }
+
+  .home-shell .disruption__line {
+    font-size: clamp(2.7rem, 13vw, 4.3rem);
+  }
+
+  .home-shell .home-v2-work > .home-v2-work__sticky {
+    padding-bottom: clamp(4rem, 12vw, 5rem);
+  }
+
+  .home-shell .home-v2-work .home-v2-work__title {
+    margin-top: clamp(2.4rem, 9vw, 3.6rem);
+    font-size: clamp(2.9rem, 13vw, 4.6rem);
+  }
+
+  .home-shell .home-v2-work .home-v2-projects {
+    gap: clamp(2.3rem, 8vw, 3.2rem);
+    margin-top: clamp(2.5rem, 9vw, 3.5rem);
+  }
+
+  .home-shell .home-v2-project__summary {
+    position: static;
+    max-width: none;
+    padding: 0;
+    background: none;
+    color: #aaa79f;
+    font-size: 0.82rem;
+    backdrop-filter: none;
+  }
+
+  .home-shell .home-v2-work .home-v2-work__bottom {
+    margin-top: clamp(3rem, 10vw, 4rem);
+  }
+
+  .home-shell .home-v2-capabilities {
+    padding-block: clamp(4rem, 13vw, 5.5rem);
+  }
+
+  .home-shell .home-v2-capabilities__head {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding-block: clamp(2.5rem, 9vw, 3.5rem);
+  }
+
+  .home-shell .home-v2-capabilities__head h2 {
+    font-size: clamp(2.8rem, 13vw, 4.5rem);
+  }
+
+  .home-shell .home-v2-capabilities__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-shell .home-v2-capability {
+    min-height: 0;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 0.55rem 1rem;
+    padding: 1.15rem;
+  }
+
+  .home-shell .home-v2-capability__index {
+    grid-row: 1 / span 2;
+    padding-top: 0.15rem;
+  }
+
+  .home-shell .home-v2-capability h3 {
+    font-size: clamp(1.65rem, 7.5vw, 2.5rem);
+  }
+
+  .home-shell .home-v2-capability p {
+    grid-column: 2;
+  }
+
+  .home-shell .home-v2-perspective {
+    min-height: auto;
+    padding-block: clamp(4.2rem, 13vw, 5.6rem);
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    margin-top: clamp(2.5rem, 9vw, 3.5rem);
+    font-size: clamp(3rem, 13.5vw, 4.8rem);
+  }
+
+  .home-shell .home-v2-perspective__bottom {
+    margin-top: clamp(2.7rem, 9vw, 3.6rem);
+  }
+
+  .home-shell .home-v2-close {
+    min-height: auto;
+    padding-block: clamp(4.2rem, 13vw, 5.6rem) 1.25rem;
+  }
+
+  .home-shell .home-v2-close h2 {
+    font-size: clamp(3rem, 13.5vw, 4.8rem);
+  }
+
+  .mp-page .mp-hero,
+  .contact-page .contact-hero,
+  .case-page .case-hero {
+    min-height: 84svh;
+  }
+
+  .mp-page .mp-hero h1,
+  .contact-page .contact-hero h1 {
+    font-size: clamp(3.3rem, 15vw, 5.2rem);
+  }
+
+  .mp-work .work-exhibit,
+  .mp-work .work-exhibit__link {
+    min-height: auto;
+  }
+
+  .mp-work .work-exhibit__link {
+    padding-block: 1rem clamp(3.5rem, 12vw, 5rem);
+  }
+
+  .mp-work .work-exhibit__name {
+    font-size: clamp(6rem, 31vw, 11rem);
+  }
+
+  .mp-about .about-definition,
+  .mp-about .about-standard,
+  .mp-about .about-standard__inner,
+  .mp-page .mp-closing {
+    min-height: auto;
+  }
+
+  .mp-about .about-definition,
+  .mp-about .about-standard__inner,
+  .mp-page .mp-closing {
+    padding-block: clamp(4.2rem, 13vw, 5.6rem);
+  }
+
+  .mp-about .about-principle {
+    min-height: auto;
+    padding-block: clamp(3rem, 10vw, 4rem);
+  }
+
+  .mp-services .service-decision__head {
+    min-height: 7.3rem;
+  }
+
+  .mp-services .service-decision__head h2 {
+    font-size: clamp(2rem, 9vw, 3.2rem);
+  }
+
+  .contact-page .contact-intent {
+    min-height: 0;
+  }
+
+  .contact-page .contact-intents,
+  .contact-page .contact-talk,
+  .contact-page .contact-brief {
+    padding-block: clamp(3.8rem, 12vw, 5rem);
+  }
+
+  .contact-page .contact-intent__title {
+    font-size: clamp(2rem, 9.5vw, 3.3rem);
+  }
+
+  .case-page .case-hero h1 {
+    font-size: 22vw;
+  }
+
+  .case-page--anelika .case-hero h1 {
+    font-size: 20vw;
+  }
+
+  .case-page .case-narrative__row {
+    padding-block: clamp(2.4rem, 8vw, 3.5rem);
+  }
+
+  .page-contact-cta {
+    min-height: auto;
+  }
+
+  .page-contact-cta .page-contact-cta__body {
+    min-height: auto;
+    padding-block: clamp(3rem, 10vw, 4rem);
+  }
+
+  .page-contact-cta h2 {
+    font-size: clamp(2.9rem, 13vw, 4.6rem);
+  }
+}
