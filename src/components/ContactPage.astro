@@ -123,19 +123,19 @@ const routerConfig = JSON.stringify({ starters: router.starters, prompts: router
       <form class="contact-brief__form" data-contact-brief>
         <div class="contact-brief__row">
           <label for={`brief-business-${locale}`}>{router.brief.business}</label>
-          <input id={`brief-business-${locale}`} name="business" type="text" autocomplete="organization" placeholder={router.brief.businessPlaceholder} />
+          <input id={`brief-business-${locale}`} name="business" type="text" autocomplete="organization" aria-label={router.brief.business} placeholder={router.brief.businessPlaceholder} />
         </div>
         <div class="contact-brief__row">
           <label for={`brief-website-${locale}`}>{router.brief.website}</label>
-          <input id={`brief-website-${locale}`} name="website" type="url" inputmode="url" autocomplete="url" placeholder={router.brief.websitePlaceholder} />
+          <input id={`brief-website-${locale}`} name="website" type="url" inputmode="url" autocomplete="url" aria-label={router.brief.website} placeholder={router.brief.websitePlaceholder} />
         </div>
         <div class="contact-brief__row">
           <label for={`brief-problem-${locale}`}>{router.brief.problem}</label>
-          <textarea id={`brief-problem-${locale}`} name="problem" rows="4" placeholder={router.brief.problemPlaceholder}></textarea>
+          <textarea id={`brief-problem-${locale}`} name="problem" rows="4" aria-label={router.brief.problem} placeholder={router.brief.problemPlaceholder}></textarea>
         </div>
         <div class="contact-brief__row">
           <label for={`brief-change-${locale}`}>{router.brief.change}</label>
-          <textarea id={`brief-change-${locale}`} name="change" rows="3" placeholder={router.brief.changePlaceholder}></textarea>
+          <textarea id={`brief-change-${locale}`} name="change" rows="3" aria-label={router.brief.change} placeholder={router.brief.changePlaceholder}></textarea>
         </div>
         <div class="contact-brief__actions">
           {defaultWhatsapp && (
