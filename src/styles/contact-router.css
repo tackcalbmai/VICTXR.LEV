@@ -1,0 +1,439 @@
+/* XO WEB contact router -------------------------------------------------
+ * One system, four routes: problem -> WhatsApp / short brief / email / IG.
+ */
+
+.contact-dock {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 120;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.8rem);
+  transition: opacity 260ms ease, transform 420ms var(--ease-out);
+}
+
+.contact-dock.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.contact-dock__trigger {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.35rem;
+  padding: 0.42rem 1rem 0.42rem 0.42rem;
+  border: 1px solid rgb(var(--ink-rgb) / 22%);
+  border-radius: 999px;
+  background: rgb(var(--paper-rgb) / 96%);
+  color: var(--ink);
+  box-shadow: 0 0.9rem 2.5rem rgb(0 0 0 / 12%);
+  text-transform: uppercase;
+  font-size: 0.61rem;
+  font-weight: 790;
+  letter-spacing: 0.11em;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.contact-dock__trigger-mark {
+  position: relative;
+  display: grid;
+  width: 2.45rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgb(var(--ink-rgb) / 45%);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.contact-dock__trigger-mark i,
+.contact-dock__trigger-mark b {
+  position: absolute;
+  font-style: normal;
+  font-size: 1.35rem;
+  font-weight: 840;
+  line-height: 1;
+  transition: opacity 260ms ease, transform 420ms var(--ease-out), color 260ms ease;
+}
+
+.contact-dock__trigger-mark i { transform: scale(1); }
+.contact-dock__trigger-mark b { color: var(--accent); opacity: 0; transform: rotate(-22deg) scale(0.65); }
+.contact-dock.is-open .contact-dock__trigger-mark i { opacity: 0; transform: scale(0.65); }
+.contact-dock.is-open .contact-dock__trigger-mark b { opacity: 1; transform: rotate(0deg) scale(1); }
+
+.contact-dock__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  background: rgb(0 0 0 / 0%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease, background 320ms ease;
+}
+
+.contact-dock.is-open .contact-dock__backdrop {
+  background: rgb(0 0 0 / 28%);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.contact-dock__panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.75rem);
+  z-index: 2;
+  width: min(30rem, calc(100vw - 2rem));
+  padding: 1.1rem;
+  border: 1px solid rgb(var(--paper-rgb) / 14%);
+  background: #0b0b0a;
+  color: var(--paper);
+  box-shadow: 0 2rem 7rem rgb(0 0 0 / 32%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.985);
+  transform-origin: 100% 100%;
+  transition: opacity 260ms ease, transform 420ms var(--ease-out);
+}
+
+.contact-dock.is-open .contact-dock__panel {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.contact-dock__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--inverse-line);
+  color: #9e9a92;
+  text-transform: uppercase;
+  font-size: 0.54rem;
+  font-weight: 760;
+  letter-spacing: 0.11em;
+}
+
+.contact-dock__intro {
+  display: grid;
+  gap: 0.75rem;
+  padding-block: 1.5rem;
+}
+
+.contact-dock__intro strong {
+  max-width: 11ch;
+  text-transform: uppercase;
+  font-size: clamp(1.75rem, 5vw, 2.6rem);
+  font-weight: 810;
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.contact-dock__intro p {
+  max-width: 28rem;
+  color: #aaa79f;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.contact-dock__router {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 0;
+  border-top: 1px solid var(--paper);
+  border-bottom: 1px solid var(--paper);
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  font-weight: 790;
+  letter-spacing: 0.1em;
+}
+
+.contact-dock__channels { display: grid; margin-top: 1.35rem; }
+
+.contact-dock__channels > a {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 4.4rem;
+  border-bottom: 1px solid var(--inverse-line);
+}
+
+.contact-dock__channels > a > span:nth-child(2) { display: grid; gap: 0.2rem; }
+.contact-dock__channels strong { font-size: 0.84rem; font-weight: 720; }
+.contact-dock__channels small { color: #85827b; font-size: 0.64rem; line-height: 1.25; }
+.contact-dock__icon,
+.contact-dock__glyph { display: grid; width: 2.05rem; aspect-ratio: 1; place-items: center; border: 1px solid rgb(var(--paper-rgb) / 24%); border-radius: 50%; }
+.contact-dock__icon svg { width: 0.92rem; height: 0.92rem; }
+.contact-dock__glyph { color: var(--accent); font-size: 1rem; font-weight: 820; }
+
+/* Dedicated Contact route --------------------------------------------- */
+.contact-talk {
+  position: relative;
+  min-height: 100svh;
+  padding: clamp(3rem, 6vw, 6rem) var(--gutter) clamp(5rem, 9vw, 9rem);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.contact-talk__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+  align-items: end;
+  gap: clamp(2rem, 8vw, 9rem);
+  padding-block: clamp(5rem, 9vw, 9rem) clamp(3rem, 6vw, 6rem);
+}
+
+.contact-talk__heading h2 {
+  max-width: 9ch;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-size: clamp(3.8rem, 8.5vw, 9rem);
+  font-weight: 820;
+  line-height: 0.8;
+  letter-spacing: -0.082em;
+}
+
+.contact-talk__heading h2 span { display: block; }
+.contact-talk__heading h2 span:last-child { padding-left: 5vw; color: #a9a69f; }
+.contact-talk__heading > p { max-width: 34rem; color: #aaa79f; font-size: clamp(1rem, 1.3vw, 1.18rem); line-height: 1.48; }
+
+.contact-talk__primary {
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr) minmax(15rem, 0.55fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+  min-height: clamp(9rem, 14vw, 13rem);
+  padding: 1.4rem 0;
+  border-top: 1px solid var(--paper);
+  border-bottom: 1px solid var(--paper);
+}
+
+.contact-talk__primary-mark {
+  display: grid;
+  width: 4rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid rgb(var(--paper-rgb) / 35%);
+  border-radius: 50%;
+  color: var(--accent);
+  font-size: 2.1rem;
+  font-weight: 840;
+}
+
+.contact-talk__primary strong {
+  text-transform: uppercase;
+  font-size: clamp(2.3rem, 5vw, 5.2rem);
+  font-weight: 810;
+  line-height: 0.86;
+  letter-spacing: -0.065em;
+}
+.contact-talk__primary p { color: #aaa79f; font-size: 0.88rem; line-height: 1.45; }
+.contact-talk__primary .arrow { width: 2.2rem; }
+
+.contact-talk__secondary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--inverse-line);
+}
+
+.contact-talk__secondary > a {
+  display: grid;
+  min-height: 12rem;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  padding: 1.4rem;
+  border-right: 1px solid var(--inverse-line);
+}
+.contact-talk__secondary > a:first-child { padding-left: 0; }
+.contact-talk__secondary > a:last-child { border-right: 0; padding-right: 0; }
+.contact-talk__secondary strong { align-self: end; text-transform: uppercase; font-size: clamp(1.5rem, 2.6vw, 2.7rem); font-weight: 790; line-height: 0.9; letter-spacing: -0.055em; }
+.contact-talk__secondary p { max-width: 18rem; color: #918e87; font-size: 0.76rem; line-height: 1.4; }
+.contact-talk__secondary .arrow { justify-self: end; }
+
+.contact-talk__note {
+  max-width: 42rem;
+  margin: clamp(4rem, 7vw, 7rem) 0 0 auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--inverse-line);
+  color: #96938c;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.contact-brief {
+  position: relative;
+  padding: clamp(6rem, 10vw, 10rem) var(--gutter) 1.25rem;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.contact-brief__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+  align-items: end;
+  gap: clamp(2rem, 8vw, 9rem);
+  padding-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+.contact-brief__head h2 {
+  max-width: 9ch;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  font-size: clamp(3.8rem, 8.5vw, 9rem);
+  font-weight: 820;
+  line-height: 0.8;
+  letter-spacing: -0.082em;
+}
+.contact-brief__head h2 span { display: block; }
+.contact-brief__head h2 span:last-child { padding-left: 6vw; color: var(--accent); }
+.contact-brief__head > p { max-width: 36rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: clamp(1rem, 1.3vw, 1.18rem); line-height: 1.48; }
+
+.contact-brief__form { border-top: 1px solid var(--line); }
+
+.contact-brief__row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 0.38fr) minmax(0, 1.62fr);
+  gap: 2rem 6vw;
+  padding: clamp(1.5rem, 3vw, 3rem) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.contact-brief__row label {
+  padding-top: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  font-weight: 760;
+  letter-spacing: 0.1em;
+}
+
+.contact-brief__row input,
+.contact-brief__row textarea {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(1.25rem, 2.4vw, 2.35rem);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+  resize: vertical;
+}
+.contact-brief__row textarea { min-height: 7rem; }
+.contact-brief__row input::placeholder,
+.contact-brief__row textarea::placeholder { color: #aaa79f; opacity: 1; }
+.contact-brief__row:focus-within { border-color: var(--ink); }
+
+.contact-brief__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: stretch;
+  padding: clamp(2rem, 4vw, 4rem) 0;
+}
+
+.contact-brief__actions > a,
+.contact-brief__actions > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.5rem;
+  padding: 0 1rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  font-weight: 790;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.contact-brief__actions > a:first-child { background: var(--ink); color: var(--paper); }
+.contact-brief__actions > button { min-width: 10rem; justify-content: center; }
+.contact-brief__note { padding-bottom: clamp(4rem, 7vw, 7rem); color: var(--muted); font-size: 0.78rem; line-height: 1.4; }
+.contact-brief__footer { border-color: var(--line); color: var(--muted); }
+
+@media (hover: hover) {
+  .contact-dock__router:hover,
+  .contact-dock__channels > a:hover { color: #fff; }
+  .contact-talk__primary:hover .contact-talk__primary-mark { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .contact-talk__secondary > a:hover strong { color: var(--accent); }
+  .contact-brief__actions > a:hover,
+  .contact-brief__actions > button:hover { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+}
+
+@media (max-width: 760px) {
+  .contact-dock { right: max(0.75rem, env(safe-area-inset-right)); bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+  .contact-dock__trigger { min-height: 3.15rem; }
+  .contact-dock__trigger-mark { width: 2.28rem; }
+  .contact-dock__panel {
+    position: fixed;
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: calc(max(0.75rem, env(safe-area-inset-bottom)) + 3.9rem);
+    left: max(0.75rem, env(safe-area-inset-left));
+    width: auto;
+    max-height: min(72svh, 39rem);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .contact-dock__intro { padding-block: 1.2rem; }
+  .contact-dock__channels > a { min-height: 4rem; }
+
+  .contact-talk { padding-top: 2rem; }
+  .contact-talk__heading,
+  .contact-brief__head { grid-template-columns: 1fr; gap: 2rem; }
+  .contact-talk__heading h2,
+  .contact-brief__head h2 { font-size: clamp(3.25rem, 16.5vw, 6rem); }
+  .contact-talk__heading h2 span:last-child,
+  .contact-brief__head h2 span:last-child { padding-left: 4vw; }
+  .contact-talk__primary {
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+    gap: 0.9rem;
+    min-height: 8.5rem;
+  }
+  .contact-talk__primary-mark { width: 3.15rem; font-size: 1.6rem; }
+  .contact-talk__primary strong { font-size: clamp(2rem, 9.8vw, 3.4rem); }
+  .contact-talk__primary p { grid-column: 2 / -1; }
+  .contact-talk__primary > .arrow { grid-column: 3; grid-row: 1; }
+  .contact-talk__secondary { grid-template-columns: 1fr; }
+  .contact-talk__secondary > a,
+  .contact-talk__secondary > a:first-child,
+  .contact-talk__secondary > a:last-child {
+    min-height: 8.5rem;
+    padding: 1.2rem 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--inverse-line);
+  }
+  .contact-talk__secondary strong { font-size: clamp(1.85rem, 9vw, 3rem); }
+  .contact-talk__note { margin-top: 3.5rem; }
+
+  .contact-brief { padding-top: 5rem; }
+  .contact-brief__row { grid-template-columns: 1fr; gap: 0.75rem; padding: 1.5rem 0; }
+  .contact-brief__row label { padding-top: 0; }
+  .contact-brief__row input,
+  .contact-brief__row textarea { font-size: clamp(1.2rem, 5.8vw, 1.65rem); }
+  .contact-brief__actions { grid-template-columns: 1fr; }
+  .contact-brief__actions > button { min-width: 0; }
+  .contact-brief__footer { grid-template-columns: 1fr auto; }
+  .contact-brief__footer > :nth-child(2) { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-dock,
+  .contact-dock__panel,
+  .contact-dock__backdrop,
+  .contact-dock__trigger-mark i,
+  .contact-dock__trigger-mark b { transition-duration: 0.01ms !important; }
+}
