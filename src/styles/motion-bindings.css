@@ -19,6 +19,10 @@ html:not(.no-js) [data-motion-reveal].is-xo-visible {
   pointer-events: auto;
 }
 
+.home-v2-work__title {
+  pointer-events: none;
+}
+
 .work-exhibit__media[data-takeover-layer] {
   transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
   will-change: transform;
