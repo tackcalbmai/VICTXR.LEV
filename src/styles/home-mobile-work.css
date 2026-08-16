@@ -1,13 +1,16 @@
 /* Mobile Selected Work is its own composition.
  * Desktop can overlap project surfaces; narrow screens need separation so
  * project UI and XO typography never compete for the same pixels.
+ *
+ * Scope every override through .home-shell so this mobile art direction wins
+ * even when Astro reorders component CSS chunks during production builds.
  */
 @media (max-width: 760px) {
-  .home-v2-work {
+  .home-shell .home-v2-work {
     min-height: 0;
   }
 
-  .home-v2-work__sticky {
+  .home-shell .home-v2-work > .home-v2-work__sticky {
     position: relative;
     top: auto;
     display: block;
@@ -16,28 +19,28 @@
     overflow: clip;
   }
 
-  .home-v2-work__topline {
+  .home-shell .home-v2-work .home-v2-work__topline {
     align-items: flex-start;
     gap: 1.25rem;
   }
 
-  .home-v2-work__topline > span:last-child {
+  .home-shell .home-v2-work .home-v2-work__topline > span:last-child {
     max-width: 10rem;
     text-align: right;
   }
 
-  .home-v2-work__title {
+  .home-shell .home-v2-work .home-v2-work__title {
     max-width: 10ch;
     margin-top: clamp(3.25rem, 13vw, 5rem);
     font-size: clamp(3.1rem, 14.6vw, 5.4rem);
     line-height: 0.82;
   }
 
-  .home-v2-work__title span:last-child {
+  .home-shell .home-v2-work .home-v2-work__title span:last-child {
     padding-left: 3vw;
   }
 
-  .home-v2-projects {
+  .home-shell .home-v2-work .home-v2-projects {
     position: relative;
     inset: auto;
     display: grid;
@@ -45,7 +48,7 @@
     margin-top: clamp(3.25rem, 12vw, 5rem);
   }
 
-  .home-v2-project {
+  .home-shell .home-v2-work .home-v2-project {
     position: relative;
     inset: auto;
     display: grid;
@@ -57,14 +60,14 @@
     box-shadow: none;
   }
 
-  .home-v2-project--catrin {
+  .home-shell .home-v2-work .home-v2-project--catrin {
     top: auto;
     left: auto;
     justify-self: start;
     transform: rotate(-1.1deg) translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
   }
 
-  .home-v2-project--anelika {
+  .home-shell .home-v2-work .home-v2-project--anelika {
     right: auto;
     bottom: auto;
     justify-self: end;
@@ -72,7 +75,7 @@
     transform: rotate(1.1deg) translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
   }
 
-  .home-v2-project__label {
+  .home-shell .home-v2-work .home-v2-project__label {
     position: static;
     z-index: auto;
     width: 100%;
@@ -86,8 +89,8 @@
     backdrop-filter: none;
   }
 
-  .home-v2-project picture,
-  .home-v2-project .responsive-project-image {
+  .home-shell .home-v2-work .home-v2-project picture,
+  .home-shell .home-v2-work .home-v2-project .responsive-project-image {
     display: block;
     width: 100%;
     height: auto;
@@ -98,21 +101,21 @@
     box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 28%);
   }
 
-  .home-v2-project img {
+  .home-shell .home-v2-work .home-v2-project img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .home-v2-project--catrin img {
+  .home-shell .home-v2-work .home-v2-project--catrin img {
     object-position: 50% 22%;
   }
 
-  .home-v2-project--anelika img {
+  .home-shell .home-v2-work .home-v2-project--anelika img {
     object-position: 50% 14%;
   }
 
-  .home-v2-work__bottom {
+  .home-shell .home-v2-work .home-v2-work__bottom {
     margin-top: clamp(4rem, 15vw, 6rem);
     padding-top: 1.25rem;
     gap: 1.5rem;
@@ -120,8 +123,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) and (max-width: 760px) {
-  .home-v2-project--catrin,
-  .home-v2-project--anelika {
+  .home-shell .home-v2-work .home-v2-project--catrin,
+  .home-shell .home-v2-work .home-v2-project--anelika {
     transform: none !important;
   }
 }
