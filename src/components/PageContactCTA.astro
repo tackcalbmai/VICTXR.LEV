@@ -2,6 +2,7 @@
 import Arrow from './Arrow.astro';
 import { contactRoutes } from '../data/architecture';
 import { getSiteCopy, type Locale } from '../data/site';
+import '../styles/architecture-v2.css';
 
 interface Props {
   locale: Locale;
@@ -37,3 +38,8 @@ const cta = locale === 'lv' ? 'Pastāstīt par problēmu' : 'Tell me the problem
     <a href="#top">{site.footer.backToTop}<Arrow direction="up" /></a>
   </footer>
 </section>
+
+<script>
+  import { initArchitectureMotion } from '../scripts/architecture-motion';
+  initArchitectureMotion();
+</script>
