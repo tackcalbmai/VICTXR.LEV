@@ -77,7 +77,7 @@ const defaultMailto = `mailto:${contacts.email}?subject=${encodeURIComponent(def
   </main>
 </div>
 
-<script define:vars={{ email: contacts.email }}>
+<script is:inline define:vars={{ email: contacts.email }}>
   const root = document.querySelector('[data-contact-page]');
   if (root) {
     const buttons = Array.from(root.querySelectorAll('[data-contact-intent]'));
