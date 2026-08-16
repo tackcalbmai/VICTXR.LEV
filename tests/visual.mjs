@@ -340,6 +340,7 @@ if (notFound?.status() !== 404 || !await routePage.locator('.not-found').count()
 routeErrors.length = 0;
 const lvNotFound = await openPage(routePage, '/lv/this-page-does-not-exist/');
 if (lvNotFound?.status() !== 404 || await routePage.locator('html').getAttribute('lang') !== 'lv') throw new Error('Custom Latvian 404 did not render correctly');
+routeErrors.length = 0;
 
 await openPage(routePage, '/work/anelika/');
 await routePage.locator('.case-next a').first().click();
