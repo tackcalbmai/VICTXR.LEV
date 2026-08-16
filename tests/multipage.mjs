@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
 const outDir = 'artifacts/visual';
@@ -110,7 +110,9 @@ async function assertWorkImagesLoaded(page, label) {
     const image = images.nth(i);
     await image.scrollIntoViewIfNeeded();
     await image.evaluate(async (element) => {
-      if (!element.complete || element.naturalWidth === 0) await element.decode().catch(() => {});
+      if (!element.complete || element.naturalWidth === 0) {
+        await element.decode().catch(() => {});
+      }
     });
   }
   const brokenImages = await images.evaluateAll((elements) => elements
@@ -135,43 +137,15 @@ async function captureViewport(page, selector, fileName) {
   await page.screenshot({ path: `${outDir}/${fileName}`, fullPage: false });
 }
 
-async function persistFirstWorkState(page, response, runtimeErrors) {
-  const state = await page.evaluate(() => ({
-    url: location.href,
-    lang: document.documentElement.lang,
-    mainCount: document.querySelectorAll('main').length,
-    h1Count: document.querySelectorAll('h1').length,
-    canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
-    alternates: [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map((node) => ({ hreflang: node.getAttribute('hreflang'), href: node.getAttribute('href') })),
-    languageHref: document.querySelector('.site-language')?.getAttribute('href') ?? null,
-    desktopNav: [...document.querySelectorAll('.site-nav--desktop a')].map((node) => node.getAttribute('href')),
-    menuDisplay: getComputedStyle(document.querySelector('[data-menu-toggle]')).display,
-    desktopNavDisplay: getComputedStyle(document.querySelector('.site-nav--desktop')).display,
-    viewport: document.documentElement.clientWidth,
-    documentWidth: document.documentElement.scrollWidth,
-    bodyWidth: document.body.scrollWidth,
-    heroSpans: document.querySelectorAll('.mp-hero h1 span').length,
-    contactTitleSpans: document.querySelectorAll('.page-contact-cta h2 span').length,
-    contactLinks: [...document.querySelectorAll('.page-contact-cta a')].map((node) => node.getAttribute('href')),
-    workExhibits: document.querySelectorAll('.work-exhibit').length,
-    workImages: [...document.querySelectorAll('.work-exhibit img')].map((image) => ({ complete: image.complete, naturalWidth: image.naturalWidth, src: image.currentSrc || image.src })),
-  }));
-  state.responseStatus = response?.status() ?? null;
-  state.runtimeErrors = runtimeErrors;
-  await writeFile(`${outDir}/diag-work-en-state.json`, JSON.stringify(state, null, 2));
-  await page.screenshot({ path: `${outDir}/diag-work-en-state.png`, fullPage: false });
-}
-
 for (const profile of profiles) {
   const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
   for (const route of routes) {
     const page = await context.newPage();
     const runtimeErrors = collectErrors(page);
     const response = await page.goto(new URL(route.path, baseURL).toString(), { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    if (profile.name === 'desktop' && route.key === 'work-en') await persistFirstWorkState(page, response, runtimeErrors);
-
     assert(response?.ok(), `${profile.name} ${route.path} returned ${response?.status()}`);
+    await page.evaluate(() => document.fonts.ready);
+
     const label = `${profile.name} ${route.key}`;
     assert(await page.locator('html').getAttribute('lang') === route.lang, `${label} has wrong document language`);
     assert(await page.locator('main').count() === 1, `${label} must have exactly one main`);
