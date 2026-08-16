@@ -24,7 +24,7 @@ const site = getSiteCopy(locale);
 const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
 const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
 const alternateHref = locale === 'lv' ? `/work/${projectId}/` : `/lv/darbi/${projectId}/`;
-const workHref = pageRoutes[locale].work;
+const workHref = `${pageRoutes[locale].work}#work`;
 const contactEmail = contacts.email;
 const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact.subject)}`;
 const projectTransitionName = `xo-project-${projectId}`;
