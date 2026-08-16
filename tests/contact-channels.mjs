@@ -43,6 +43,20 @@ async function assertMenuChannels(page, scope, expectedMessage) {
   assert(whatsappDisplay === '+371 20 000 000', `${scope} did not format the Latvian WhatsApp number for reading: ${whatsappDisplay}`);
 }
 
+async function assertDockChannels(page, scope, expectedMessage) {
+  const whatsapp = page.locator(`${scope} a[data-contact-channel="whatsapp"]`);
+  const email = page.locator(`${scope} a[data-contact-channel="email"]`);
+  const instagram = page.locator(`${scope} a[data-contact-channel="instagram"]`);
+  assert(await whatsapp.count() === 1, `${scope} is missing WhatsApp`);
+  assert(await email.count() === 1, `${scope} is missing Email`);
+  assert(await instagram.count() === 1, `${scope} is missing Instagram`);
+
+  const whatsappHref = await whatsapp.getAttribute('href');
+  const whatsappUrl = new URL(whatsappHref);
+  assert(whatsappUrl.hostname === 'wa.me' && whatsappUrl.pathname === '/37120000000', `${scope} built an invalid WhatsApp deep link: ${whatsappHref}`);
+  assert(whatsappUrl.searchParams.get('text') === expectedMessage, `${scope} lost the localized WhatsApp opening message`);
+}
+
 async function assertRouterChannels(page, starter) {
   const whatsapp = page.locator('.contact-talk a[data-router-whatsapp]').first();
   const instagram = page.locator('.contact-talk a[data-contact-channel="instagram"]');
@@ -114,7 +128,7 @@ for (const [path, expectedContact] of ctaRoutes) {
   await page.locator('[data-contact-dock-toggle]').click();
   await page.waitForTimeout(50);
   assert(await page.locator('[data-contact-dock-panel][aria-hidden="false"]').count() === 1, 'Contact dock did not open');
-  await assertMenuChannels(page, '[data-contact-dock-panel]', enMessage);
+  await assertDockChannels(page, '[data-contact-dock-panel]', enMessage);
   await context.close();
 }
 
