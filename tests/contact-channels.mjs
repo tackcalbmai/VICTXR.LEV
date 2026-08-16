@@ -23,7 +23,7 @@ async function openPage(path, viewport, { waitForHomeIntro = false } = {}) {
   return { context, page };
 }
 
-async function assertChannels(page, scope, expectedMessage) {
+async function assertMenuChannels(page, scope, expectedMessage) {
   const links = page.locator(`${scope} .contact-channels > a`);
   assert(await links.count() === 2, `${scope} did not render exactly WhatsApp and Instagram`);
 
@@ -41,9 +41,20 @@ async function assertChannels(page, scope, expectedMessage) {
 
   const whatsappDisplay = (await whatsapp.locator('.contact-channels__display').innerText()).trim();
   assert(whatsappDisplay === '+371 20 000 000', `${scope} did not format the Latvian WhatsApp number for reading: ${whatsappDisplay}`);
+}
+
+async function assertRouterChannels(page, starter) {
+  const whatsapp = page.locator('.contact-talk a[data-router-whatsapp]').first();
+  const instagram = page.locator('.contact-talk a[data-contact-channel="instagram"]');
+  assert(await whatsapp.count() === 1, 'Contact router is missing its primary WhatsApp action');
+  assert(await instagram.count() === 1, 'Contact router is missing Instagram');
+
+  const whatsappUrl = new URL(await whatsapp.getAttribute('href'));
+  assert(whatsappUrl.hostname === 'wa.me' && whatsappUrl.pathname === '/37120000000', `Contact router built an invalid WhatsApp deep link: ${whatsappUrl}`);
+  assert(whatsappUrl.searchParams.get('text')?.startsWith(starter), 'Contact router did not use the localized intent-aware WhatsApp starter');
 
   const overflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - document.documentElement.clientWidth);
-  assert(overflow <= 2, `${scope} enabled contact state causes ${overflow}px horizontal overflow`);
+  assert(overflow <= 2, `Contact router enabled state causes ${overflow}px horizontal overflow`);
 }
 
 const enMessage = 'Hi! I visited xoweb.lv and would like to discuss a website project.';
@@ -51,40 +62,41 @@ const lvMessage = 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas 
 
 {
   const { context, page } = await openPage('/contact/', { width: 1366, height: 768 });
-  await page.locator('.contact-direct').scrollIntoViewIfNeeded();
+  await page.locator('.contact-talk').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '.contact-direct', enMessage);
+  await assertRouterChannels(page, 'Hi! I’m not sure what web solution I need yet.');
   const intentCount = await page.locator('[data-contact-intent]').count();
   assert(intentCount === 3, `English Contact should expose three starting points, got ${intentCount}`);
+  assert(await page.locator('[data-contact-brief]').count() === 1, 'English Contact is missing the short brief builder');
   await page.screenshot({ path: `${outDir}/future-contacts-en-desktop.png`, fullPage: false });
   await context.close();
 }
 
 {
   const { context, page } = await openPage('/lv/kontakti/', { width: 393, height: 852 });
-  await page.locator('.contact-direct').scrollIntoViewIfNeeded();
+  await page.locator('.contact-talk').scrollIntoViewIfNeeded();
   await page.waitForTimeout(120);
-  await assertChannels(page, '.contact-direct', lvMessage);
+  await assertRouterChannels(page, 'Sveiki! Vēl nezinu, kāds web risinājums man ir vajadzīgs.');
   await page.screenshot({ path: `${outDir}/future-contacts-lv-mobile.png`, fullPage: false });
 
   await page.evaluate(() => window.scrollTo(0, 0));
   const toggle = page.locator('[data-menu-toggle]');
   await toggle.click();
   await page.waitForTimeout(540);
-  await assertChannels(page, '[data-mobile-menu]', lvMessage);
+  await assertMenuChannels(page, '[data-mobile-menu]', lvMessage);
   await page.screenshot({ path: `${outDir}/future-contacts-lv-menu.png`, fullPage: false });
   await context.close();
 }
 
 const ctaRoutes = [
-  ['/work/', '/contact/'],
-  ['/about/', '/contact/'],
-  ['/services/', '/contact/'],
-  ['/work/catrin/', '/contact/'],
-  ['/lv/darbi/', '/lv/kontakti/'],
-  ['/lv/par-mani/', '/lv/kontakti/'],
-  ['/lv/pakalpojumi/', '/lv/kontakti/'],
-  ['/lv/darbi/catrin/', '/lv/kontakti/'],
+  ['/work/', '/contact/?from=work#start'],
+  ['/about/', '/contact/?from=about#start'],
+  ['/services/', '/contact/?from=services#start'],
+  ['/work/catrin/', '/contact/?from=case-catrin#start'],
+  ['/lv/darbi/', '/lv/kontakti/?from=work#start'],
+  ['/lv/par-mani/', '/lv/kontakti/?from=about#start'],
+  ['/lv/pakalpojumi/', '/lv/kontakti/?from=services#start'],
+  ['/lv/darbi/catrin/', '/lv/kontakti/?from=case-catrin#start'],
 ];
 
 for (const [path, expectedContact] of ctaRoutes) {
@@ -95,5 +107,16 @@ for (const [path, expectedContact] of ctaRoutes) {
   await context.close();
 }
 
+{
+  const { context, page } = await openPage('/services/', { width: 393, height: 852 });
+  const dock = page.locator('[data-contact-dock]');
+  assert(await dock.count() === 1, 'Internal pages should expose the global contact dock');
+  await page.locator('[data-contact-dock-toggle]').click();
+  await page.waitForTimeout(50);
+  assert(await page.locator('[data-contact-dock-panel][aria-hidden="false"]').count() === 1, 'Contact dock did not open');
+  await assertMenuChannels(page, '[data-contact-dock-panel]', enMessage);
+  await context.close();
+}
+
 await browser.close();
-console.log('Enabled contact QA passed on dedicated EN/LV Contact pages, mobile menu and compact cross-page exits.');
+console.log('Enabled contact QA passed on the contact router, mobile menu, global contact dock and context-aware page exits.');
