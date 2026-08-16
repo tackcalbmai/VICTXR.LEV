@@ -11,14 +11,14 @@ const cases = [
   {
     home: '/',
     lang: 'en',
-    nav: ['/work/', '/about/', '/services/'],
+    nav: ['/work/', '/about/', '/services/', '/contact/'],
     casePath: '/work/catrin/',
     caseBack: '/work/#work',
   },
   {
     home: '/lv/',
     lang: 'lv',
-    nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/'],
+    nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/', '/lv/kontakti/'],
     casePath: '/lv/darbi/catrin/',
     caseBack: '/lv/darbi/#work',
   },
@@ -38,19 +38,22 @@ for (const current of cases) {
   );
   await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 }).catch(() => {});
 
-  const homeNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
-  assert(JSON.stringify(homeNav) === JSON.stringify(current.nav), `${current.lang} homepage header still uses old anchor navigation: ${homeNav.join(', ')}`);
+  const homeNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  assert(JSON.stringify(homeNav) === JSON.stringify(current.nav), `${current.lang} homepage header should use the four real page routes: ${homeNav.join(', ')}`);
 
-  const workActions = page.locator('main .hero a[data-analytics-event="view_work_click"]');
-  const startActions = page.locator('main .hero a[data-analytics-event="start_project_click"]');
-  const workHrefs = await workActions.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  const startHrefs = await startActions.evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  assert(workHrefs.includes('#work'), `${current.lang} homepage lost its local Work → #work hero journey: ${workHrefs.join(', ')}`);
-  assert(startHrefs.includes('#contact'), `${current.lang} homepage lost its local Start project → #contact hero journey: ${startHrefs.join(', ')}`);
+  const workHref = await page.locator('main .hero a[data-analytics-event="view_work_click"]').getAttribute('href');
+  const startHref = await page.locator('main .hero a[data-analytics-event="start_project_click"]').getAttribute('href');
+  assert(workHref === current.nav[0], `${current.lang} homepage Work CTA should route to ${current.nav[0]}, got ${workHref}`);
+  assert(startHref === current.nav[3], `${current.lang} homepage Start project CTA should route to ${current.nav[3]}, got ${startHref}`);
+
+  response = await page.goto(new URL(current.nav[3], baseURL).toString(), { waitUntil: 'load' });
+  assert(response?.ok(), `${current.nav[3]} returned ${response?.status()}`);
+  const contactNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+  assert(JSON.stringify(contactNav) === JSON.stringify(current.nav), `${current.lang} contact header is not connected to the full multi-page navigation`);
 
   response = await page.goto(new URL(current.casePath, baseURL).toString(), { waitUntil: 'load' });
   assert(response?.ok(), `${current.casePath} returned ${response?.status()}`);
-  const caseNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
+  const caseNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
   assert(JSON.stringify(caseNav) === JSON.stringify(current.nav), `${current.lang} case header is not connected to multi-page navigation`);
   const caseBack = await page.locator('.case-next a').first().getAttribute('href');
   assert(caseBack === current.caseBack, `${current.lang} case back link should return to the Work exhibition at ${current.caseBack}, got ${caseBack}`);
@@ -60,4 +63,4 @@ for (const current of cases) {
 }
 
 await browser.close();
-console.log('Multi-page navigation QA passed: homepage and case headers use real pages, homepage hero keeps its local journey, and cases return to the Work exhibition.');
+console.log('Multi-page navigation QA passed: Home, Contact and cases use the full route architecture, and cases return to the Work exhibition.');
