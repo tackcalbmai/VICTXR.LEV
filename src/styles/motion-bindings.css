@@ -4,14 +4,21 @@ html:not(.no-js) [data-motion-reveal] {
 }
 
 html:not(.no-js) [data-motion-reveal] > * {
-  opacity: 0;
-  transform: translateY(var(--xo-reveal-y, 2rem));
-  transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
+  opacity: 1;
+  transform: translateY(var(--xo-reveal-y, 1.15rem));
+  transition: transform 850ms var(--ease-out);
 }
 
 html:not(.no-js) [data-motion-reveal].is-xo-visible > * {
-  opacity: 1;
   transform: translateY(0);
+}
+
+/* Contrast is a hard invariant. These selectors intentionally live outside
+ * the layered global stylesheet so later component chunks cannot darken the
+ * header while it is sampled over a dark scene. */
+.site-header[data-over-theme='dark'],
+.site-header[data-over-theme='anelika'] {
+  color: var(--paper) !important;
 }
 
 [data-motion-shift] {
@@ -40,7 +47,6 @@ html:not(.no-js) [data-motion-reveal].is-xo-visible > * {
 
 @media (prefers-reduced-motion: reduce) {
   html:not(.no-js) [data-motion-reveal] > * {
-    opacity: 1;
     transform: none;
     transition: none;
   }
