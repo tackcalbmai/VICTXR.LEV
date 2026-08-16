@@ -30,11 +30,11 @@ const projectIds = ['catrin', 'anelika'] as const;
       <div class="mp-hero__bottom">
         <p>{page.intro}</p>
         <p class="mp-hero__proof">{page.proof}</p>
-        <a href="#selected-projects">{site.hero.scroll}<Arrow direction="down" /></a>
+        <a href="#work">{site.hero.scroll}<Arrow direction="down" /></a>
       </div>
     </section>
 
-    <section class="work-exhibition" id="selected-projects" aria-label={page.eyebrow}>
+    <section class="work-exhibition" id="work" aria-label={page.eyebrow}>
       {projectIds.map((projectId, index) => {
         const project = projects[projectId];
         const card = site.work.projects[projectId];
