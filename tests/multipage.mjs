@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
 const outDir = 'artifacts/visual';
@@ -110,9 +110,7 @@ async function assertWorkImagesLoaded(page, label) {
     const image = images.nth(i);
     await image.scrollIntoViewIfNeeded();
     await image.evaluate(async (element) => {
-      if (!element.complete || element.naturalWidth === 0) {
-        await element.decode().catch(() => {});
-      }
+      if (!element.complete || element.naturalWidth === 0) await element.decode().catch(() => {});
     });
   }
   const brokenImages = await images.evaluateAll((elements) => elements
@@ -137,9 +135,31 @@ async function captureViewport(page, selector, fileName) {
   await page.screenshot({ path: `${outDir}/${fileName}`, fullPage: false });
 }
 
-async function checkpoint(page, profile, route, stage) {
-  if (profile.name !== 'desktop' || route.key !== 'work-en') return;
-  await page.screenshot({ path: `${outDir}/diag-work-en-${stage}.png`, fullPage: false });
+async function persistFirstWorkState(page, response, runtimeErrors) {
+  const state = await page.evaluate(() => ({
+    url: location.href,
+    lang: document.documentElement.lang,
+    mainCount: document.querySelectorAll('main').length,
+    h1Count: document.querySelectorAll('h1').length,
+    canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
+    alternates: [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map((node) => ({ hreflang: node.getAttribute('hreflang'), href: node.getAttribute('href') })),
+    languageHref: document.querySelector('.site-language')?.getAttribute('href') ?? null,
+    desktopNav: [...document.querySelectorAll('.site-nav--desktop a')].map((node) => node.getAttribute('href')),
+    menuDisplay: getComputedStyle(document.querySelector('[data-menu-toggle]')).display,
+    desktopNavDisplay: getComputedStyle(document.querySelector('.site-nav--desktop')).display,
+    viewport: document.documentElement.clientWidth,
+    documentWidth: document.documentElement.scrollWidth,
+    bodyWidth: document.body.scrollWidth,
+    heroSpans: document.querySelectorAll('.mp-hero h1 span').length,
+    contactTitleSpans: document.querySelectorAll('.page-contact-cta h2 span').length,
+    contactLinks: [...document.querySelectorAll('.page-contact-cta a')].map((node) => node.getAttribute('href')),
+    workExhibits: document.querySelectorAll('.work-exhibit').length,
+    workImages: [...document.querySelectorAll('.work-exhibit img')].map((image) => ({ complete: image.complete, naturalWidth: image.naturalWidth, src: image.currentSrc || image.src })),
+  }));
+  state.responseStatus = response?.status() ?? null;
+  state.runtimeErrors = runtimeErrors;
+  await writeFile(`${outDir}/diag-work-en-state.json`, JSON.stringify(state, null, 2));
+  await page.screenshot({ path: `${outDir}/diag-work-en-state.png`, fullPage: false });
 }
 
 for (const profile of profiles) {
@@ -148,9 +168,10 @@ for (const profile of profiles) {
     const page = await context.newPage();
     const runtimeErrors = collectErrors(page);
     const response = await page.goto(new URL(route.path, baseURL).toString(), { waitUntil: 'load' });
-    assert(response?.ok(), `${profile.name} ${route.path} returned ${response?.status()}`);
     await page.evaluate(() => document.fonts.ready);
+    if (profile.name === 'desktop' && route.key === 'work-en') await persistFirstWorkState(page, response, runtimeErrors);
 
+    assert(response?.ok(), `${profile.name} ${route.path} returned ${response?.status()}`);
     const label = `${profile.name} ${route.key}`;
     assert(await page.locator('html').getAttribute('lang') === route.lang, `${label} has wrong document language`);
     assert(await page.locator('main').count() === 1, `${label} must have exactly one main`);
@@ -158,7 +179,6 @@ for (const profile of profiles) {
     assert((await page.locator('link[rel="canonical"]').getAttribute('href'))?.endsWith(route.path), `${label} canonical does not preserve route`);
     assert(await page.locator(`link[rel="alternate"][href$="${route.alternate}"]`).count() >= 1, `${label} is missing page-preserving hreflang alternate`);
     assert(await page.locator(`.site-language[href="${route.alternate}"]`).count() === 1, `${label} language switch loses page context`);
-    await checkpoint(page, profile, route, '01-metadata');
 
     const desktopLinks = await page.locator('.site-nav--desktop a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
     assert(JSON.stringify(desktopLinks) === JSON.stringify(route.nav), `${label} primary navigation is not route-based: ${desktopLinks.join(', ')}`);
@@ -174,14 +194,10 @@ for (const profile of profiles) {
       assert(!(await toggle.isVisible()), `${label} unexpectedly exposes compact navigation`);
       assert(await page.locator('.site-nav--desktop').isVisible(), `${label} should expose desktop navigation`);
     }
-    await checkpoint(page, profile, route, '02-navigation');
 
     await assertNoHorizontalOverflow(page, label);
     await assertTextInside(page, '.mp-hero h1 span', `${label} hero`);
-    await checkpoint(page, profile, route, '03-hero');
-
     await assertTextInside(page, '.page-contact-cta h2 span', `${label} contact transition title`);
-    await checkpoint(page, profile, route, '04-contact-type');
 
     if (route.key.startsWith('about-')) {
       await assertTextInside(page, '.about-definition h2 span, .about-principle h2, .about-standard h2 span', `${label} about display type`);
@@ -193,12 +209,10 @@ for (const profile of profiles) {
     if (route.key.startsWith('work-')) {
       assert(await page.locator('.work-exhibit').count() === 2, `${label} should expose two finished projects`);
       await assertWorkImagesLoaded(page, label);
-      await checkpoint(page, profile, route, '05-work-images');
     }
 
     const expectedContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
     assert(await page.locator(`.page-contact-cta a[href="${expectedContact}"]`).count() === 1, `${label} compact exit does not route to ${expectedContact}`);
-    await checkpoint(page, profile, route, '06-contact-route');
 
     await captureElement(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
     await captureViewport(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
