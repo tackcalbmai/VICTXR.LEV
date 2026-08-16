@@ -270,6 +270,7 @@ for (const [path, lang, alternate] of contactCases) {
   if (!response?.ok()) throw new Error(`${path} returned ${response?.status()}`);
   await assertCoreDocument(page, path, lang);
   if (await page.locator('[data-cinematic-intro]').count()) throw new Error(`${path} incorrectly launches the Home cinematic`);
+  if (await page.locator('[data-contact-dock]').count()) throw new Error(`${path} duplicates the global Contact dock on the dedicated Contact route`);
   if (await page.locator('[data-contact-intent]').count() !== 3) throw new Error(`${path} must expose three project starting points`);
   if (await page.locator('[data-contact-intent].is-active').count() !== 1) throw new Error(`${path} must expose one initial focus state`);
   if (await page.locator('.site-language').getAttribute('href') !== alternate) throw new Error(`${path} language switch loses Contact context`);
@@ -279,11 +280,23 @@ for (const [path, lang, alternate] of contactCases) {
   if (await firstIntent.getAttribute('aria-pressed') !== 'true') throw new Error(`${path} intent selection is not exposed accessibly`);
   const selectedLabel = (await page.locator('[data-contact-selection]').innerText()).trim();
   const firstLabel = (await firstIntent.locator('.contact-intent__title').innerText()).trim();
-  if (selectedLabel !== firstLabel) throw new Error(`${path} selection does not update the direct-contact state`);
-  const emailHref = await page.locator('[data-contact-email]').getAttribute('href');
-  if (!emailHref?.startsWith('mailto:') || !emailHref.includes('subject=')) throw new Error(`${path} selected intent does not prepare an email subject`);
-  await page.locator('.contact-direct').scrollIntoViewIfNeeded();
-  if (await page.locator('.contact-direct .contact-channels > a').count() < 1) throw new Error(`${path} is missing direct social contact channels`);
+  if (selectedLabel !== firstLabel) throw new Error(`${path} selection does not update the channel-router state`);
+
+  const expectedSubject = await firstIntent.getAttribute('data-contact-subject');
+  const emailHref = await page.locator('.contact-talk [data-router-email]').getAttribute('href');
+  if (!emailHref?.startsWith('mailto:')) throw new Error(`${path} selected intent does not prepare an email action`);
+  const emailSubject = new URL(emailHref).searchParams.get('subject');
+  if (!expectedSubject || emailSubject !== expectedSubject) throw new Error(`${path} selected intent does not propagate its email subject`);
+
+  const whatsappHref = await page.locator('.contact-talk [data-router-whatsapp]').first().getAttribute('href');
+  if (!whatsappHref?.startsWith('https://wa.me/')) throw new Error(`${path} is missing the primary WhatsApp action`);
+  const whatsappText = new URL(whatsappHref).searchParams.get('text') ?? '';
+  const expectedStarter = lang === 'lv' ? 'Sveiki! Vēlos sākt mājaslapas projektu no nulles.' : 'Hi! I’m starting a website project from zero.';
+  if (!whatsappText.startsWith(expectedStarter)) throw new Error(`${path} selected intent does not propagate to WhatsApp`);
+
+  if (await page.locator('[data-contact-brief]').count() !== 1) throw new Error(`${path} is missing the Short Brief builder`);
+  if (await page.locator('.contact-talk [data-contact-channel="instagram"]').count() !== 1) throw new Error(`${path} is missing Instagram as a secondary contact channel`);
+  await page.locator('.contact-talk').scrollIntoViewIfNeeded();
   await screenshot(page, `${lang}-contact-focus`);
   await assertNoHorizontalOverflow(page, path);
   if (errors.length) throw new Error(`${path} runtime errors:\n${errors.join('\n')}`);
@@ -339,7 +352,7 @@ const notFound = await openPage(routePage, '/this-page-does-not-exist/');
 if (notFound?.status() !== 404 || !await routePage.locator('.not-found').count()) throw new Error('Custom English 404 did not render correctly');
 routeErrors.length = 0;
 const lvNotFound = await openPage(routePage, '/lv/this-page-does-not-exist/');
-if (lvNotFound?.status() !== 404 || await routePage.locator('html').getAttribute('lang') !== 'lv') throw new Error('Custom Latvian 404 did not render correctly');
+if (lvNotFound?.status() !== 404 || await routePage.locator('html').getAttribute('lang') !== 'lv') throw new Error('Custom Latvian 404 did not set localized content');
 routeErrors.length = 0;
 
 await openPage(routePage, '/work/anelika/');
@@ -352,4 +365,4 @@ if (routeErrors.length) throw new Error(`Route runtime errors:\n${routeErrors.jo
 await routeContext.close();
 
 await browser.close();
-console.log('Visual QA passed: the shorter Home trailer, project takeover, dedicated Contact, responsive geometry, history behavior and case-study routes are stable.');
+console.log('Visual QA passed: the shorter Home trailer, project takeover, dedicated Contact router, responsive geometry, history behavior and case-study routes are stable.');
