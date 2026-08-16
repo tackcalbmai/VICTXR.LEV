@@ -102,6 +102,25 @@ async function assertServiceGeometry(page, label) {
   }
 }
 
+async function assertWorkImagesLoaded(page, label) {
+  const images = page.locator('.work-exhibit img');
+  const count = await images.count();
+  assert(count === 2, `${label} should expose two project images, got ${count}`);
+  for (let i = 0; i < count; i += 1) {
+    const image = images.nth(i);
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate(async (element) => {
+      if (!element.complete || element.naturalWidth === 0) {
+        await element.decode().catch(() => {});
+      }
+    });
+  }
+  const brokenImages = await images.evaluateAll((elements) => elements
+    .filter((image) => !image.complete || image.naturalWidth === 0)
+    .map((image) => image.currentSrc || image.src));
+  assert(!brokenImages.length, `${label} has broken work images: ${brokenImages.join(', ')}`);
+}
+
 async function captureElement(page, selector, fileName) {
   const locator = page.locator(selector).first();
   assert(await locator.count(), `${selector} is missing for screenshot`);
@@ -163,8 +182,7 @@ for (const profile of profiles) {
     }
     if (route.key.startsWith('work-')) {
       assert(await page.locator('.work-exhibit').count() === 2, `${label} should expose two finished projects`);
-      const brokenImages = await page.locator('.work-exhibit img').evaluateAll((images) => images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => image.currentSrc));
-      assert(!brokenImages.length, `${label} has broken work images: ${brokenImages.join(', ')}`);
+      await assertWorkImagesLoaded(page, label);
     }
 
     const expectedContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
