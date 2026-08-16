@@ -1,6 +1,6 @@
 ---
 import Arrow from './Arrow.astro';
-import PageContact from './PageContact.astro';
+import PageContactCTA from './PageContactCTA.astro';
 import SiteHeader from './SiteHeader.astro';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
@@ -19,16 +19,16 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
 ---
 
 <div class="mp-page mp-about" id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
+  <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="mp-hero mp-about__hero" aria-labelledby="about-page-title">
       <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>{locale === 'lv' ? 'Neatkarīgs / Latvija' : 'Independent / Latvia'}</span></div>
       <div class="about-identity-mark" aria-hidden="true"><span class="is-x">X</span><span class="is-o">O</span></div>
-      <h1 id="about-page-title">{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted']}>{line}</span>)}</h1>
+      <h1 id="about-page-title" data-motion-shift>{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted']}>{line}</span>)}</h1>
       <p class="mp-about__lead">{page.lead}</p>
     </section>
 
-    <section class="about-definition section-pad" aria-labelledby="about-definition-title">
+    <section class="about-definition section-pad" aria-labelledby="about-definition-title" data-motion-reveal>
       <p class="mp-kicker">XO / AUTHORSHIP</p>
       <h2 id="about-definition-title">{page.identityTitle.map((line) => <span>{line}</span>)}</h2>
       <p>{page.identityText}</p>
@@ -36,7 +36,7 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
 
     <section class="about-principles" aria-label={locale === 'lv' ? 'Darba principi' : 'Working principles'}>
       {page.principles.map((principle, index) => (
-        <article class:list={['about-principle', index % 2 === 1 && 'is-offset']}>
+        <article class:list={['about-principle', index % 2 === 1 && 'is-offset']} data-motion-reveal>
           <span class="about-principle__index">{principle.index}</span>
           <h2>{principle.title}</h2>
           <p>{principle.text}</p>
@@ -45,7 +45,7 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
       ))}
     </section>
 
-    <section class="about-standard" data-theme="dark" aria-labelledby="about-standard-title">
+    <section class="about-standard" data-theme="dark" aria-labelledby="about-standard-title" data-motion-reveal>
       <div class="about-standard__inner">
         <p class="mp-kicker">DIFFERENT PERSPECTIVE</p>
         <h2 id="about-standard-title">{page.standardTitle.map((line, index) => <span class:list={[index === 2 && 'is-accent']}>{line}</span>)}</h2>
@@ -53,7 +53,7 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
       </div>
     </section>
 
-    <section class="about-bridge section-pad">
+    <section class="about-bridge section-pad" data-motion-reveal>
       <p class="mp-kicker">{page.bridgeLabel}</p>
       <p class="about-bridge__statement">{page.bridgeText}</p>
       <div class="about-bridge__links">
@@ -62,6 +62,6 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.about : pageRoutes.lv.abou
       </div>
     </section>
 
-    <PageContact locale={locale} />
+    <PageContactCTA locale={locale} />
   </main>
 </div>
