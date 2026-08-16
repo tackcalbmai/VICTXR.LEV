@@ -1,6 +1,12 @@
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export function initArchitectureMotion() {
+  // Project Takeover is intentionally a dark Home act. Register it with the
+  // existing header contrast sampler instead of inventing a second theme system.
+  document.querySelectorAll<HTMLElement>('.home-v2-work').forEach((section) => {
+    if (!section.dataset.theme) section.dataset.theme = 'dark';
+  });
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const revealNodes = Array.from(document.querySelectorAll<HTMLElement>('[data-motion-reveal]'));
 
