@@ -1,9 +1,6 @@
 import { chromium } from 'playwright';
-import { mkdir, writeFile } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
-const outDir = 'artifacts/visual';
-await mkdir(outDir, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 
 function assert(condition, message) {
@@ -54,7 +51,6 @@ for (const path of ['/services/', '/lv/pakalpojumi/']) {
     const count = await rows.count();
     assert(count === 6, `${path} ${profile.name} should expose six service decisions, got ${count}`);
 
-    const geometry = [];
     for (let index = 0; index < count; index += 1) {
       const row = rows.nth(index);
       await row.scrollIntoViewIfNeeded();
@@ -63,30 +59,11 @@ for (const path of ['/services/', '/lv/pakalpojumi/']) {
       const mark = row.locator('.service-decision__mark');
       const [titleBox, bodyBox, markBox] = await Promise.all([rect(title), rect(body), rect(mark)]);
       const titleText = (await title.textContent())?.replace(/\s+/g, ' ').trim() ?? `row ${index + 1}`;
-      geometry.push({
-        index: index + 1,
-        title: titleText,
-        titleBox,
-        bodyBox,
-        markBox,
-        titleBodyOverlap: overlaps(titleBox, bodyBox),
-        titleMarkOverlap: overlaps(titleBox, markBox),
-        bodyMarkOverlap: overlaps(bodyBox, markBox),
-      });
-    }
 
-    const slug = `${path.includes('/lv/') ? 'lv' : 'en'}-${profile.name}`;
-    await writeFile(`${outDir}/services-geometry-${slug}.json`, JSON.stringify({ path, viewport: profile.viewport, geometry }, null, 2));
-    await page.screenshot({ path: `${outDir}/services-geometry-${slug}.png`, fullPage: false });
+      assert(!overlaps(titleBox, bodyBox), `${path} ${profile.name} service title overlaps its descriptive body: “${titleText}”`);
+      assert(!overlaps(titleBox, markBox), `${path} ${profile.name} service title overlaps the X/O focus mark: “${titleText}”`);
+      assert(!overlaps(bodyBox, markBox), `${path} ${profile.name} service body overlaps the X/O focus mark: “${titleText}”`);
 
-    for (const item of geometry) {
-      assert(!item.titleBodyOverlap, `${path} ${profile.name} service title overlaps its descriptive body: “${item.title}”`);
-      assert(!item.titleMarkOverlap, `${path} ${profile.name} service title overlaps the X/O focus mark: “${item.title}”`);
-      assert(!item.bodyMarkOverlap, `${path} ${profile.name} service body overlaps the X/O focus mark: “${item.title}”`);
-    }
-
-    for (let index = 0; index < count; index += 1) {
-      const mark = rows.nth(index).locator('.service-decision__mark');
       const x = mark.locator('i');
       const o = mark.locator('b');
       assert(await x.count() === 1 && await o.count() === 1, `${path} ${profile.name} service ${index + 1} lost the semantic X → O focus mechanism`);
