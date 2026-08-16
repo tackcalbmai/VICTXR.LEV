@@ -1,0 +1,39 @@
+---
+import Arrow from './Arrow.astro';
+import { contactRoutes } from '../data/architecture';
+import { getSiteCopy, type Locale } from '../data/site';
+
+interface Props {
+  locale: Locale;
+  label?: string;
+}
+
+const { locale, label } = Astro.props;
+const site = getSiteCopy(locale);
+const href = contactRoutes[locale];
+const eyebrow = label ?? (locale === 'lv' ? 'Nākamais solis' : 'Next step');
+const title = locale === 'lv' ? ['Ir problēma,', 'ko vērts salabot?'] : ['Have a problem', 'worth fixing?'];
+const text = locale === 'lv'
+  ? 'Sāc ar to, kas nestrādā. Tehniskais uzdevums un gatavs risinājums nav nepieciešams.'
+  : 'Start with what is not working. A technical brief and a pre-written solution are not required.';
+const cta = locale === 'lv' ? 'Pastāstīt par problēmu' : 'Tell me the problem';
+---
+
+<section class="page-contact-cta" data-theme="dark" data-motion-reveal aria-labelledby="page-contact-cta-title">
+  <div class="page-contact-cta__topline">
+    <span>{eyebrow}</span>
+    <span>XO → O</span>
+  </div>
+  <div class="page-contact-cta__body">
+    <h2 id="page-contact-cta-title">{title.map((line) => <span>{line}</span>)}</h2>
+    <div class="page-contact-cta__aside">
+      <p>{text}</p>
+      <a href={href} data-analytics-event="contact_page_click">{cta}<Arrow direction="right" /></a>
+    </div>
+  </div>
+  <footer class="page-contact-cta__footer">
+    <span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span>
+    <span>{site.footer.note}</span>
+    <a href="#top">{site.footer.backToTop}<Arrow direction="up" /></a>
+  </footer>
+</section>
