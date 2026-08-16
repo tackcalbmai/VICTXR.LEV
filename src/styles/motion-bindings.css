@@ -45,6 +45,19 @@ html:not(.no-js) [data-motion-reveal].is-xo-visible > * {
   transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0) perspective(1200px) rotateX(0.5deg) scale(1.006);
 }
 
+/* Latvian needs slightly more horizontal room for MĀJASLAPU on narrow screens.
+ * Preserve the scale of the scene, but relax the optical indent and type size
+ * just enough to keep the full word inside the viewport. */
+@media (max-width: 760px) {
+  html[lang='lv'] .home-v2-perspective h2 {
+    font-size: clamp(3.2rem, 15.5vw, 5.9rem);
+  }
+
+  html[lang='lv'] .home-v2-perspective h2 span:nth-child(2) {
+    padding-left: 3vw;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:not(.no-js) [data-motion-reveal] > * {
     transform: none;
