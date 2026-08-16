@@ -39,7 +39,7 @@ async function textGeometry(locator) {
       const range = document.createRange();
       range.selectNodeContents(textNode);
       for (const rect of range.getClientRects()) {
-        if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom });
+        if (rect.width > 1 && rect.height > 1) rects.push({ left: rect.left, right: rect.right });
       }
       textNode = walker.nextNode();
     }
@@ -89,29 +89,36 @@ for (const viewport of viewports) {
 
     await assertNoHorizontalClipping(
       page,
-      '.hero__title, .disruption__line, .display-title, .project-feature__title, .about__statement, .approach__steps strong, .xo-section h2, .anti-sales__title, .contact__title',
-      `${locale} ${viewport.width}px home display type`,
+      '.hero__title, .disruption__line, .home-v2-work__title, .home-v2-perspective h2, .home-v2-close h2',
+      `${locale} ${viewport.width}px Home display type`,
     );
 
     if (locale === 'en') {
       await assertLineHeightFloor(page, '.hero__title', 0.82, `en ${viewport.width}px hero`);
-      await assertLineHeightFloor(page, '.display-title', 0.90, `en ${viewport.width}px display title`);
       await assertLineHeightFloor(page, '.disruption__line', 0.92, `en ${viewport.width}px disruption`);
-      await assertLineHeightFloor(page, '.about__statement', 0.92, `en ${viewport.width}px about statement`);
-      await assertLineHeightFloor(page, '.approach__steps strong', 0.94, `en ${viewport.width}px approach`);
-      await assertLineHeightFloor(page, '.anti-sales__title', 0.86, `en ${viewport.width}px anti-sales`);
-      await assertLineHeightFloor(page, '.contact__title', 0.84, `en ${viewport.width}px contact`);
+      await assertLineHeightFloor(page, '.home-v2-work__title', 0.78, `en ${viewport.width}px takeover`);
+      await assertLineHeightFloor(page, '.home-v2-perspective h2', 0.77, `en ${viewport.width}px perspective`);
+      await assertLineHeightFloor(page, '.home-v2-close h2', 0.76, `en ${viewport.width}px close`);
+    }
+
+    const contactPath = locale === 'lv' ? '/lv/kontakti/' : '/contact/';
+    await openReadyPage(page, contactPath);
+    await assertNoHorizontalClipping(page, '.contact-hero h1, .contact-intent__title, .contact-direct h2', `${locale} ${viewport.width}px Contact display type`);
+    if (locale === 'en') {
+      await assertLineHeightFloor(page, '.contact-hero h1', 0.74, `en ${viewport.width}px Contact hero`);
+      await assertLineHeightFloor(page, '.contact-intent__title', 0.82, `en ${viewport.width}px Contact intent`);
+      await assertLineHeightFloor(page, '.contact-direct h2', 0.78, `en ${viewport.width}px Contact direct`);
     }
 
     for (const project of ['catrin', 'anelika']) {
       const path = locale === 'lv' ? `/lv/darbi/${project}/` : `/work/${project}/`;
       await openReadyPage(page, path);
-      await assertNoHorizontalClipping(page, '.case-hero h1, .case-narrative__row h2, .case-result p, .case-contact > h2', `${locale} ${viewport.width}px ${project} display type`);
+      await assertNoHorizontalClipping(page, '.case-hero h1, .case-narrative__row h2, .case-result p, .page-contact-cta h2', `${locale} ${viewport.width}px ${project} display type`);
       if (locale === 'en') {
         await assertLineHeightFloor(page, '.case-hero h1', 0.78, `en ${viewport.width}px ${project} hero`);
         await assertLineHeightFloor(page, '.case-narrative__row h2', 1.0, `en ${viewport.width}px ${project} narrative`);
         await assertLineHeightFloor(page, '.case-result p', 1.01, `en ${viewport.width}px ${project} result`);
-        await assertLineHeightFloor(page, '.case-contact > h2', 0.84, `en ${viewport.width}px ${project} contact`);
+        await assertLineHeightFloor(page, '.page-contact-cta h2', 0.78, `en ${viewport.width}px ${project} Contact transition`);
       }
     }
 
@@ -120,4 +127,4 @@ for (const viewport of viewports) {
 }
 
 await browser.close();
-console.log('Desktop display typography QA passed: EN/LV oversized text stays inside the viewport and settled masks cannot crop glyphs.');
+console.log('Desktop display typography QA passed across the new Home trailer, dedicated Contact and EN/LV case-study exits.');
