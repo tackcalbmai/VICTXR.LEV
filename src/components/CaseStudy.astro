@@ -77,6 +77,6 @@ const projectTransitionName = `xo-project-${projectId}`;
       <a href={nextHref} data-analytics-event="case_study_click" data-project-id={nextId}>{content.nextLabel}<Arrow direction="right" /></a>
     </nav>
 
-    <PageContactCTA locale={locale} label={locale === 'lv' ? 'Pēc projekta' : 'After the work'} />
+    <PageContactCTA locale={locale} context="case" source={`case-${projectId}`} />
   </main>
 </div>
