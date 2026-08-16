@@ -72,11 +72,11 @@ async function assertBrandMotion(name, viewport) {
   const reference = page.locator('.site-brand-submark__core > span').first();
 
   const hierarchy = await page.evaluate(() => ({
-    primary: document.querySelector('.site-brand')?.textContent?.replace(/\s+/g, ' ').trim(),
-    byline: document.querySelector('[data-xo-submark]')?.textContent?.replace(/\s+/g, ' ').trim(),
+    primary: document.querySelector('.site-brand')?.textContent?.replace(/\s+/g, ''),
+    byline: document.querySelector('[data-xo-submark]')?.textContent?.replace(/\s+/g, ''),
   }));
-  if (hierarchy.primary !== 'XO WEB') throw new Error(`${name} primary wordmark should be XO WEB, got ${hierarchy.primary}`);
-  if (!hierarchy.byline?.includes('BY VICTXR.LEV')) throw new Error(`${name} author signature should expose BY VICTXR.LEV, got ${hierarchy.byline}`);
+  if (hierarchy.primary !== 'XOWEB') throw new Error(`${name} primary wordmark should be XO WEB, got ${hierarchy.primary}`);
+  if (!hierarchy.byline?.includes('BYVICTXR.LEV')) throw new Error(`${name} author signature should expose BY VICTXR.LEV, got ${hierarchy.byline}`);
 
   const primaryBox = await primaryBrand.boundingBox();
   const bylineBox = await byline.boundingBox();
