@@ -1,0 +1,17 @@
+/* Latvian Contact needs its own mobile optical scale: the translated display lines are wider than EN. */
+@media (max-width: 760px) {
+  html[lang='lv'] .contact-hero h1 {
+    max-width: 100%;
+    font-size: clamp(3rem, 13.8vw, 5.2rem);
+    line-height: 0.84;
+  }
+
+  html[lang='lv'] .contact-hero h1 .is-accent {
+    padding-left: 3vw;
+  }
+
+  html[lang='lv'] .contact-hero h1 .is-muted {
+    padding-left: 4vw;
+    font-size: 0.9em;
+  }
+}
