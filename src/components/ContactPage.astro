@@ -1,6 +1,5 @@
 ---
 import Arrow from './Arrow.astro';
-import ContactIcon from './ContactIcon.astro';
 import SiteHeader from './SiteHeader.astro';
 import { contacts, getSocialContactLinks } from '../data/contacts';
 import { contactRoutes, getContactPageCopy } from '../data/architecture';
@@ -161,7 +160,7 @@ const routerConfig = JSON.stringify({ starters: router.starters, prompts: router
       </footer>
     </section>
   </main>
-  <script type="application/json" data-contact-router-config set:html={routerConfig}></script>
+  <script is:inline type="application/json" data-contact-router-config set:html={routerConfig}></script>
 </div>
 
 <script>
