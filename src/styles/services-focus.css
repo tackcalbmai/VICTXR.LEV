@@ -1,7 +1,7 @@
 .service-decision__mark {
   position: relative;
-  width: 3.4rem;
-  height: 3.4rem;
+  width: 2.75rem;
+  height: 2.75rem;
   transform: none;
 }
 
@@ -10,7 +10,7 @@
   position: absolute;
   inset: 50% auto auto 50%;
   font-style: normal;
-  font-size: clamp(2rem, 3.5vw, 3.6rem);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
   font-weight: 820;
   line-height: 1;
   transform: translate(-50%, -50%);
@@ -43,6 +43,18 @@
 .service-decision:focus-within .service-decision__mark b {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+@media (max-width: 760px) {
+  .service-decision__mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .service-decision__mark i,
+  .service-decision__mark b {
+    font-size: 2rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
