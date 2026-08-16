@@ -5,7 +5,7 @@ import PageContactCTA from './PageContactCTA.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
 import { pageRoutes } from '../data/multipage';
-import { getSiteCopy, type Locale } from '../data/site';
+import type { Locale } from '../data/site';
 import { projects, type ProjectId } from '../data/projects';
 import '../styles/case-study.css';
 import '../styles/no-indexes.css';
@@ -19,7 +19,6 @@ interface Props {
 const { locale, projectId } = Astro.props;
 const project = projects[projectId];
 const content = project.content[locale];
-const site = getSiteCopy(locale);
 const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
 const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
 const alternateHref = locale === 'lv' ? `/work/${projectId}/` : `/lv/darbi/${projectId}/`;
