@@ -141,4 +141,17 @@
     animation: none !important;
     transition: none !important;
   }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(xo-project-catrin),
+  ::view-transition-old(xo-project-catrin),
+  ::view-transition-new(xo-project-catrin),
+  ::view-transition-group(xo-project-anelika),
+  ::view-transition-old(xo-project-anelika),
+  ::view-transition-new(xo-project-anelika) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
 }
