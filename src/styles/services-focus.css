@@ -1,0 +1,51 @@
+.service-decision__mark {
+  position: relative;
+  width: 3.4rem;
+  height: 3.4rem;
+  transform: none;
+}
+
+.service-decision__mark i,
+.service-decision__mark b {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  font-style: normal;
+  font-size: clamp(2rem, 3.5vw, 3.6rem);
+  font-weight: 820;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 360ms ease, transform 500ms var(--ease-out), color 360ms ease;
+}
+
+.service-decision__mark i {
+  color: var(--accent);
+  transform: translate(-50%, -50%) rotate(-18deg);
+}
+
+.service-decision__mark b {
+  color: var(--ink);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.62);
+}
+
+.service-decision:hover .service-decision__mark,
+.service-decision:focus-within .service-decision__mark {
+  transform: none;
+}
+
+.service-decision:hover .service-decision__mark i,
+.service-decision:focus-within .service-decision__mark i {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(0deg) scale(0.7);
+}
+
+.service-decision:hover .service-decision__mark b,
+.service-decision:focus-within .service-decision__mark b {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-decision__mark i,
+  .service-decision__mark b { transition: none; }
+}
