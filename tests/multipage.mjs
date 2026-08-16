@@ -185,8 +185,12 @@ for (const profile of profiles) {
       await assertWorkImagesLoaded(page, label);
     }
 
-    const expectedContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
-    assert(await page.locator(`.page-contact-cta a[href="${expectedContact}"]`).count() === 1, `${label} compact exit does not route to ${expectedContact}`);
+    const source = route.key.split('-')[0];
+    const baseContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
+    const expectedContact = `${baseContact}?from=${source}#start`;
+    const contactExit = page.locator('.page-contact-cta a[data-analytics-event="contact_page_click"]');
+    assert(await contactExit.count() === 1, `${label} compact Contact exit is missing`);
+    assert(await contactExit.getAttribute('href') === expectedContact, `${label} compact exit does not preserve ${source} context: expected ${expectedContact}`);
 
     await captureElement(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
     await captureViewport(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
@@ -199,4 +203,4 @@ for (const profile of profiles) {
 }
 
 await browser.close();
-console.log('Multi-page QA passed: EN/LV Work, About and Services are route-aware, overflow-safe, visually bounded and exit through dedicated Contact pages.');
+console.log('Multi-page QA passed: EN/LV Work, About and Services are route-aware, overflow-safe, visually bounded and preserve page context when exiting through Contact.');
