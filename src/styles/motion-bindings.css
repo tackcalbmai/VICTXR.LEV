@@ -1,10 +1,15 @@
 html:not(.no-js) [data-motion-reveal] {
+  opacity: 1;
+  transform: none;
+}
+
+html:not(.no-js) [data-motion-reveal] > * {
   opacity: 0;
   transform: translateY(var(--xo-reveal-y, 2rem));
   transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
 }
 
-html:not(.no-js) [data-motion-reveal].is-xo-visible {
+html:not(.no-js) [data-motion-reveal].is-xo-visible > * {
   opacity: 1;
   transform: translateY(0);
 }
@@ -34,7 +39,7 @@ html:not(.no-js) [data-motion-reveal].is-xo-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html:not(.no-js) [data-motion-reveal] {
+  html:not(.no-js) [data-motion-reveal] > * {
     opacity: 1;
     transform: none;
     transition: none;
