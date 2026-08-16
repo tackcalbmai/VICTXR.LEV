@@ -27,6 +27,16 @@ const contactHref = buildContactHref(locale, 'home', undefined, 'start');
 const catrin = projects.catrin;
 const anelika = projects.anelika;
 const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
+const valueLine = locale === 'lv'
+  ? 'Veidots ap biznesa problēmu — nevis ap veidni.'
+  : 'Built around the business problem — not around a template.';
+const capabilityTitle = locale === 'lv'
+  ? 'Ko es varu izdarīt tava biznesa labā.'
+  : 'What I can actually do for your business.';
+const capabilityIntro = locale === 'lv'
+  ? 'Nevis tehnoloģiju saraksts. Seši praktiski veidi, kā mājaslapa var kļūt skaidrāka, spēcīgāka vai noderīgāka.'
+  : 'Not a technology list. Six practical ways a website can become clearer, stronger or more useful.';
+const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / at a glance';
 ---
 
 <div class="home-shell" data-home-intro="pending" id="top">
@@ -67,7 +77,7 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
       </h1>
       <p class="hero__side-note" data-side-note><span>{copy.hero.sideNote}</span></p>
       <div class="hero__footer" data-intro-footer>
-        <p class="hero__intro">{copy.hero.intro}</p>
+        <p class="hero__intro">{copy.hero.intro}<br /><span>{valueLine}</span></p>
         <a class="scroll-rail" href="#different-business" data-scroll-journey>
           <span class="scroll-rail__label">{copy.hero.scroll}</span>
           <span class="scroll-rail__window" aria-hidden="true"><span class="scroll-rail__track">{railGlyphs.map((glyph) => <span class:list={[glyph === 'O' && 'is-o']}>{glyph}</span>)}</span></span>
@@ -98,16 +108,38 @@ const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
           <a class="home-v2-project home-v2-project--catrin" href={copy.work.projects.catrin.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="catrin">
             <span class="home-v2-project__label">CATRIN / {copy.work.projects.catrin.sector}</span>
             <ResponsiveProjectImage desktop={catrin.hero} mobile={catrin.mobile} alt={locale === 'lv' ? 'CATRIN projekta priekšskatījums' : 'CATRIN project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 86vw, 58vw" />
+            <span class="home-v2-project__summary">{copy.work.projects.catrin.summary}</span>
           </a>
           <a class="home-v2-project home-v2-project--anelika" href={copy.work.projects.anelika.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="anelika">
             <span class="home-v2-project__label">ANELIKA / {copy.work.projects.anelika.sector}</span>
             <ResponsiveProjectImage desktop={anelika.hero} mobile={anelika.mobile} alt={locale === 'lv' ? 'ANELIKA projekta priekšskatījums' : 'ANELIKA project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 91vw, 62vw" />
+            <span class="home-v2-project__summary">{copy.work.projects.anelika.summary}</span>
           </a>
         </div>
         <div class="home-v2-work__bottom">
           <p>{v2.workText}</p>
           <a class="home-v2-link" href={routes.work}>{v2.workCta}<Arrow direction="right" /></a>
         </div>
+      </div>
+    </section>
+
+    <section class="home-v2-capabilities" aria-labelledby="home-v2-capabilities-title" data-motion-reveal>
+      <div class="home-v2-capabilities__topline"><span>{capabilityLabel}</span><span>XO / BUSINESS OUTCOMES</span></div>
+      <div class="home-v2-capabilities__head">
+        <h2 id="home-v2-capabilities-title">{capabilityTitle}</h2>
+        <p>{capabilityIntro}</p>
+      </div>
+      <div class="home-v2-capabilities__grid">
+        {copy.services.items.map(([index, title, text]) => (
+          <article class="home-v2-capability">
+            <span class="home-v2-capability__index">{index}</span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+      <div class="home-v2-capabilities__footer">
+        <a class="home-v2-link" href={routes.services}>{v2.servicesCta}<Arrow direction="right" /></a>
       </div>
     </section>
 
