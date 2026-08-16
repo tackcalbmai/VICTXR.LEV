@@ -137,6 +137,11 @@ async function captureViewport(page, selector, fileName) {
   await page.screenshot({ path: `${outDir}/${fileName}`, fullPage: false });
 }
 
+async function checkpoint(page, profile, route, stage) {
+  if (profile.name !== 'desktop' || route.key !== 'work-en') return;
+  await page.screenshot({ path: `${outDir}/diag-work-en-${stage}.png`, fullPage: false });
+}
+
 for (const profile of profiles) {
   const context = await browser.newContext({ viewport: profile.viewport, reducedMotion: 'reduce' });
   for (const route of routes) {
@@ -153,6 +158,7 @@ for (const profile of profiles) {
     assert((await page.locator('link[rel="canonical"]').getAttribute('href'))?.endsWith(route.path), `${label} canonical does not preserve route`);
     assert(await page.locator(`link[rel="alternate"][href$="${route.alternate}"]`).count() >= 1, `${label} is missing page-preserving hreflang alternate`);
     assert(await page.locator(`.site-language[href="${route.alternate}"]`).count() === 1, `${label} language switch loses page context`);
+    await checkpoint(page, profile, route, '01-metadata');
 
     const desktopLinks = await page.locator('.site-nav--desktop a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
     assert(JSON.stringify(desktopLinks) === JSON.stringify(route.nav), `${label} primary navigation is not route-based: ${desktopLinks.join(', ')}`);
@@ -168,10 +174,14 @@ for (const profile of profiles) {
       assert(!(await toggle.isVisible()), `${label} unexpectedly exposes compact navigation`);
       assert(await page.locator('.site-nav--desktop').isVisible(), `${label} should expose desktop navigation`);
     }
+    await checkpoint(page, profile, route, '02-navigation');
 
     await assertNoHorizontalOverflow(page, label);
     await assertTextInside(page, '.mp-hero h1 span', `${label} hero`);
+    await checkpoint(page, profile, route, '03-hero');
+
     await assertTextInside(page, '.page-contact-cta h2 span', `${label} contact transition title`);
+    await checkpoint(page, profile, route, '04-contact-type');
 
     if (route.key.startsWith('about-')) {
       await assertTextInside(page, '.about-definition h2 span, .about-principle h2, .about-standard h2 span', `${label} about display type`);
@@ -183,10 +193,12 @@ for (const profile of profiles) {
     if (route.key.startsWith('work-')) {
       assert(await page.locator('.work-exhibit').count() === 2, `${label} should expose two finished projects`);
       await assertWorkImagesLoaded(page, label);
+      await checkpoint(page, profile, route, '05-work-images');
     }
 
     const expectedContact = route.lang === 'lv' ? '/lv/kontakti/' : '/contact/';
     assert(await page.locator(`.page-contact-cta a[href="${expectedContact}"]`).count() === 1, `${label} compact exit does not route to ${expectedContact}`);
+    await checkpoint(page, profile, route, '06-contact-route');
 
     await captureElement(page, '.mp-hero', `multipage-${route.key}-${profile.name}-hero.png`);
     await captureViewport(page, route.section, `multipage-${route.key}-${profile.name}-content.png`);
