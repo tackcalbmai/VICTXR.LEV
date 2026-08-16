@@ -13,14 +13,14 @@ const cases = [
     lang: 'en',
     nav: ['/work/', '/about/', '/services/'],
     casePath: '/work/catrin/',
-    caseBack: '/#work',
+    caseBack: '/work/#work',
   },
   {
     home: '/lv/',
     lang: 'lv',
     nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/'],
     casePath: '/lv/darbi/catrin/',
-    caseBack: '/lv/#work',
+    caseBack: '/lv/darbi/#work',
   },
 ];
 
@@ -53,11 +53,11 @@ for (const current of cases) {
   const caseNav = await page.locator('.site-header .site-nav--desktop > a').evaluateAll((links) => links.slice(0, 3).map((link) => link.getAttribute('href')));
   assert(JSON.stringify(caseNav) === JSON.stringify(current.nav), `${current.lang} case header is not connected to multi-page navigation`);
   const caseBack = await page.locator('.case-next a').first().getAttribute('href');
-  assert(caseBack === current.caseBack, `${current.lang} case back link should preserve ${current.caseBack}, got ${caseBack}`);
+  assert(caseBack === current.caseBack, `${current.lang} case back link should return to the Work exhibition at ${current.caseBack}, got ${caseBack}`);
 
   await page.close();
   await context.close();
 }
 
 await browser.close();
-console.log('Multi-page navigation QA passed: homepage and case headers use real pages while the existing homepage hero and case back-to-work journeys remain intact.');
+console.log('Multi-page navigation QA passed: homepage and case headers use real pages, homepage hero keeps its local journey, and cases return to the Work exhibition.');
