@@ -1,13 +1,14 @@
 ---
 import Arrow from './Arrow.astro';
-import ContactChannels from './ContactChannels.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
-import { contacts } from '../data/contacts';
+import { contactRoutes, getHomeV2Copy } from '../data/architecture';
+import { pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import { projects } from '../data/projects';
 import '../styles/home.css';
 import '../styles/cinematic.css';
+import '../styles/architecture-v2.css';
 import '../styles/no-indexes.css';
 import '../styles/commercial-hardening.css';
 
@@ -17,12 +18,12 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getSiteCopy(locale);
+const v2 = getHomeV2Copy(locale);
+const routes = pageRoutes[locale];
+const contactHref = contactRoutes[locale];
 const catrin = projects.catrin;
 const anelika = projects.anelika;
-const contactEmail = contacts.email;
-const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(copy.contact.subject)}`;
 const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];
-const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, '');
 ---
 
 <div class="home-shell" data-home-intro="pending" id="top">
@@ -48,7 +49,8 @@ const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, ''
       window.setTimeout(() => releaseFallback(true), 6800);
     })();
   </script>
-  <SiteHeader locale={locale} contactHref="#contact" multipageNavigation />
+
+  <SiteHeader locale={locale} multipageNavigation />
 
   <main id="main-content" tabindex="-1">
     <section class="hero" data-hero aria-labelledby="hero-title">
@@ -69,8 +71,8 @@ const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, ''
           <Arrow direction="down" />
         </a>
         <nav class="hero__actions" aria-label={locale === 'lv' ? 'Galvenā navigācija' : 'Primary navigation'}>
-          <a href="#work" data-analytics-event="view_work_click"><span>{copy.hero.work}</span><Arrow direction="down" /></a>
-          <a href="#contact" data-analytics-event="start_project_click"><span>{copy.hero.start}</span><Arrow direction="down" /></a>
+          <a href={routes.work} data-analytics-event="view_work_click"><span>{copy.hero.work}</span><Arrow direction="right" /></a>
+          <a href={contactHref} data-analytics-event="start_project_click"><span>{copy.hero.start}</span><Arrow direction="right" /></a>
         </nav>
       </div>
     </section>
@@ -85,63 +87,59 @@ const cleanSectionLabel = (label: string) => label.replace(/\s*\/\s*\d+\s*$/, ''
       </div>
     </section>
 
-    <section class="work-heading section-pad" id="work" aria-labelledby="work-title">
-      <div class="section-kicker reveal" data-reveal><span>{copy.work.label}</span></div>
-      <div class="work-heading__grid"><h2 id="work-title" class="display-title reveal" data-reveal>{copy.work.title}</h2><p class="section-copy reveal" data-reveal>{copy.work.intro}</p></div>
+    <section class="home-v2-work" id="work" data-takeover-zone aria-labelledby="home-v2-work-title">
+      <div class="home-v2-work__sticky">
+        <div class="home-v2-work__topline"><span>{v2.workLabel}</span><span>XO / PROJECT TAKEOVER</span></div>
+        <h2 class="home-v2-work__title" id="home-v2-work-title" data-motion-shift>{v2.workTitle.map((line) => <span>{line}</span>)}</h2>
+        <div class="home-v2-projects" aria-label={locale === 'lv' ? 'Atlasīto projektu priekšskatījumi' : 'Selected project previews'}>
+          <a class="home-v2-project home-v2-project--catrin" href={copy.work.projects.catrin.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="catrin">
+            <span class="home-v2-project__label">CATRIN / {copy.work.projects.catrin.sector}</span>
+            <ResponsiveProjectImage desktop={catrin.hero} mobile={catrin.mobile} alt={locale === 'lv' ? 'CATRIN projekta priekšskatījums' : 'CATRIN project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 86vw, 58vw" />
+          </a>
+          <a class="home-v2-project home-v2-project--anelika" href={copy.work.projects.anelika.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="anelika">
+            <span class="home-v2-project__label">ANELIKA / {copy.work.projects.anelika.sector}</span>
+            <ResponsiveProjectImage desktop={anelika.hero} mobile={anelika.mobile} alt={locale === 'lv' ? 'ANELIKA projekta priekšskatījums' : 'ANELIKA project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 91vw, 62vw" />
+          </a>
+        </div>
+        <div class="home-v2-work__bottom">
+          <p>{v2.workText}</p>
+          <a class="home-v2-link" href={routes.work}>{v2.workCta}<Arrow direction="right" /></a>
+        </div>
+      </div>
     </section>
 
-    <article class="project-feature project-feature--catrin" data-project data-theme="dark">
-      <a class="project-feature__link" href={copy.work.projects.catrin.href} data-analytics-event="case_study_click" data-project-id="catrin">
-        <div class="project-feature__topline"><span>{copy.work.label}</span><span>{copy.work.projects.catrin.sector}</span></div>
-        <h3 class="project-feature__title" data-project-title>CATRIN</h3>
-        <div class="project-feature__media project-feature__media--catrin" data-project-media data-perspective-card><ResponsiveProjectImage class="project-screen" desktop={catrin.hero} mobile={catrin.mobile} alt={locale === 'lv' ? 'CATRIN kāzu salona mājaslapas responsīvie skati' : 'Responsive views of the CATRIN bridal salon website'} loading="lazy" quality={86} sizes="(max-width: 760px) calc(100vw - 2rem), 66vw" /></div>
-        <div class="project-feature__bottom"><p>{copy.work.projects.catrin.summary}</p><ul>{copy.work.projects.catrin.scope.map((item) => <li>{item}</li>)}</ul><span class="text-link">{copy.work.caseStudy}<Arrow direction="right" /></span></div>
-      </a>
-    </article>
-
-    <article class="project-feature project-feature--anelika" data-project data-theme="anelika">
-      <a class="project-feature__link" href={copy.work.projects.anelika.href} data-analytics-event="case_study_click" data-project-id="anelika">
-        <div class="project-feature__topline"><span>{copy.work.label}</span><span>{copy.work.projects.anelika.sector}</span></div>
-        <h3 class="project-feature__title" data-project-title>ANELIKA</h3>
-        <div class="project-feature__media project-feature__media--anelika" data-project-media data-perspective-card><ResponsiveProjectImage class="project-screen" desktop={anelika.hero} mobile={anelika.mobile} alt={locale === 'lv' ? 'ANELIKA pakalpojumu mājaslapas responsīvie skati' : 'Responsive views of the ANELIKA property services website'} loading="lazy" quality={86} sizes="(max-width: 760px) calc(100vw - 2rem), 82vw" /></div>
-        <div class="project-feature__bottom"><p>{copy.work.projects.anelika.summary}</p><ul>{copy.work.projects.anelika.scope.map((item) => <li>{item}</li>)}</ul><span class="text-link">{copy.work.caseStudy}<Arrow direction="right" /></span></div>
-      </a>
-    </article>
-
-    <section class="about section-pad" id="about" aria-labelledby="about-title">
-      <div class="section-kicker reveal" data-reveal><span>{cleanSectionLabel(copy.about.label)}</span></div>
-      <div class="about__top"><h2 class="display-title reveal" id="about-title" data-reveal>{copy.about.title.map((line) => <span>{line}</span>)}</h2><p class="about__aside reveal" data-reveal>{copy.about.aside}</p></div>
-      <div class="about__body"><div class="about__copy reveal" data-reveal>{copy.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}</div><p class="about__statement" data-statement>{copy.about.statement.map((line) => <span>{line}</span>)}</p></div>
+    <section class="home-v2-perspective" aria-labelledby="home-v2-perspective-title" data-motion-reveal>
+      <div class="home-v2-perspective__topline"><span>{v2.perspectiveLabel}</span><span>XO / QUESTION THE BRIEF</span></div>
+      <div class="home-v2-perspective__xo" aria-hidden="true"><span class="x">X</span><span class="o">O</span></div>
+      <h2 id="home-v2-perspective-title" data-statement data-motion-shift>{v2.perspectiveTitle.map((line) => <span>{line}</span>)}</h2>
+      <div class="home-v2-perspective__bottom">
+        <p>{v2.perspectiveText}</p>
+        <div class="home-v2-perspective__links" data-approach-step>
+          <a class="home-v2-link" href={routes.about}>{v2.aboutCta}<Arrow direction="right" /></a>
+          <a class="home-v2-link" href={routes.services}>{v2.servicesCta}<Arrow direction="right" /></a>
+        </div>
+      </div>
     </section>
 
-    <section class="approach" id="approach" data-theme="dark" aria-labelledby="approach-title">
-      <div class="approach__intro section-pad"><div class="section-kicker"><span>{cleanSectionLabel(copy.approach.label)}</span></div><h2 id="approach-title">{copy.approach.intro}</h2></div>
-      <ol class="approach__steps" data-approach>{copy.approach.steps.map((step) => <li data-approach-step><strong>{step}</strong></li>)}</ol>
-    </section>
-
-    <section class="services section-pad" id="services" aria-labelledby="services-title">
-      <div class="section-kicker reveal" data-reveal><span>{cleanSectionLabel(copy.services.label)}</span></div>
-      <h2 class="display-title services__title reveal" id="services-title" data-reveal>{copy.services.title}</h2>
-      <div class="services__list">{copy.services.items.map(([, title, text]) => <article class="service-row reveal" data-reveal><h3>{title}</h3><p>{text}</p><span class="service-row__mark" aria-hidden="true">X</span></article>)}</div>
-    </section>
-
-    <section class="xo-section" aria-labelledby="xo-title"><div class="xo-section__noise" aria-hidden="true">X X X X X X X X X X X X X X X X X X</div><div class="xo-section__content"><p>{copy.xo.label}</p><h2 id="xo-title">{copy.xo.title.map((line) => <span>{line.split(/([XO])/g).map((part) => part === 'X' ? <b style="color: var(--accent); font-weight: inherit;">X</b> : part === 'O' ? <b style="color: var(--muted); font-weight: inherit;">O</b> : part)}</span>)}</h2><p>{copy.xo.text}</p></div></section>
-
-    <section class="anti-sales" data-anti-sales aria-label={copy.anti.first.join(' ')}><div class="anti-sales__stage"><p class="anti-sales__title anti-sales__title--first" data-anti-first>{copy.anti.first.map((line) => <span>{line}</span>)}</p><p class="anti-sales__title anti-sales__title--second" data-anti-second>{copy.anti.second.map((line) => <span>{line}</span>)}</p><p class="anti-sales__copy" data-anti-copy>{copy.anti.text}</p></div></section>
-
-    <section class="contact section-pad" id="contact" data-theme="dark" aria-labelledby="contact-title">
-      <div class="section-kicker"><span>{cleanSectionLabel(copy.contact.label)}</span></div>
-      <p class="contact__availability">{copy.contact.availability}</p>
-      <h2 class="contact__title" id="contact-title">{copy.contact.title.map((line) => <span>{line}</span>)}</h2>
-      <p class="contact__expectation">{copy.contact.expectation}</p>
-      {contactEmail && <div class="contact__actions"><a class="contact__email" href={mailto} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email"><span>{copy.contact.emailLabel}</span><strong>{contactEmail}</strong><Arrow direction="right" /></a><button type="button" data-copy-email data-email={contactEmail} data-copy-label={copy.contact.copy} data-copied-label={copy.contact.copied} data-analytics-event="copy_email_click"><span data-copy-text>{copy.contact.copy}</span><span class="copy-mark" aria-hidden="true"></span></button><p class="sr-only" aria-live="polite" data-copy-status></p></div>}
-      <ContactChannels locale={locale} />
-      <footer class="site-footer"><span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span><span>{copy.footer.note}</span><a href="#top">{copy.footer.backToTop}<Arrow direction="up" /></a></footer>
+    <section class="home-v2-close" data-theme="dark" aria-labelledby="home-v2-close-title" data-motion-reveal>
+      <p class="home-v2-close__eyebrow">{v2.closeEyebrow}</p>
+      <h2 id="home-v2-close-title">{v2.closeTitle.map((line) => <span>{line}</span>)}</h2>
+      <div class="home-v2-close__aside">
+        <p>{v2.closeText}</p>
+        <a class="home-v2-link" href={contactHref} data-analytics-event="contact_page_click">{v2.closeCta}<Arrow direction="right" /></a>
+      </div>
+      <footer class="home-v2-close__footer page-contact-cta__footer">
+        <span>© <span data-current-year>2026</span> XO WEB / VICTXR.LEV</span>
+        <span>{copy.footer.note}</span>
+        <a href="#top">{copy.footer.backToTop}<Arrow direction="up" /></a>
+      </footer>
     </section>
   </main>
 </div>
 
 <script>
   import { initHomeMotion } from '../scripts/home';
+  import { initArchitectureMotion } from '../scripts/architecture-motion';
   initHomeMotion();
+  initArchitectureMotion();
 </script>
