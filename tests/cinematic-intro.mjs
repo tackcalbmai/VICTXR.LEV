@@ -148,16 +148,13 @@ async function assertCinematicIntro(name, viewport) {
   const delta = rectDelta(flyingBox, landedHeaderBox);
   const tolerance = viewport.width <= 760 ? 2.5 : 2;
   if (delta.left > tolerance || delta.top > tolerance || delta.width > tolerance || delta.height > tolerance) {
-    throw new Error(`${name} flying logo missed the real header slot: left ${delta.left.toFixed(1)}, top ${delta.top.toFixed(1)}, width ${delta.width.toFixed(1)}, height ${delta.height.toFixed(1)}px`);
+    throw new Error(`${name} flying logo missed the real XO WEB header slot: left ${delta.left.toFixed(1)}, top ${delta.top.toFixed(1)}, width ${delta.width.toFixed(1)}, height ${delta.height.toFixed(1)}px`);
   }
   const headerOpacity = Number(await page.locator('[data-site-header]').evaluate((element) => getComputedStyle(element).opacity));
   if (headerOpacity < 0.9) throw new Error(`${name} real header did not take over after exact landing (${headerOpacity})`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed-slot.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    // Playwright can attach after the assemble phase has already begun, so the
-    // observed assemble→logo interval is allowed a small instrumentation margin.
-    // The production GSAP timeline itself still keeps the phase at ~620ms.
     ['assemble', 'logo', 380],
     ['logo', 'x-to-o', 360],
     ['x-to-o', 'o-rest', 820],
@@ -180,10 +177,12 @@ async function assertCinematicIntro(name, viewport) {
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
 
   await page.waitForTimeout(500);
-  const headerSubmark = (await page.locator('[data-xo-submark]').innerText()).replace(/\s+/g, '').trim();
-  if (headerSubmark !== 'XO·WEB') throw new Error(`${name} landed XO WEB header signature is malformed: ${headerSubmark}`);
-  const submarkOpacity = Number(await page.locator('[data-xo-submark]').evaluate((element) => getComputedStyle(element).opacity));
-  if (submarkOpacity < 0.9) throw new Error(`${name} landed XO WEB header signature stayed hidden (${submarkOpacity})`);
+  const headerBrand = (await page.locator('.site-brand').textContent())?.replace(/\s+/g, '') ?? '';
+  if (headerBrand !== 'XOWEB') throw new Error(`${name} primary XO WEB header wordmark is malformed: ${headerBrand}`);
+  const headerByline = (await page.locator('[data-xo-submark]').innerText()).replace(/\s+/g, '').trim();
+  if (headerByline !== 'BYVICTXR.LEV') throw new Error(`${name} landed VICTXR.LEV author signature is malformed: ${headerByline}`);
+  const bylineOpacity = Number(await page.locator('[data-xo-submark]').evaluate((element) => getComputedStyle(element).opacity));
+  if (bylineOpacity < 0.9) throw new Error(`${name} landed VICTXR.LEV author signature stayed hidden (${bylineOpacity})`);
 
   const heroLine = page.locator('[data-intro-line]').first();
   const heroOpacity = Number(await heroLine.evaluate((element) => getComputedStyle(element).opacity));
@@ -221,4 +220,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Premium XO WEB intro lands in the real header slot once per session (${desktop.duration}ms / ${mobile.duration}ms).`);
+console.log(`Premium VICTXR.LEV intro resolves into the XO WEB header with visible authorship once per session (${desktop.duration}ms / ${mobile.duration}ms).`);

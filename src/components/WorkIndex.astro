@@ -30,15 +30,16 @@ const projectIds = ['catrin', 'anelika'] as const;
       <div class="mp-hero__bottom">
         <p>{page.intro}</p>
         <p class="mp-hero__proof">{page.proof}</p>
-        <a href="#selected-projects">{site.hero.scroll}<Arrow direction="down" /></a>
+        <a href="#work">{site.hero.scroll}<Arrow direction="down" /></a>
       </div>
     </section>
 
-    <section class="work-exhibition" id="selected-projects" aria-label={page.eyebrow}>
+    <section class="work-exhibition" id="work" aria-label={page.eyebrow}>
       {projectIds.map((projectId, index) => {
         const project = projects[projectId];
         const card = site.work.projects[projectId];
         const caseCopy = project.content[locale];
+        const projectTransitionName = `xo-project-${projectId}`;
         return (
           <article class:list={['work-exhibit', `work-exhibit--${projectId}`]} data-theme={projectId === 'catrin' ? 'dark' : 'anelika'}>
             <a class="work-exhibit__link" href={card.href} data-analytics-event="case_study_click" data-project-id={projectId}>
@@ -47,7 +48,7 @@ const projectIds = ['catrin', 'anelika'] as const;
                 <span>{card.sector}</span>
               </div>
               <div class="work-exhibit__name" aria-hidden="true">{caseCopy.title}</div>
-              <figure class="work-exhibit__media">
+              <figure class="work-exhibit__media" style={`view-transition-name: ${projectTransitionName};`}>
                 <ResponsiveProjectImage class="work-exhibit__image" desktop={project.hero} mobile={project.mobile} alt={`${caseCopy.title} ${locale === 'lv' ? 'mājaslapas skats' : 'website view'}`} loading={index === 0 ? 'eager' : 'lazy'} fetchpriority={index === 0 ? 'high' : 'auto'} quality={88} sizes="(max-width: 760px) calc(100vw - 2rem), 70vw" />
               </figure>
               <div class="work-exhibit__caption">

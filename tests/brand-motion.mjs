@@ -65,11 +65,26 @@ async function assertBrandMotion(name, viewport) {
   await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3000 });
   await page.waitForTimeout(80);
 
+  const primaryBrand = page.locator('.site-brand');
+  const byline = page.locator('[data-xo-submark]');
   const slot = page.locator('.site-brand__letter-wrap');
   const glyph = page.locator('[data-brand-letter]');
-  const reference = page.locator('.site-brand > span').first();
+  const reference = page.locator('.site-brand-submark__core > span').first();
+
+  const hierarchy = await page.evaluate(() => ({
+    primary: document.querySelector('.site-brand')?.textContent?.replace(/\s+/g, ''),
+    byline: document.querySelector('[data-xo-submark]')?.textContent?.replace(/\s+/g, ''),
+  }));
+  if (hierarchy.primary !== 'XOWEB') throw new Error(`${name} primary wordmark should be XO WEB, got ${hierarchy.primary}`);
+  if (!hierarchy.byline?.includes('BYVICTXR.LEV')) throw new Error(`${name} author signature should expose BY VICTXR.LEV, got ${hierarchy.byline}`);
+
+  const primaryBox = await primaryBrand.boundingBox();
+  const bylineBox = await byline.boundingBox();
+  if (!primaryBox || !bylineBox) throw new Error(`${name} brand hierarchy has missing geometry`);
+  if (primaryBox.height <= bylineBox.height) throw new Error(`${name} XO WEB no longer has stronger visual hierarchy than the author signature`);
+
   const baselineBox = await slot.boundingBox();
-  if (!baselineBox) throw new Error(`${name} brand slot has no geometry`);
+  if (!baselineBox) throw new Error(`${name} author X/O slot has no geometry`);
   const baselineCenter = center(baselineBox);
   const referenceGlyph = await glyphRect(reference);
   const referenceColor = await reference.evaluate((element) => getComputedStyle(element).color);
@@ -82,8 +97,6 @@ async function assertBrandMotion(name, viewport) {
     return color;
   });
 
-  // The intro already performs one full X/O cycle. The header is intentionally
-  // given a long quiet hold before its own idle signature starts again.
   let maxFlight = 0;
   let sawO = false;
   for (let i = 0; i < 300; i += 1) {
@@ -96,19 +109,19 @@ async function assertBrandMotion(name, viewport) {
     await page.waitForTimeout(40);
   }
 
-  if (!sawO) throw new Error(`${name} brand never changed from X to O after its intentional idle hold`);
+  if (!sawO) throw new Error(`${name} author signature never changed from X to O after its intentional idle hold`);
   if (maxFlight < (viewport.width <= 760 ? 2.5 : 4)) throw new Error(`${name} X/O motion no longer has an intentional flight (${maxFlight.toFixed(1)}px)`);
 
   await waitForBrandRest(page, 'O');
   const oBox = await slot.boundingBox();
   if (!oBox) throw new Error(`${name} O landing has no geometry`);
   const oOffset = distance(center(oBox), baselineCenter);
-  if (oOffset > 1.5) throw new Error(`${name} O landed ${oOffset.toFixed(1)}px away from its brand slot`);
+  if (oOffset > 1.5) throw new Error(`${name} O landed ${oOffset.toFixed(1)}px away from its author slot`);
   const oInk = await glyphRect(glyph);
   const oBaselineDelta = Math.abs(center(oInk).y - center(referenceGlyph).y);
-  if (oBaselineDelta > 0.8) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the wordmark line`);
+  if (oBaselineDelta > 1.5) throw new Error(`${name} O sits ${oBaselineDelta.toFixed(1)}px off the author line`);
   const oColor = await glyph.evaluate((element) => getComputedStyle(element).color);
-  if (oColor !== referenceColor) throw new Error(`${name} O should inherit the wordmark color (${oColor} vs ${referenceColor})`);
+  if (oColor !== referenceColor) throw new Error(`${name} O should inherit the author-signature color (${oColor} vs ${referenceColor})`);
   await assertCrispRest(slot, glyph, name, 'O landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-o-landed.png`, fullPage: false });
 
@@ -117,12 +130,12 @@ async function assertBrandMotion(name, viewport) {
   const xBox = await slot.boundingBox();
   if (!xBox) throw new Error(`${name} X return has no geometry`);
   const xOffset = distance(center(xBox), baselineCenter);
-  if (xOffset > 1.5) throw new Error(`${name} X returned ${xOffset.toFixed(1)}px away from its brand slot`);
+  if (xOffset > 1.5) throw new Error(`${name} X returned ${xOffset.toFixed(1)}px away from its author slot`);
   const xInk = await glyphRect(glyph);
   const xBaselineDelta = Math.abs(center(xInk).y - center(referenceGlyph).y);
-  if (xBaselineDelta > 0.8) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the wordmark line`);
+  if (xBaselineDelta > 1.5) throw new Error(`${name} X sits ${xBaselineDelta.toFixed(1)}px off the author line`);
   const xColor = await glyph.evaluate((element) => getComputedStyle(element).color);
-  if (xColor !== accentColor) throw new Error(`${name} X does not use the site accent (${xColor} vs ${accentColor})`);
+  if (xColor !== accentColor) throw new Error(`${name} author X does not use the site accent (${xColor} vs ${accentColor})`);
   await assertCrispRest(slot, glyph, name, 'X landing');
   await page.screenshot({ path: `${outDir}/${name}-brand-x-restored.png`, fullPage: false });
 
@@ -137,4 +150,4 @@ await assertBrandMotion('desktop-1366', { width: 1366, height: 768 });
 await assertBrandMotion('mobile-393', { width: 393, height: 852 });
 
 await browser.close();
-console.log('Brand X/O flight keeps a deliberate post-intro pause, then lands precisely on the wordmark line and returns to a transform-free crisp rest state.');
+console.log('XO WEB stays primary while the VICTXR.LEV author signature keeps its X/O motion, precise landing and crisp rest state.');

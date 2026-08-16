@@ -25,16 +25,20 @@ const navHrefs = multipageNavigation
 const available = copy.contact.status;
 const alternateLanguage = locale === 'lv' ? 'en' : 'lv';
 const languageLabel = locale === 'lv' ? 'Pārslēgt uz angļu valodu' : 'Switch to Latvian';
-const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — home';
+const homeLabel = locale === 'lv' ? 'XO WEB — sākums' : 'XO WEB — home';
+const authorLabel = locale === 'lv' ? 'XO WEB autors — Victxr Lev' : 'XO WEB by Victxr Lev';
 ---
 
 <header class="site-header" data-site-header>
   <a class="site-brand" href={home} aria-label={homeLabel}>
-    <span>VICT</span><span class="site-brand__letter-wrap"><span data-brand-letter>X</span></span><span>R</span><span class="site-brand__dot">.</span><span>LEV</span>
+    <span class="site-brand__xo" aria-hidden="true"><b>X</b><b>O</b></span>
+    <span class="site-brand__web" aria-hidden="true">WEB</span>
   </a>
-  <span class="site-brand-submark" data-xo-submark aria-hidden="true">
-    <span class="site-brand-submark__core" data-xo-submark-core><b>X</b><b>O</b></span>
-    <span class="site-brand-submark__tail" data-xo-submark-tail><span class="site-brand-submark__dot">·</span><span class="site-brand-submark__web">WEB</span></span>
+  <span class="site-brand-submark" data-xo-submark aria-label={authorLabel}>
+    <span class="site-brand-submark__core" data-xo-submark-core aria-hidden="true">
+      <span>BY VICT</span><span class="site-brand__letter-wrap"><span data-brand-letter>X</span></span><span>R</span>
+    </span>
+    <span class="site-brand-submark__tail" data-xo-submark-tail aria-hidden="true"><span class="site-brand-submark__dot">.</span><span>LEV</span></span>
   </span>
 
   <nav class="site-nav site-nav--desktop" aria-label={copy.nav.menu}>
@@ -65,7 +69,7 @@ const homeLabel = locale === 'lv' ? 'VICTXR.LEV — sākums' : 'VICTXR.LEV — h
 
 <div class="mobile-menu" id="mobile-menu" data-mobile-menu aria-hidden="true" inert>
   <div class="mobile-menu__meta">
-    <span>VICTXR.LEV</span>
+    <span>XO WEB / VICTXR LEV</span>
     <span>{copy.hero.meta}</span>
   </div>
   <nav class="mobile-menu__nav" aria-label={copy.nav.menu}>

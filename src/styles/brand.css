@@ -1,3 +1,32 @@
+.site-brand {
+  gap: 0.3em;
+  font-size: clamp(1.08rem, 1.42vw, 1.34rem);
+  font-weight: 840;
+  letter-spacing: -0.065em;
+}
+
+.site-brand__xo,
+.site-brand__web {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.site-brand__xo {
+  gap: 0.025em;
+}
+
+.site-brand__xo b {
+  font-weight: inherit;
+}
+
+.site-brand__xo b:first-child {
+  color: var(--accent);
+}
+
+.site-brand__web {
+  letter-spacing: -0.045em;
+}
+
 .site-brand__letter-wrap {
   transform-origin: 50% 52%;
 }
@@ -20,19 +49,20 @@
 
 .site-brand-submark {
   position: absolute;
-  top: calc(50% + 0.72rem);
+  top: calc(50% + 0.78rem);
   left: var(--gutter);
   z-index: 102;
   display: inline-flex;
   width: max-content;
   align-items: baseline;
-  gap: 0.18em;
+  gap: 0.06em;
   color: currentColor;
   text-transform: uppercase;
-  font-size: 0.43rem;
-  font-weight: 790;
+  font-size: 0.46rem;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: 0.16em;
+  opacity: 0.64;
   pointer-events: none;
   transform-origin: 0 50%;
 }
@@ -44,23 +74,16 @@
 }
 
 .site-brand-submark__core {
-  gap: 0.04em;
+  gap: 0;
 }
 
 .site-brand-submark__tail {
-  gap: 0.18em;
-}
-
-.site-brand-submark__core b {
-  font-weight: inherit;
-}
-
-.site-brand-submark__core b:first-child {
-  color: var(--accent);
+  gap: 0.02em;
 }
 
 .site-brand-submark__dot {
-  opacity: 0.45;
+  margin-inline: 0.03em 0;
+  opacity: 0.5;
 }
 
 .home-shell[data-home-intro='pending'] .site-brand-submark {
@@ -94,8 +117,13 @@
 }
 
 @media (max-width: 760px) {
+  .site-brand {
+    gap: 0.27em;
+    font-size: 1.08rem;
+  }
+
   .site-brand-submark {
-    top: calc(50% + 0.66rem);
+    top: calc(50% + 0.7rem);
     font-size: 0.4rem;
     letter-spacing: 0.14em;
   }
@@ -112,5 +140,18 @@
   .site-brand-submark__tail {
     animation: none !important;
     transition: none !important;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(xo-project-catrin),
+  ::view-transition-old(xo-project-catrin),
+  ::view-transition-new(xo-project-catrin),
+  ::view-transition-group(xo-project-anelika),
+  ::view-transition-old(xo-project-anelika),
+  ::view-transition-new(xo-project-anelika) {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
   }
 }

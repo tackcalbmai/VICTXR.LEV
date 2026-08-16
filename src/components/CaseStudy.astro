@@ -5,6 +5,7 @@ import ContactChannels from './ContactChannels.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
 import { contacts } from '../data/contacts';
+import { pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import { projects, type ProjectId } from '../data/projects';
 import '../styles/case-study.css';
@@ -20,12 +21,13 @@ const { locale, projectId } = Astro.props;
 const project = projects[projectId];
 const content = project.content[locale];
 const site = getSiteCopy(locale);
-const home = site.homeHref;
 const nextId: ProjectId = projectId === 'catrin' ? 'anelika' : 'catrin';
 const nextHref = locale === 'lv' ? `/lv/darbi/${nextId}/` : `/work/${nextId}/`;
 const alternateHref = locale === 'lv' ? `/work/${projectId}/` : `/lv/darbi/${projectId}/`;
+const workHref = `${pageRoutes[locale].work}#work`;
 const contactEmail = contacts.email;
 const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact.subject)}`;
+const projectTransitionName = `xo-project-${projectId}`;
 ---
 
 <div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} id="top">
@@ -39,7 +41,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
       <a class="case-live-link" href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={projectId}>{content.liveLabel}<Arrow direction="right" /></a>
     </section>
 
-    <figure class="case-browser reveal" data-reveal>
+    <figure class="case-browser reveal" data-reveal style={`view-transition-name: ${projectTransitionName};`}>
       <div class="case-browser__bar"><span></span><span></span><span></span><em>{new URL(project.liveUrl).hostname}</em></div>
       <ResponsiveProjectImage class="case-screen" desktop={project.hero} mobile={project.mobile} alt={`${content.title} ${locale === 'lv' ? 'mājaslapas responsīvie skati' : 'responsive website views'}`} loading="eager" fetchpriority="high" quality={88} sizes="calc(100vw - 2rem)" />
     </figure>
@@ -75,7 +77,7 @@ const mailto = `mailto:${contactEmail}?subject=${encodeURIComponent(site.contact
     </section>
 
     <nav class="case-next" data-theme="light" aria-label={locale === 'lv' ? 'Projektu navigācija' : 'Project navigation'}>
-      <a href={`${home}#work`}><Arrow direction="left" />{content.backLabel}</a>
+      <a href={workHref}><Arrow direction="left" />{content.backLabel}</a>
       <a href={nextHref} data-analytics-event="case_study_click" data-project-id={nextId}>{content.nextLabel}<Arrow direction="right" /></a>
     </nav>
 
