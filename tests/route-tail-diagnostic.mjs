@@ -12,20 +12,51 @@ const errors = [];
 page.on('console', (message) => { if (message.type() === 'error') errors.push(`console: ${message.text()}`); });
 page.on('pageerror', (error) => errors.push(`page: ${error.message}`));
 
-const response = await page.goto(new URL('/work/anelika/', baseURL).toString(), { waitUntil: 'load' });
-await page.evaluate(() => document.fonts.ready);
-const back = page.locator('.case-next a').first();
-const before = {
-  response: response?.status(),
+const state = {};
+
+errors.length = 0;
+let response = await page.goto(new URL('/this-page-does-not-exist/', baseURL).toString(), { waitUntil: 'domcontentloaded' });
+state.notFoundEn = {
+  status: response?.status(),
   url: page.url(),
-  backHref: await back.getAttribute('href'),
-  backText: (await back.innerText()).trim(),
+  notFoundCount: await page.locator('.not-found').count(),
+  lang: await page.locator('html').getAttribute('lang'),
+  title: await page.title(),
   errors: [...errors],
 };
 
-await back.click();
-await page.waitForTimeout(1200);
-const after = await page.evaluate(() => ({
+errors.length = 0;
+response = await page.goto(new URL('/lv/this-page-does-not-exist/', baseURL).toString(), { waitUntil: 'domcontentloaded' });
+state.notFoundLv = {
+  status: response?.status(),
+  url: page.url(),
+  notFoundCount: await page.locator('.not-found').count(),
+  lang: await page.locator('html').getAttribute('lang'),
+  title: await page.title(),
+  errors: [...errors],
+};
+
+errors.length = 0;
+response = await page.goto(new URL('/work/anelika/', baseURL).toString(), { waitUntil: 'load' });
+await page.evaluate(() => document.fonts.ready);
+const back = page.locator('.case-next a').first();
+state.backBefore = {
+  status: response?.status(),
+  url: page.url(),
+  href: await back.getAttribute('href'),
+  text: (await back.innerText()).trim(),
+  errors: [...errors],
+};
+
+let clickError = null;
+try {
+  await back.click();
+  await page.waitForURL('**/work/#work', { timeout: 5000 });
+} catch (error) {
+  clickError = error instanceof Error ? error.message : String(error);
+}
+await page.waitForTimeout(1000);
+state.backAfter = await page.evaluate(() => ({
   url: location.href,
   pathname: location.pathname,
   hash: location.hash,
@@ -33,11 +64,11 @@ const after = await page.evaluate(() => ({
   workTop: document.querySelector('#work')?.getBoundingClientRect().top ?? null,
   mainCount: document.querySelectorAll('main').length,
   h1: document.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim() ?? null,
-  homeIntro: document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') ?? null,
 }));
-after.errors = [...errors];
+state.backAfter.clickError = clickError;
+state.backAfter.errors = [...errors];
 
-await writeFile(`${outDir}/route-tail-state.json`, JSON.stringify({ before, after }, null, 2));
+await writeFile(`${outDir}/route-tail-state.json`, JSON.stringify(state, null, 2));
 await page.screenshot({ path: `${outDir}/route-tail-state.png`, fullPage: false });
 await context.close();
 await browser.close();
