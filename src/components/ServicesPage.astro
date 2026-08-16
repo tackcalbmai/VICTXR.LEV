@@ -1,7 +1,8 @@
 ---
 import Arrow from './Arrow.astro';
-import PageContact from './PageContact.astro';
+import PageContactCTA from './PageContactCTA.astro';
 import SiteHeader from './SiteHeader.astro';
+import { contactRoutes } from '../data/architecture';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import '../styles/multipage.css';
@@ -19,22 +20,22 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.s
 ---
 
 <div class="mp-page mp-services" id="top">
-  <SiteHeader locale={locale} alternateHref={alternateHref} contactHref="#contact" multipageNavigation />
+  <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="mp-hero mp-services__hero" aria-labelledby="services-page-title">
       <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>XO / PROBLEM FIRST</span></div>
-      <h1 id="services-page-title">{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted', index === 2 && 'is-accent']}>{line}</span>)}</h1>
+      <h1 id="services-page-title" data-motion-shift>{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted', index === 2 && 'is-accent']}>{line}</span>)}</h1>
       <p class="mp-services__intro">{page.intro}</p>
       <a class="mp-services__jump" href="#service-list">{locale === 'lv' ? 'Skatīt variantus' : 'See the options'}<Arrow direction="down" /></a>
     </section>
 
     <section class="services-decision" id="service-list" aria-label={page.eyebrow}>
       {page.services.map((service) => (
-        <article class="service-decision">
+        <article class="service-decision" data-motion-reveal>
           <div class="service-decision__head">
             <span>{service.index}</span>
             <h2>{service.title}</h2>
-            <span class="service-decision__mark" aria-hidden="true">X</span>
+            <span class="service-decision__mark" aria-hidden="true"><i>X</i><b>O</b></span>
           </div>
           <div class="service-decision__body">
             <div>
@@ -50,7 +51,7 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.s
       ))}
     </section>
 
-    <section class="services-anti" data-theme="dark" aria-labelledby="services-anti-title">
+    <section class="services-anti" data-theme="dark" aria-labelledby="services-anti-title" data-motion-reveal>
       <div class="services-anti__noise" aria-hidden="true">X O X O X O X O X O X O</div>
       <div class="services-anti__inner">
         <p class="mp-kicker">ANTI-SALES / ON PURPOSE</p>
@@ -59,16 +60,16 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.s
       </div>
     </section>
 
-    <section class="services-process section-pad" aria-labelledby="services-process-title">
+    <section class="services-process section-pad" aria-labelledby="services-process-title" data-motion-reveal>
       <p class="mp-kicker">{page.processLabel}</p>
       <h2 id="services-process-title">{page.processTitle}</h2>
       <p>{page.processText}</p>
       <div class="services-process__links">
         <a class="mp-text-link" href={routes.work}>{site.nav.work}<Arrow direction="right" /></a>
-        <a class="mp-text-link" href="#contact">{site.nav.contact}<Arrow direction="down" /></a>
+        <a class="mp-text-link" href={contactRoutes[locale]}>{site.nav.contact}<Arrow direction="right" /></a>
       </div>
     </section>
 
-    <PageContact locale={locale} />
+    <PageContactCTA locale={locale} />
   </main>
 </div>
