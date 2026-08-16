@@ -98,12 +98,14 @@ const accessibilityRoutes = [
   ['/work/', 'en'],
   ['/about/', 'en'],
   ['/services/', 'en'],
+  ['/contact/', 'en'],
   ['/work/catrin/', 'en'],
   ['/work/anelika/', 'en'],
   ['/lv/', 'lv'],
   ['/lv/darbi/', 'lv'],
   ['/lv/par-mani/', 'lv'],
   ['/lv/pakalpojumi/', 'lv'],
+  ['/lv/kontakti/', 'lv'],
   ['/lv/darbi/catrin/', 'lv'],
   ['/lv/darbi/anelika/', 'lv'],
 ];
@@ -115,6 +117,7 @@ const performanceRoutes = [
   ['work', '/work/', { totalBytes: 1_600_000, imageBytes: 1_000_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['about', '/about/', { totalBytes: 1_050_000, imageBytes: 300_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['services', '/services/', { totalBytes: 1_050_000, imageBytes: 300_000, scriptBytes: 350_000, lcp: 4_000 }],
+  ['contact', '/contact/', { totalBytes: 1_050_000, imageBytes: 300_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['catrin', '/work/catrin/', { totalBytes: 1_500_000, imageBytes: 900_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['anelika', '/work/anelika/', { totalBytes: 1_500_000, imageBytes: 900_000, scriptBytes: 350_000, lcp: 4_000 }],
 ];
@@ -191,4 +194,4 @@ for (const [name, path, budget] of performanceRoutes) {
 }
 
 await browser.close();
-console.log('Quality gates passed across home, multipage routes and case studies: semantic accessibility and throttled mobile performance budgets are within limits.');
+console.log('Quality gates passed across Home, Contact, multipage routes and case studies: semantic accessibility and throttled mobile performance budgets are within limits.');
