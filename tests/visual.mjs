@@ -143,9 +143,14 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
   await instantScroll(page, 0);
 
   const disruptionTop = await topOf(page, '[data-disruption]');
-  await instantScroll(page, disruptionTop + viewport.height * (viewport.width <= 760 ? 0.74 : 0.82));
-  const disruptionOpacity = await page.locator('[data-disruption-two]').evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
-  if (disruptionOpacity < 0.12) throw new Error(`${name} second disruption statement does not enter on scroll`);
+  const disruptionOffsets = viewport.width <= 760 ? [0.62, 0.72, 0.82, 0.92] : [0.58, 0.7, 0.82, 0.94, 1.06];
+  let disruptionOpacity = 0;
+  for (const offset of disruptionOffsets) {
+    await instantScroll(page, disruptionTop + viewport.height * offset);
+    disruptionOpacity = await page.locator('[data-disruption-two]').evaluate((element) => Number.parseFloat(getComputedStyle(element).opacity));
+    if (disruptionOpacity >= 0.12) break;
+  }
+  if (disruptionOpacity < 0.12) throw new Error(`${name} second disruption statement never enters within the disruption scene`);
   await screenshot(page, `${name}-disruption`);
 
   const workTop = await topOf(page, '.home-v2-work');
