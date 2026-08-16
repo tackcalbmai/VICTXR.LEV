@@ -1,6 +1,22 @@
+html:not(.no-js) [data-motion-reveal] {
+  opacity: 0;
+  transform: translateY(var(--xo-reveal-y, 2rem));
+  transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out);
+}
+
+html:not(.no-js) [data-motion-reveal].is-xo-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 [data-motion-shift] {
   transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
   will-change: transform;
+}
+
+.home-v2-projects,
+.home-v2-project {
+  pointer-events: auto;
 }
 
 .work-exhibit__media[data-takeover-layer] {
@@ -14,6 +30,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html:not(.no-js) [data-motion-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   [data-motion-shift],
   .work-exhibit__media[data-takeover-layer] {
     transform: none !important;
