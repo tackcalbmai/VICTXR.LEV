@@ -1,0 +1,22 @@
+[data-motion-shift] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
+  will-change: transform;
+}
+
+.work-exhibit__media[data-takeover-layer] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0);
+  will-change: transform;
+}
+
+.work-exhibit__link:hover .work-exhibit__media[data-takeover-layer],
+.work-exhibit__link:focus-visible .work-exhibit__media[data-takeover-layer] {
+  transform: translate3d(var(--xo-shift-x, 0), var(--xo-shift-y, 0), 0) perspective(1200px) rotateX(0.5deg) scale(1.006);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion-shift],
+  .work-exhibit__media[data-takeover-layer] {
+    transform: none !important;
+    will-change: auto;
+  }
+}
