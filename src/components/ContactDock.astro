@@ -1,0 +1,80 @@
+---
+import Arrow from './Arrow.astro';
+import ContactIcon from './ContactIcon.astro';
+import { contacts, getSocialContactLinks } from '../data/contacts';
+import { contactRoutes } from '../data/architecture';
+import { buildContactHref, getContactRouterCopy, normalizeContactSource } from '../data/contact-router';
+import type { Locale } from '../data/site';
+import '../styles/contact-router.css';
+
+interface Props {
+  locale: Locale;
+  canonicalPath: string;
+}
+
+const { locale, canonicalPath } = Astro.props;
+const copy = getContactRouterCopy(locale);
+const source = normalizeContactSource(canonicalPath);
+const isContactPage = canonicalPath === contactRoutes[locale];
+const contactHref = buildContactHref(locale, source, undefined, 'start');
+const briefHref = buildContactHref(locale, source, undefined, 'brief');
+const socialLinks = getSocialContactLinks(locale);
+const whatsapp = socialLinks.find((link) => link.channel === 'whatsapp');
+const instagram = socialLinks.find((link) => link.channel === 'instagram');
+const emailSubject = locale === 'lv' ? 'Mājaslapas projekts — XO WEB' : 'Website project — XO WEB';
+const emailHref = contacts.email ? `mailto:${contacts.email}?subject=${encodeURIComponent(emailSubject)}` : '';
+const deferUntilScroll = canonicalPath === '/' || canonicalPath === '/lv/';
+---
+
+{!isContactPage && (
+  <aside class="contact-dock" data-contact-dock data-defer-until-scroll={deferUntilScroll ? 'true' : 'false'}>
+    <button class="contact-dock__backdrop" type="button" data-contact-dock-close tabindex="-1" aria-label={locale === 'lv' ? 'Aizvērt saziņas izvēlni' : 'Close contact menu'}></button>
+    <div class="contact-dock__panel" id="contact-dock-panel" data-contact-dock-panel aria-hidden="true" inert>
+      <div class="contact-dock__topline"><span>XO / CONTACT</span><span>O →</span></div>
+      <div class="contact-dock__intro">
+        <strong>{copy.dock.title}</strong>
+        <p>{copy.dock.text}</p>
+      </div>
+      <a class="contact-dock__router" href={contactHref} data-analytics-event="contact_page_click">
+        <span>{copy.dock.openRouter}</span><Arrow direction="right" />
+      </a>
+      <nav class="contact-dock__channels" aria-label={locale === 'lv' ? 'Ātrie saziņas veidi' : 'Quick contact options'}>
+        {whatsapp && (
+          <a href={whatsapp.href} target="_blank" rel="noopener noreferrer" data-contact-channel="whatsapp" data-analytics-event="contact_click" data-analytics-channel="whatsapp">
+            <span class="contact-dock__icon"><ContactIcon channel="whatsapp" /></span>
+            <span><strong>WhatsApp</strong><small>{copy.dock.whatsappNote}</small></span>
+            <Arrow direction="right" />
+          </a>
+        )}
+        <a href={briefHref} data-analytics-event="contact_page_click">
+          <span class="contact-dock__glyph" aria-hidden="true">O</span>
+          <span><strong>{copy.talk.brief}</strong><small>{copy.talk.briefNote}</small></span>
+          <Arrow direction="right" />
+        </a>
+        {emailHref && (
+          <a href={emailHref} data-contact-channel="email" data-analytics-event="contact_click" data-analytics-channel="email">
+            <span class="contact-dock__icon"><ContactIcon channel="email" /></span>
+            <span><strong>Email</strong><small>{copy.dock.emailNote}</small></span>
+            <Arrow direction="right" />
+          </a>
+        )}
+        {instagram && (
+          <a href={instagram.href} target="_blank" rel="noopener noreferrer" data-contact-channel="instagram" data-analytics-event="contact_click" data-analytics-channel="instagram">
+            <span class="contact-dock__icon"><ContactIcon channel="instagram" /></span>
+            <span><strong>Instagram</strong><small>{copy.dock.instagramNote}</small></span>
+            <Arrow direction="right" />
+          </a>
+        )}
+      </nav>
+    </div>
+    <button class="contact-dock__trigger" type="button" aria-expanded="false" aria-controls="contact-dock-panel" data-contact-dock-toggle>
+      <span class="contact-dock__trigger-mark" aria-hidden="true"><i>O</i><b>X</b></span>
+      <span>{copy.dock.label}</span>
+    </button>
+  </aside>
+)}
+
+<script>
+  import { initContactDock } from '../scripts/contact-dock';
+  initContactDock();
+</script>

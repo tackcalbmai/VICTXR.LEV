@@ -2,7 +2,7 @@
 import Arrow from './Arrow.astro';
 import PageContactCTA from './PageContactCTA.astro';
 import SiteHeader from './SiteHeader.astro';
-import { contactRoutes } from '../data/architecture';
+import { buildContactHref } from '../data/contact-router';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import '../styles/multipage.css';
@@ -18,6 +18,7 @@ const page = getMultipageCopy(locale).services;
 const site = getSiteCopy(locale);
 const routes = pageRoutes[locale];
 const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.services;
+const contactHref = buildContactHref(locale, 'services', 'unsure', 'start');
 ---
 
 <div class="mp-page mp-services" id="top">
@@ -67,10 +68,10 @@ const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.s
       <p>{page.processText}</p>
       <div class="services-process__links">
         <a class="mp-text-link" href={routes.work}>{site.nav.work}<Arrow direction="right" /></a>
-        <a class="mp-text-link" href={contactRoutes[locale]}>{site.nav.contact}<Arrow direction="right" /></a>
+        <a class="mp-text-link" href={contactHref}>{site.nav.contact}<Arrow direction="right" /></a>
       </div>
     </section>
 
-    <PageContactCTA locale={locale} />
+    <PageContactCTA locale={locale} context="services" source="services" />
   </main>
 </div>

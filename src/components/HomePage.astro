@@ -2,7 +2,8 @@
 import Arrow from './Arrow.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
-import { contactRoutes, getHomeV2Copy } from '../data/architecture';
+import { getHomeV2Copy } from '../data/architecture';
+import { buildContactHref } from '../data/contact-router';
 import { pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import { projects } from '../data/projects';
@@ -22,7 +23,7 @@ const { locale } = Astro.props;
 const copy = getSiteCopy(locale);
 const v2 = getHomeV2Copy(locale);
 const routes = pageRoutes[locale];
-const contactHref = contactRoutes[locale];
+const contactHref = buildContactHref(locale, 'home', undefined, 'start');
 const catrin = projects.catrin;
 const anelika = projects.anelika;
 const railGlyphs = ['X', 'X', 'X', 'X', 'X', 'O', 'X', 'X'];

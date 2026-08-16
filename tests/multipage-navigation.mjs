@@ -12,6 +12,7 @@ const cases = [
     home: '/',
     lang: 'en',
     nav: ['/work/', '/about/', '/services/', '/contact/'],
+    startProject: '/contact/?from=home#start',
     casePath: '/work/catrin/',
     caseBack: '/work/#work',
   },
@@ -19,6 +20,7 @@ const cases = [
     home: '/lv/',
     lang: 'lv',
     nav: ['/lv/darbi/', '/lv/par-mani/', '/lv/pakalpojumi/', '/lv/kontakti/'],
+    startProject: '/lv/kontakti/?from=home#start',
     casePath: '/lv/darbi/catrin/',
     caseBack: '/lv/darbi/#work',
   },
@@ -44,7 +46,7 @@ for (const current of cases) {
   const workHref = await page.locator('main .hero a[data-analytics-event="view_work_click"]').getAttribute('href');
   const startHref = await page.locator('main .hero a[data-analytics-event="start_project_click"]').getAttribute('href');
   assert(workHref === current.nav[0], `${current.lang} homepage Work CTA should route to ${current.nav[0]}, got ${workHref}`);
-  assert(startHref === current.nav[3], `${current.lang} homepage Start project CTA should route to ${current.nav[3]}, got ${startHref}`);
+  assert(startHref === current.startProject, `${current.lang} homepage Start project CTA should carry Home context into ${current.startProject}, got ${startHref}`);
 
   response = await page.goto(new URL(current.nav[3], baseURL).toString(), { waitUntil: 'load' });
   assert(response?.ok(), `${current.nav[3]} returned ${response?.status()}`);
@@ -63,4 +65,4 @@ for (const current of cases) {
 }
 
 await browser.close();
-console.log('Multi-page navigation QA passed: Home, Contact and cases use the full route architecture, and cases return to the Work exhibition.');
+console.log('Multi-page navigation QA passed: Home carries contact context, Contact keeps the full navigation, and cases return to Work.');

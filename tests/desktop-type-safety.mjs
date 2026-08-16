@@ -103,11 +103,16 @@ for (const viewport of viewports) {
 
     const contactPath = locale === 'lv' ? '/lv/kontakti/' : '/contact/';
     await openReadyPage(page, contactPath);
-    await assertNoHorizontalClipping(page, '.contact-hero h1, .contact-intent__title, .contact-direct h2', `${locale} ${viewport.width}px Contact display type`);
+    await assertNoHorizontalClipping(
+      page,
+      '.contact-hero h1, .contact-intent__title, .contact-talk__heading h2, .contact-brief__head h2',
+      `${locale} ${viewport.width}px Contact display type`,
+    );
     if (locale === 'en') {
       await assertLineHeightFloor(page, '.contact-hero h1', 0.74, `en ${viewport.width}px Contact hero`);
       await assertLineHeightFloor(page, '.contact-intent__title', 0.82, `en ${viewport.width}px Contact intent`);
-      await assertLineHeightFloor(page, '.contact-direct h2', 0.78, `en ${viewport.width}px Contact direct`);
+      await assertLineHeightFloor(page, '.contact-talk__heading h2', 0.78, `en ${viewport.width}px Contact channel router`);
+      await assertLineHeightFloor(page, '.contact-brief__head h2', 0.78, `en ${viewport.width}px Contact brief`);
     }
 
     for (const project of ['catrin', 'anelika']) {
@@ -127,4 +132,4 @@ for (const viewport of viewports) {
 }
 
 await browser.close();
-console.log('Desktop display typography QA passed across the new Home trailer, dedicated Contact and EN/LV case-study exits.');
+console.log('Desktop display typography QA passed across the Home trailer, Contact router/brief and EN/LV case-study exits.');

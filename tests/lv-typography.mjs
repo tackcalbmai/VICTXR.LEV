@@ -142,10 +142,13 @@ for (const profile of profiles) {
   await openReadyPage(page, '/lv/kontakti/');
   await assertLineHeight(page, '.contact-hero h1', 0.74, `${profile.name} Contact hero`);
   await assertLineHeight(page, '.contact-intent__title', 0.82, `${profile.name} Contact intents`);
-  await assertLineHeight(page, '.contact-direct h2', 0.78, `${profile.name} Contact direct heading`);
-  await assertTextWithinViewport(page, '.contact-hero h1 span, .contact-intent__title, .contact-direct h2', `${profile.name} Contact typography`);
+  await assertLineHeight(page, '.contact-talk__heading h2', 0.78, `${profile.name} Contact channel router`);
+  await assertLineHeight(page, '.contact-brief__head h2', 0.78, `${profile.name} Contact brief`);
+  await assertTextWithinViewport(page, '.contact-hero h1 span, .contact-intent__title, .contact-talk__heading h2, .contact-brief__head h2', `${profile.name} Contact typography`);
   await screenshotSection(page, '.contact-hero', `${profile.name}-contact-hero.png`);
   await screenshotSection(page, '.contact-intents', `${profile.name}-contact-intents.png`);
+  await screenshotSection(page, '.contact-talk', `${profile.name}-contact-talk.png`);
+  await screenshotSection(page, '.contact-brief', `${profile.name}-contact-brief.png`);
 
   for (const project of ['catrin', 'anelika']) {
     await openReadyPage(page, `/lv/darbi/${project}/`);
@@ -164,4 +167,4 @@ for (const profile of profiles) {
 }
 
 await browser.close();
-console.log('Latvian typography QA passed across the Home trailer, Services, Contact and both case studies on desktop, tablet and mobile.');
+console.log('Latvian typography QA passed across the Home trailer, Services, Contact router/brief and both case studies on desktop, tablet and mobile.');
