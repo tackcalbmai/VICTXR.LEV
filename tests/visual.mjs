@@ -140,6 +140,7 @@ async function assertHome({ name, viewport, path = '/', lang = 'en', detailed = 
   await page.waitForFunction((initialY) => window.scrollY > initialY + 10, startY, { timeout: 2500 }).catch(() => {});
   if (await page.evaluate(() => window.scrollY) < startY + 10) throw new Error(`${name} scroll journey did not begin`);
   await page.mouse.wheel(0, 1);
+  await instantScroll(page, 0);
 
   const disruptionTop = await topOf(page, '[data-disruption]');
   await instantScroll(page, disruptionTop + viewport.height * (viewport.width <= 760 ? 0.74 : 0.82));
