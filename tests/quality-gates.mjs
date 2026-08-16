@@ -76,6 +76,16 @@ async function auditAccessibility(path, expectedLang) {
       if (focusable && visible(focusable)) failures.push(`aria-hidden subtree contains a focusable control: ${focusable.outerHTML.slice(0, 140)}`);
     }
 
+    const headingLevels = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+      .filter(visible)
+      .map((heading) => Number(heading.tagName.slice(1)));
+    for (let index = 1; index < headingLevels.length; index += 1) {
+      if (headingLevels[index] - headingLevels[index - 1] > 1) {
+        failures.push(`heading hierarchy skips from h${headingLevels[index - 1]} to h${headingLevels[index]}`);
+        break;
+      }
+    }
+
     return failures;
   }, expectedLang);
 
@@ -85,9 +95,15 @@ async function auditAccessibility(path, expectedLang) {
 
 const accessibilityRoutes = [
   ['/', 'en'],
-  ['/lv/', 'lv'],
+  ['/work/', 'en'],
+  ['/about/', 'en'],
+  ['/services/', 'en'],
   ['/work/catrin/', 'en'],
   ['/work/anelika/', 'en'],
+  ['/lv/', 'lv'],
+  ['/lv/darbi/', 'lv'],
+  ['/lv/par-mani/', 'lv'],
+  ['/lv/pakalpojumi/', 'lv'],
   ['/lv/darbi/catrin/', 'lv'],
   ['/lv/darbi/anelika/', 'lv'],
 ];
@@ -96,6 +112,9 @@ for (const [path, lang] of accessibilityRoutes) await auditAccessibility(path, l
 
 const performanceRoutes = [
   ['home', '/', { totalBytes: 1_200_000, imageBytes: 550_000, scriptBytes: 350_000, lcp: 4_000 }],
+  ['work', '/work/', { totalBytes: 1_600_000, imageBytes: 1_000_000, scriptBytes: 350_000, lcp: 4_000 }],
+  ['about', '/about/', { totalBytes: 1_050_000, imageBytes: 300_000, scriptBytes: 350_000, lcp: 4_000 }],
+  ['services', '/services/', { totalBytes: 1_050_000, imageBytes: 300_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['catrin', '/work/catrin/', { totalBytes: 1_500_000, imageBytes: 900_000, scriptBytes: 350_000, lcp: 4_000 }],
   ['anelika', '/work/anelika/', { totalBytes: 1_500_000, imageBytes: 900_000, scriptBytes: 350_000, lcp: 4_000 }],
 ];
@@ -172,4 +191,4 @@ for (const [name, path, budget] of performanceRoutes) {
 }
 
 await browser.close();
-console.log('Quality gates passed: semantic accessibility regressions and throttled mobile performance budgets are within limits.');
+console.log('Quality gates passed across home, multipage routes and case studies: semantic accessibility and throttled mobile performance budgets are within limits.');
