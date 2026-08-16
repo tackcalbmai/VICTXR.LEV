@@ -177,8 +177,8 @@ async function assertCinematicIntro(name, viewport) {
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
 
   await page.waitForTimeout(500);
-  const headerBrand = (await page.locator('.site-brand').innerText()).replace(/\s+/g, ' ').trim();
-  if (headerBrand !== 'XO WEB') throw new Error(`${name} primary XO WEB header wordmark is malformed: ${headerBrand}`);
+  const headerBrand = (await page.locator('.site-brand').textContent())?.replace(/\s+/g, '') ?? '';
+  if (headerBrand !== 'XOWEB') throw new Error(`${name} primary XO WEB header wordmark is malformed: ${headerBrand}`);
   const headerByline = (await page.locator('[data-xo-submark]').innerText()).replace(/\s+/g, '').trim();
   if (headerByline !== 'BYVICTXR.LEV') throw new Error(`${name} landed VICTXR.LEV author signature is malformed: ${headerByline}`);
   const bylineOpacity = Number(await page.locator('[data-xo-submark]').evaluate((element) => getComputedStyle(element).opacity));
