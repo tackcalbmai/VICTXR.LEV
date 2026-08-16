@@ -1,8 +1,8 @@
 ---
-import type { SocialContactLink } from '../data/contacts';
+import type { ContactChannel } from '../data/contacts';
 
 interface Props {
-  channel: SocialContactLink['channel'];
+  channel: ContactChannel;
 }
 
 const { channel } = Astro.props;
@@ -13,6 +13,11 @@ const { channel } = Astro.props;
     <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" />
     <circle cx="12" cy="12" r="4.1" />
     <circle class="contact-icon__dot" cx="17.35" cy="6.75" r="1" />
+  </svg>
+) : channel === 'email' ? (
+  <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="3.2" y="5.2" width="17.6" height="13.6" rx="1.8" />
+    <path d="m4.5 7 7.5 6 7.5-6" />
   </svg>
 ) : (
   <svg class="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
