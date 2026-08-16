@@ -33,7 +33,7 @@
 
 .site-brand__letter-wrap > span {
   inset: auto;
-  top: calc(0.11em + 1px);
+  top: 0.11em;
   left: 0;
   width: 100%;
   height: 100%;
