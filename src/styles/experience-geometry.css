@@ -18,6 +18,10 @@
     inset: clamp(19rem, 34vh, 25rem) 0 clamp(6rem, 11vh, 7.2rem);
   }
 
+  .home-shell .home-v2-perspective {
+    padding-top: max(clamp(3.8rem, 6vw, 5.8rem), calc(var(--header-height) + 1.35rem));
+  }
+
   .home-shell .home-v2-perspective h2 {
     max-width: none;
   }
@@ -62,6 +66,10 @@
 }
 
 @media (max-width: 760px) {
+  .home-shell .home-v2-perspective {
+    padding-top: max(var(--xo-section-y), calc(var(--header-height) + 1rem));
+  }
+
   .home-shell .home-v2-perspective h2 span {
     white-space: normal;
   }
