@@ -15,11 +15,38 @@
   }
 
   .home-shell .home-v2-projects {
-    inset: clamp(18rem, 32vh, 24rem) 0 clamp(5.8rem, 10.5vh, 7rem);
+    inset: clamp(19rem, 34vh, 25rem) 0 clamp(6rem, 11vh, 7.2rem);
   }
 
   .home-shell .home-v2-perspective h2 {
     max-width: none;
+  }
+}
+
+@media (min-width: 1180px) and (max-height: 900px) {
+  .home-shell .home-v2-project--catrin {
+    width: min(34vw, 56svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: 0.8vw;
+    bottom: 7%;
+    width: min(36vw, 58svh);
+  }
+}
+
+@media (min-width: 1180px) and (max-height: 820px) {
+  .home-shell .home-v2-projects {
+    inset: 18.5rem 0 6.3rem;
+  }
+
+  .home-shell .home-v2-project--catrin {
+    width: min(32vw, 52svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    bottom: 9%;
+    width: min(34vw, 54svh);
   }
 }
 
