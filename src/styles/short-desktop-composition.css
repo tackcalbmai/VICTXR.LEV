@@ -1,0 +1,373 @@
+/* XO WEB low-height desktop composition pass ---------------------------------
+ * Laptop browsers are often very wide but only 700–900px tall. Scaling desktop
+ * values is not enough there: the composition itself needs to change.
+ * These rules keep the same XO system while prioritising complete, readable
+ * scenes over deliberate overlap.
+ */
+
+@media (min-width: 1180px) and (max-height: 960px) {
+  /* HERO ---------------------------------------------------------------- */
+  .home-shell .hero {
+    min-height: 100svh;
+    padding-bottom: clamp(0.8rem, 1.6vh, 1.15rem);
+  }
+
+  .home-shell .hero__title {
+    padding-block: clamp(1.15rem, 2.5vh, 1.85rem) clamp(0.7rem, 1.4vh, 1rem);
+    font-size: clamp(3.9rem, min(7.7vw, 13.2vh), 7.7rem);
+    line-height: 0.8;
+  }
+
+  .home-shell .hero__footer {
+    padding-top: 0.55rem;
+  }
+
+  .home-shell .hero__intro {
+    max-width: 29rem;
+    font-size: clamp(0.82rem, 0.9vw, 0.96rem);
+    line-height: 1.28;
+  }
+
+  /* DISRUPTION --------------------------------------------------------- */
+  .home-shell .disruption,
+  .home-shell .disruption__stage {
+    min-height: 82svh;
+  }
+
+  .home-shell .disruption__stage {
+    padding: clamp(2.1rem, 4vh, 3.25rem) var(--gutter);
+  }
+
+  .home-shell .disruption__line {
+    left: 5vw;
+    width: 90vw;
+    font-size: clamp(3rem, min(5.8vw, 10.6vh), 5.65rem);
+    line-height: 0.91;
+    letter-spacing: -0.058em;
+  }
+
+  .home-shell .disruption__line--one { top: 13%; }
+  .home-shell .disruption__line--two { top: 48%; }
+  .home-shell .disruption__x { font-size: min(21vw, 43vh); }
+  .home-shell .disruption__caption { bottom: clamp(0.8rem, 1.8vh, 1.2rem); }
+
+  /* SELECTED WORK ------------------------------------------------------ */
+  .home-shell .home-v2-work {
+    min-height: 106svh;
+  }
+
+  .home-shell .home-v2-work__sticky {
+    min-height: 100svh;
+    padding-top: calc(var(--header-height) + 0.6rem);
+    padding-bottom: clamp(0.75rem, 1.5vh, 1rem);
+  }
+
+  .home-shell .home-v2-work__topline {
+    padding-bottom: 0.62rem;
+    font-size: 0.57rem;
+  }
+
+  .home-shell .home-v2-work__title {
+    max-width: 17ch;
+    margin-top: clamp(0.85rem, 1.8vh, 1.35rem);
+    font-size: clamp(3.35rem, min(4.6vw, 8.8vh), 5.3rem);
+    line-height: 0.86;
+    letter-spacing: -0.07em;
+  }
+
+  .home-shell .home-v2-work__title span:last-child {
+    padding-left: 2.4vw;
+  }
+
+  .home-shell .home-v2-projects {
+    inset: clamp(14.5rem, 32vh, 17rem) 0 clamp(5.4rem, 11vh, 6.5rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    top: 2%;
+    left: 4vw;
+    width: min(36vw, 66svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: 0.5vw;
+    bottom: 2%;
+    width: min(39vw, 70svh);
+  }
+
+  .home-shell .home-v2-project__label {
+    top: 0.55rem;
+    left: 0.6rem;
+    font-size: 0.5rem;
+  }
+
+  .home-shell .home-v2-project__summary {
+    right: 0.6rem;
+    bottom: 0.55rem;
+    max-width: min(22rem, 68%);
+    padding: 0.5rem 0.6rem;
+    font-size: 0.64rem;
+  }
+
+  .home-shell .home-v2-work__bottom {
+    gap: 1rem 3vw;
+    padding-top: 0.58rem;
+  }
+
+  .home-shell .home-v2-work__bottom p {
+    max-width: 50rem;
+    font-size: clamp(0.78rem, 0.88vw, 0.92rem);
+    line-height: 1.36;
+  }
+
+  .home-shell .home-v2-work__bottom .home-v2-link {
+    padding-block: 0.55rem;
+  }
+
+  /* CAPABILITIES ------------------------------------------------------- */
+  .home-shell .home-v2-capabilities {
+    padding-block: clamp(2.8rem, 5vh, 4rem);
+  }
+
+  .home-shell .home-v2-capabilities__head {
+    padding-block: clamp(1.6rem, 3vh, 2.4rem);
+  }
+
+  .home-shell .home-v2-capabilities__head h2 {
+    font-size: clamp(2.75rem, min(4.8vw, 8.7vh), 5rem);
+    line-height: 0.87;
+  }
+
+  .home-shell .home-v2-capability {
+    min-height: clamp(8.5rem, 18vh, 10.25rem);
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .home-shell .home-v2-capability h3 {
+    font-size: clamp(1.25rem, min(1.85vw, 3.5vh), 2rem);
+  }
+
+  .home-shell .home-v2-capability p {
+    font-size: 0.78rem;
+    line-height: 1.36;
+  }
+
+  /* DIFFERENT PERSPECTIVE --------------------------------------------- */
+  .home-shell .home-v2-perspective {
+    min-height: 0;
+    padding: clamp(2.6rem, 5vh, 3.8rem) var(--gutter) clamp(2.8rem, 5.5vh, 4rem);
+  }
+
+  .home-shell .home-v2-perspective__topline {
+    padding-bottom: 0.62rem;
+    font-size: 0.57rem;
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    width: 100%;
+    max-width: none;
+    margin-top: clamp(1.45rem, 2.7vh, 2.1rem);
+    font-size: clamp(3rem, min(4.8vw, 9.3vh), 5.25rem);
+    line-height: 0.86;
+    letter-spacing: -0.072em;
+  }
+
+  .home-shell .home-v2-perspective h2 span {
+    white-space: nowrap;
+  }
+
+  .home-shell .home-v2-perspective h2 span:nth-child(2) { padding-left: 5vw; }
+  .home-shell .home-v2-perspective h2 span:nth-child(4) { padding-left: 8vw; }
+
+  .home-shell .home-v2-perspective__bottom {
+    grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.5fr);
+    gap: 1.25rem 5vw;
+    margin-top: clamp(1.5rem, 3vh, 2.25rem);
+    padding-top: 0.75rem;
+  }
+
+  .home-shell .home-v2-perspective__bottom > p {
+    max-width: 48rem;
+    font-size: clamp(0.9rem, 1.05vw, 1.08rem);
+    line-height: 1.38;
+  }
+
+  .home-shell .home-v2-perspective__xo {
+    inset: 50% auto auto 61%;
+    width: min(27vw, 45vh);
+    height: min(27vw, 45vh);
+  }
+
+  .home-shell .home-v2-perspective__xo span {
+    font-size: min(23vw, 39vh);
+  }
+
+  /* CLOSE -------------------------------------------------------------- */
+  .home-shell .home-v2-close {
+    min-height: 62svh;
+    padding-block: clamp(2.8rem, 5vh, 4rem) 1rem;
+  }
+
+  .home-shell .home-v2-close h2 {
+    font-size: clamp(3.1rem, min(5.3vw, 9.8vh), 5.6rem);
+    line-height: 0.85;
+  }
+
+  .home-shell .home-v2-close__footer {
+    margin-top: clamp(1.8rem, 3.2vh, 2.5rem);
+  }
+
+  /* INTERNAL PAGE HEROES --------------------------------------------- */
+  .mp-page .mp-hero,
+  .contact-page .contact-hero {
+    min-height: 72svh;
+  }
+
+  .mp-page .mp-hero h1,
+  .contact-page .contact-hero h1 {
+    max-width: 11ch;
+    padding-block: clamp(1.4rem, 3vh, 2.2rem) clamp(1rem, 2.2vh, 1.7rem);
+    font-size: clamp(3.2rem, min(6.2vw, 11.2vh), 6.5rem);
+    line-height: 0.84;
+  }
+
+  .mp-page .mp-hero__bottom,
+  .contact-page .contact-hero__intro {
+    font-size: clamp(0.88rem, 1vw, 1.04rem);
+  }
+
+  /* WORK PAGE --------------------------------------------------------- */
+  .mp-work .work-exhibit,
+  .mp-work .work-exhibit__link {
+    min-height: 78svh;
+  }
+
+  .mp-work .work-exhibit__media {
+    max-height: 46svh;
+  }
+
+  .mp-work .work-exhibit__name {
+    font-size: clamp(5.5rem, min(13vw, 24vh), 12rem);
+  }
+
+  /* ABOUT ------------------------------------------------------------- */
+  .mp-about .about-definition {
+    min-height: 56svh;
+  }
+
+  .mp-about .about-principle {
+    min-height: 30svh;
+  }
+
+  .mp-about .about-standard,
+  .mp-about .about-standard__inner {
+    min-height: 58svh;
+  }
+
+  /* SERVICES ---------------------------------------------------------- */
+  .mp-services .mp-services__hero {
+    min-height: 66svh;
+  }
+
+  .mp-services .service-decision__head {
+    min-height: clamp(5.6rem, 12vh, 7rem);
+  }
+
+  .mp-services .services-anti__inner,
+  .mp-services .services-process {
+    padding-block: clamp(2.8rem, 5vh, 4rem);
+  }
+
+  /* CONTACT ----------------------------------------------------------- */
+  .contact-page .contact-intents,
+  .contact-page .contact-talk,
+  .contact-page .contact-brief {
+    padding-block: clamp(2.8rem, 5vh, 4rem);
+  }
+
+  .contact-page .contact-intent {
+    min-height: clamp(6.8rem, 14vh, 8.5rem);
+  }
+
+  /* CASES ------------------------------------------------------------- */
+  .case-page .case-hero {
+    min-height: 76svh;
+  }
+
+  .case-page .case-hero h1 {
+    font-size: clamp(5.8rem, min(14vw, 25vh), 13rem);
+  }
+
+  .case-page .case-narrative__row {
+    padding-block: clamp(1.8rem, 3.5vh, 2.7rem);
+  }
+}
+
+/* Very shallow wide browser windows. This is common with Windows taskbar,
+ * browser chrome and 125–150% display scaling. */
+@media (min-width: 1180px) and (max-height: 820px) {
+  .home-shell .hero__title {
+    font-size: clamp(3.5rem, min(7vw, 11.7vh), 6.4rem);
+  }
+
+  .home-shell .hero__side-note {
+    display: none;
+  }
+
+  .home-shell .disruption,
+  .home-shell .disruption__stage {
+    min-height: 86svh;
+  }
+
+  .home-shell .disruption__line {
+    font-size: clamp(2.8rem, min(5.3vw, 9.5vh), 4.85rem);
+  }
+
+  .home-shell .home-v2-work__title {
+    font-size: clamp(3rem, min(4.25vw, 7.8vh), 4.45rem);
+  }
+
+  .home-shell .home-v2-projects {
+    inset: clamp(12.8rem, 29vh, 14.8rem) 0 clamp(5.1rem, 11vh, 6rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    width: min(34vw, 59svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    width: min(37vw, 63svh);
+  }
+
+  .home-shell .home-v2-perspective {
+    padding-block: clamp(2rem, 4vh, 2.8rem);
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    margin-top: clamp(1.1rem, 2.2vh, 1.6rem);
+    font-size: clamp(2.8rem, min(4.3vw, 8.3vh), 4.4rem);
+    line-height: 0.87;
+  }
+
+  .home-shell .home-v2-perspective__bottom {
+    margin-top: clamp(1.15rem, 2.3vh, 1.6rem);
+  }
+
+  .home-shell .home-v2-perspective__bottom > p {
+    font-size: 0.9rem;
+  }
+
+  .home-shell .home-v2-capability {
+    min-height: 8rem;
+  }
+
+  .mp-page .mp-hero,
+  .contact-page .contact-hero {
+    min-height: 68svh;
+  }
+
+  .case-page .case-hero {
+    min-height: 70svh;
+  }
+}

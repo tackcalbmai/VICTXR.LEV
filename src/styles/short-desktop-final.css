@@ -1,0 +1,48 @@
+/* Exact low-height desktop guardrails. Loaded after the composition pass. */
+@media (min-width: 1180px) and (max-height: 960px) {
+  .home-shell .home-v2-work__title {
+    max-width: 16em;
+  }
+
+  .home-shell .home-v2-work__title span {
+    white-space: nowrap;
+  }
+
+  /* The large desktop statement reveal moves every line down by 110% and
+   * rotates the full-width span. In a low-height viewport that transition can
+   * cross the supporting row even though the final layout is valid. Keep the
+   * section-level reveal, but remove the unsafe per-line transform here. */
+  .home-shell .home-v2-perspective [data-statement] span {
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* Tight display line-height still benefits from a deliberate optical gap. */
+  .home-shell .home-v2-perspective h2 {
+    padding-bottom: clamp(1.05rem, 2.1vh, 1.35rem);
+  }
+
+  html[lang='lv'] .home-shell .home-v2-perspective h2 {
+    padding-bottom: clamp(1.3rem, 2.6vh, 1.65rem);
+  }
+}
+
+/* At ~760px usable height the Windows taskbar/browser chrome leaves almost no
+ * spare vertical space. Recompose the project layer rather than allowing the
+ * cards to graze the title and footer. */
+@media (min-width: 1180px) and (max-height: 820px) {
+  .home-shell .home-v2-projects {
+    inset: clamp(14.3rem, 31.5vh, 15.25rem) 0 clamp(5.7rem, 12vh, 6.4rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    top: 0;
+    width: min(32vw, 54svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: 0.5vw;
+    bottom: 5%;
+    width: min(34vw, 57svh);
+  }
+}
