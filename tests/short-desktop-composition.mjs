@@ -76,6 +76,8 @@ for (const [viewportName, viewport] of viewports) {
     if (!perspective) throw new Error(`${name}: missing perspective geometry`);
     if (perspective.spans.some((span) => span.count !== 1)) throw new Error(`${name}: perspective authored line wraps: ${JSON.stringify(perspective.spans)}`);
     if (perspective.title.bottom > perspective.bottom.top + 2) throw new Error(`${name}: perspective title collides with explanatory content`);
+    const perspectiveTextBottom = Math.max(...perspective.spans.map((span) => span.bottom));
+    if (perspective.bottom.top - perspectiveTextBottom < 14) throw new Error(`${name}: perspective display has insufficient visible breathing room before supporting copy: ${JSON.stringify(perspective)}`);
     if (perspective.bottom.bottom > perspective.vh + 3) throw new Error(`${name}: perspective explanation/links are below the initial viewport: ${JSON.stringify(perspective)}`);
     if (perspective.spans.some((span) => span.left < -8 || span.right > perspective.vw + 8)) throw new Error(`${name}: perspective title clips horizontally: ${JSON.stringify(perspective.spans)}`);
     await assertNoHorizontalOverflow(page, `${name} perspective`);
