@@ -43,9 +43,6 @@ export function initLaptopResponsiveMotion() {
   const progressForViewport = () => {
     const rect = disruption.getBoundingClientRect();
     const viewport = Math.max(window.innerHeight, 1);
-    // Begin as the scene enters the lower part of the viewport and finish while
-    // its lower edge is still visible. This makes timing depend on what the user
-    // can actually see, not on monitor resolution or an artificial pin distance.
     const startLine = viewport * 0.82;
     const finishLine = viewport * 0.16;
     const travel = Math.max(startLine + rect.height - finishLine, 1);
@@ -97,13 +94,12 @@ export function initLaptopResponsiveMotion() {
     frame = window.requestAnimationFrame(renderDesktop);
   };
 
-  const enterDesktopMode = () => {
+  const enterDesktopMode = (refresh = true) => {
     killDesktopDisruptionTriggers(disruption);
     desktopMode = true;
     disruption.dataset.motionOwner = 'viewport';
     renderDesktop();
-    // Killing a legacy pin can change document geometry. Refresh the remaining
-    // triggers only after the pin spacer has been reverted.
+    if (!refresh) return;
     window.requestAnimationFrame(() => {
       ScrollTrigger.refresh();
       renderDesktop();
@@ -119,21 +115,15 @@ export function initLaptopResponsiveMotion() {
     ScrollTrigger.refresh();
   };
 
-  const syncMode = () => {
+  const syncMode = (refresh = true) => {
     const shouldOwnDesktop = window.matchMedia('(min-width: 761px)').matches;
-    if (shouldOwnDesktop) {
-      // Home's width-based GSAP matchMedia can recreate its legacy trigger when
-      // crossing responsive boundaries. Reclaim ownership every time geometry
-      // changes so there is never more than one desktop motion controller.
-      enterDesktopMode();
-    } else if (desktopMode) {
-      leaveDesktopMode();
-    }
+    if (shouldOwnDesktop) enterDesktopMode(refresh);
+    else if (desktopMode) leaveDesktopMode();
   };
 
   const onResize = () => {
     window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(syncMode, 90);
+    resizeTimer = window.setTimeout(() => syncMode(true), 100);
   };
 
   const onDesktopJourney = (event: MouseEvent) => {
@@ -147,24 +137,16 @@ export function initLaptopResponsiveMotion() {
     window.scrollTo({ top: target, left: 0, behavior: 'smooth' });
   };
 
-  // initHomeMotion() runs first, so its original desktop pin already exists and
-  // can be removed deterministically here. Two RAFs also cover font/layout
-  // settling without waiting for the user to begin scrolling.
-  window.requestAnimationFrame(() => window.requestAnimationFrame(syncMode));
+  // initHomeMotion() runs first, so its legacy desktop pin is available to
+  // remove deterministically. Re-check after layout/font settling, but do not
+  // subscribe to ScrollTrigger refresh itself (that can create a feedback loop).
+  window.requestAnimationFrame(() => window.requestAnimationFrame(() => syncMode(true)));
+  window.setTimeout(() => syncMode(false), 450);
+  window.setTimeout(() => syncMode(false), 1200);
 
   window.addEventListener('scroll', requestRender, { passive: true });
   window.addEventListener('resize', onResize, { passive: true });
   window.visualViewport?.addEventListener('resize', onResize, { passive: true });
   window.visualViewport?.addEventListener('scroll', requestRender, { passive: true });
   scrollJourney?.addEventListener('click', onDesktopJourney, { capture: true });
-
-  // A refresh can be caused by fonts, images or another responsive subsystem.
-  // If a legacy desktop trigger reappears, remove it before it can affect scroll.
-  const guardOwnership = () => {
-    if (!window.matchMedia('(min-width: 761px)').matches) return;
-    const legacy = ScrollTrigger.getAll().some((trigger) => trigger.trigger === disruption);
-    if (legacy) enterDesktopMode();
-    else requestRender();
-  };
-  ScrollTrigger.addEventListener('refresh', guardOwnership);
 }
