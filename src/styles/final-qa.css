@@ -21,6 +21,19 @@
   transform: translateY(0);
 }
 
+/* Keep the sheet visually solid throughout its movement. Fading the entire
+ * panel made the page copy show through during the opening animation. */
+.contact-dock__panel {
+  opacity: 1 !important;
+  visibility: hidden;
+  transition: transform 420ms var(--ease-out), visibility 0s linear 420ms !important;
+}
+
+.contact-dock.is-open .contact-dock__panel {
+  visibility: visible;
+  transition: transform 420ms var(--ease-out), visibility 0s linear 0s !important;
+}
+
 /* About glyphs are atmosphere, never foreground copy. */
 .mp-about .about-principle__glyph {
   z-index: 0 !important;
@@ -69,12 +82,12 @@
 
   /* Latvian four-line perspective statement has unusually deep glyph boxes.
    * Give the last line real breathing room before the explanatory copy. */
-  html[lang='lv'] .home-v2-perspective h2 {
-    line-height: 0.88;
+  html[lang='lv'] .home-shell .home-v2-perspective h2 {
+    line-height: 0.88 !important;
   }
 
-  html[lang='lv'] .home-v2-perspective__bottom {
-    margin-top: clamp(4.2rem, 14vw, 5.4rem);
+  html[lang='lv'] .home-shell .home-v2-perspective__bottom {
+    margin-top: clamp(4.2rem, 14vw, 5.4rem) !important;
   }
 
   .mp-about .about-principle__glyph {
