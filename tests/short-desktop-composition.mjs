@@ -14,7 +14,6 @@ const viewports = [
   ['common-1536x864', { width: 1536, height: 864 }],
 ];
 
-const rect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
 const intersects = (a, b, pad = 0) => !(a.right <= b.left + pad || a.left >= b.right - pad || a.bottom <= b.top + pad || a.top >= b.bottom - pad);
 
 async function openReady(page, path) {
@@ -46,12 +45,13 @@ for (const [viewportName, viewport] of viewports) {
 
     await scrollSectionToTop(page, '.home-v2-work');
     const work = await page.evaluate(() => {
+      const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
       const title = document.querySelector('.home-v2-work__title')?.getBoundingClientRect();
       const catrin = document.querySelector('.home-v2-project--catrin')?.getBoundingClientRect();
       const anelika = document.querySelector('.home-v2-project--anelika')?.getBoundingClientRect();
       const footer = document.querySelector('.home-v2-work__bottom')?.getBoundingClientRect();
-      const spans = [...document.querySelectorAll('.home-v2-work__title span')].map((el) => ({ count: el.getClientRects().length, ...rect(el.getBoundingClientRect()) }));
-      return title && catrin && anelika && footer ? { title: rect(title), catrin: rect(catrin), anelika: rect(anelika), footer: rect(footer), spans, vh: innerHeight } : null;
+      const spans = [...document.querySelectorAll('.home-v2-work__title span')].map((el) => ({ count: el.getClientRects().length, ...toRect(el.getBoundingClientRect()) }));
+      return title && catrin && anelika && footer ? { title: toRect(title), catrin: toRect(catrin), anelika: toRect(anelika), footer: toRect(footer), spans, vh: innerHeight } : null;
     });
     if (!work) throw new Error(`${name}: missing work geometry`);
     if (work.spans.some((span) => span.count !== 1)) throw new Error(`${name}: work title wraps inside an authored line: ${JSON.stringify(work.spans)}`);
@@ -66,11 +66,12 @@ for (const [viewportName, viewport] of viewports) {
 
     await scrollSectionToTop(page, '.home-v2-perspective');
     const perspective = await page.evaluate(() => {
+      const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
       const title = document.querySelector('.home-v2-perspective h2')?.getBoundingClientRect();
       const bottom = document.querySelector('.home-v2-perspective__bottom')?.getBoundingClientRect();
       const section = document.querySelector('.home-v2-perspective')?.getBoundingClientRect();
-      const spans = [...document.querySelectorAll('.home-v2-perspective h2 span')].map((el) => ({ count: el.getClientRects().length, ...rect(el.getBoundingClientRect()) }));
-      return title && bottom && section ? { title: rect(title), bottom: rect(bottom), section: rect(section), spans, vh: innerHeight, vw: innerWidth } : null;
+      const spans = [...document.querySelectorAll('.home-v2-perspective h2 span')].map((el) => ({ count: el.getClientRects().length, ...toRect(el.getBoundingClientRect()) }));
+      return title && bottom && section ? { title: toRect(title), bottom: toRect(bottom), section: toRect(section), spans, vh: innerHeight, vw: innerWidth } : null;
     });
     if (!perspective) throw new Error(`${name}: missing perspective geometry`);
     if (perspective.spans.some((span) => span.count !== 1)) throw new Error(`${name}: perspective authored line wraps: ${JSON.stringify(perspective.spans)}`);
