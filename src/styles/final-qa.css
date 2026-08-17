@@ -80,6 +80,13 @@
     inset: 0;
   }
 
+  /* Reserve the dock's footprint inside closing footers so Back to top never
+   * sits underneath the fixed O trigger. */
+  .page-contact-cta__footer,
+  .home-v2-close__footer {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+
   /* Latvian four-line perspective statement has unusually deep glyph boxes.
    * Give the last line real breathing room before the explanatory copy. */
   html[lang='lv'] .home-shell .home-v2-perspective h2 {
