@@ -14,10 +14,6 @@ const laptopMatrix = [
   ['laptop-1880x890', { width: 1880, height: 890 }],
 ];
 
-function rectData(rect) {
-  return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
-}
-
 async function openReady(page, path = '/') {
   await page.goto(new URL(path, baseURL).toString(), { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => document.fonts.ready);
@@ -32,7 +28,16 @@ async function assertTextInkInsideViewport(page, selector, name, tolerance = 8) 
     return [...range.getClientRects()]
       .filter((rect) => rect.width > 0 && rect.height > 0)
       .filter((rect) => rect.left < -tol || rect.right > innerWidth + tol)
-      .map((rect) => ({ text: element.textContent?.trim(), ...rectData(rect), viewport: innerWidth }));
+      .map((rect) => ({
+        text: element.textContent?.trim(),
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+        viewport: innerWidth,
+      }));
   }, tolerance);
   if (failures.length) throw new Error(`${name}: ${selector} clips visible text ink: ${JSON.stringify(failures)}`);
 }
@@ -64,7 +69,8 @@ for (const [name, viewport] of laptopMatrix) {
     const meta = document.querySelector('.hero__meta')?.getBoundingClientRect();
     const title = document.querySelector('.hero__title')?.getBoundingClientRect();
     const footer = document.querySelector('.hero__footer')?.getBoundingClientRect();
-    return meta && title && footer ? { meta: rectData(meta), title: rectData(title), footer: rectData(footer) } : null;
+    const pack = (rect) => ({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height });
+    return meta && title && footer ? { meta: pack(meta), title: pack(title), footer: pack(footer) } : null;
   });
   if (!heroGeometry) throw new Error(`${name}: missing hero geometry`);
   if (heroGeometry.title.top < heroGeometry.meta.bottom - 2) throw new Error(`${name}: hero title collides with meta`);
