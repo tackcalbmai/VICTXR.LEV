@@ -1,0 +1,104 @@
+/* Final visual QA corrections ------------------------------------------------
+ * These rules only address verified collisions / readability issues found in
+ * the post-density screenshot pass. Keep them narrow and measurable.
+ */
+
+/* The dock container used transform for its entrance animation. A transformed
+ * ancestor changes the containing block of fixed descendants, which made the
+ * mobile backdrop/panel collapse into the trigger width. Animate the trigger
+ * instead so fixed descendants stay viewport-bound. */
+.contact-dock {
+  transform: none !important;
+  transition: opacity 260ms ease !important;
+}
+
+.contact-dock__trigger {
+  transform: translateY(0.8rem);
+  transition: transform 420ms var(--ease-out), background 240ms ease, color 240ms ease, border-color 240ms ease;
+}
+
+.contact-dock.is-visible .contact-dock__trigger {
+  transform: translateY(0);
+}
+
+/* Keep the sheet visually solid throughout its movement. Fading the entire
+ * panel made the page copy show through during the opening animation. */
+.contact-dock__panel {
+  opacity: 1 !important;
+  visibility: hidden;
+  transition: transform 420ms var(--ease-out), visibility 0s linear 420ms !important;
+}
+
+.contact-dock.is-open .contact-dock__panel {
+  visibility: visible;
+  transition: transform 420ms var(--ease-out), visibility 0s linear 0s !important;
+}
+
+/* About glyphs are atmosphere, never foreground copy. */
+.mp-about .about-principle__glyph {
+  z-index: 0 !important;
+  opacity: 0.075 !important;
+}
+
+.mp-about .about-principle h2,
+.mp-about .about-principle > p,
+.mp-about .about-principle__index {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 760px) {
+  /* Compact mobile trigger so it cannot cover headings, links or footer copy. */
+  .contact-dock__trigger {
+    width: 3.15rem;
+    min-width: 3.15rem;
+    min-height: 3.15rem;
+    justify-content: center;
+    gap: 0;
+    padding: 0.4rem;
+    border-radius: 50%;
+  }
+
+  .contact-dock__trigger > span:last-child {
+    display: none;
+  }
+
+  .contact-dock__trigger-mark {
+    width: 2.25rem;
+  }
+
+  /* Full-width bottom sheet. With the parent transform removed, fixed
+   * positioning is once again relative to the viewport. */
+  .contact-dock__panel {
+    right: max(0.75rem, env(safe-area-inset-right));
+    left: max(0.75rem, env(safe-area-inset-left));
+    width: auto;
+    max-width: none;
+  }
+
+  .contact-dock__backdrop {
+    inset: 0;
+  }
+
+  /* Reserve the dock's footprint inside closing footers so Back to top never
+   * sits underneath the fixed O trigger. */
+  .page-contact-cta__footer,
+  .home-v2-close__footer {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+
+  /* Latvian four-line perspective statement has unusually deep glyph boxes.
+   * Give the last line real breathing room before the explanatory copy. */
+  html[lang='lv'] .home-shell .home-v2-perspective h2 {
+    line-height: 0.88 !important;
+    padding-bottom: clamp(2.25rem, 8vw, 3rem) !important;
+  }
+
+  html[lang='lv'] .home-shell .home-v2-perspective__bottom {
+    margin-top: clamp(4.2rem, 14vw, 5.4rem) !important;
+  }
+
+  .mp-about .about-principle__glyph {
+    opacity: 0.055 !important;
+  }
+}
