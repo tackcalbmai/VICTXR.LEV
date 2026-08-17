@@ -28,7 +28,7 @@ export const homeV2Copy = {
     workCta: 'Skatīt visus darbus',
     perspectiveLabel: 'Cits skatījums',
     perspectiveTitle: ['Tu prasīji', 'mājaslapu.', 'Es varu pateikt,', 'ka to nevajag.'],
-    perspectiveText: 'Sākotnējais uzdevums ir sākuma punkts, nevis pavēle. Es vispirms saprotu, kas patiesībā nestrādā, izmetu lieko un uzbūvēju mazāko spēcīgo risinājumu.',
+    perspectiveText: 'Sākotnējais uzdevums ir sākuma punkts, nevis pavēle. Vispirms saprotu, kas patiesībā nestrādā, izmetu lieko un uzbūvēju vienkāršāko spēcīgo risinājumu.',
     aboutCta: 'Kā es domāju',
     servicesCta: 'Ko es reāli daru',
     closeEyebrow: 'Pietiek ritināt. Tagad pie lietas.',
@@ -80,7 +80,7 @@ export const contactPageCopy = {
     seoDescription: 'Sāc sarunu par jaunu mājaslapu, pārveidi vai digitālu projektu ar XO WEB / Victxr Lev. Sāc ar biznesa problēmu, nevis gatavu risinājumu.',
     eyebrow: 'Kontakti / 04',
     title: ['Pastāsti par', 'problēmu.', 'Nevis risinājumu.'],
-    intro: 'Tev nav iepriekš jāzina, vai vajag jaunu mājaslapu, pārveidi vai mazāk mājaslapas. To izdomāsim pēc problēmas.',
+    intro: 'Tev nav iepriekš jāzina, vai vajag jaunu mājaslapu, pārveidi vai vienkāršāku risinājumu. To noskaidrosim, sākot ar problēmu.',
     chooseLabel: 'No kurienes sākam?',
     options: [
       {
@@ -101,7 +101,7 @@ export const contactPageCopy = {
         id: 'unsure',
         index: '03',
         title: 'Vēl nezinu',
-        text: 'Biznesa problēma ir skaidra, bet pareizais web risinājums vēl nav zināms. Ar to pilnīgi pietiek, lai sāktu.',
+        text: 'Biznesa problēma ir skaidra, bet pareizais tīmekļa risinājums vēl nav zināms. Ar to pilnīgi pietiek, lai sāktu.',
         subject: 'Mājaslapas projekts — risinājums vēl nav skaidrs',
       },
     ],
@@ -109,7 +109,7 @@ export const contactPageCopy = {
     emailCta: 'Uzrakstīt īso versiju',
     directLabel: 'Vai sazinies uzreiz',
     expectation: 'Labs pirmais ziņojums: ko dara bizness, kas šobrīd nestrādā un kam būtu jāmainās. Pietiek ar trim teikumiem.',
-    note: 'Bez pārdošanas piltuves un izrādēm ap “discovery call”. Ja domāšu, ka tev vajag mazāk nekā prasīts, pateikšu.',
+    note: 'Bez pārdošanas piltuvēm un teatrālām iepazīšanās sarunām. Ja domāšu, ka tev vajag mazāk nekā prasīts, pateikšu.',
   },
 } as const;
 
