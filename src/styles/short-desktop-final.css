@@ -1,0 +1,10 @@
+/* Exact low-height desktop guardrails. Loaded after the composition pass. */
+@media (min-width: 1180px) and (max-height: 960px) {
+  .home-shell .home-v2-work__title {
+    max-width: 16em;
+  }
+
+  .home-shell .home-v2-work__title span {
+    white-space: nowrap;
+  }
+}
