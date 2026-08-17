@@ -101,7 +101,16 @@ export function initLaptopResponsiveMotion() {
   if (!disruption) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  const scrollJourney = document.querySelector<HTMLAnchorElement>('[data-scroll-journey]');
   let resizeTimer = 0;
+
+  const onShortDesktopJourney = (event: MouseEvent) => {
+    if (!window.matchMedia('(min-width: 761px) and (max-height: 900px)').matches) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const top = disruption.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + window.innerHeight * 0.08, left: 0, behavior: 'smooth' });
+  };
 
   const rebuild = () => {
     window.clearTimeout(resizeTimer);
@@ -130,5 +139,6 @@ export function initLaptopResponsiveMotion() {
     else if (tallDesktop) buildTallDesktop(disruption);
   }, 0);
 
+  scrollJourney?.addEventListener('click', onShortDesktopJourney, { capture: true });
   window.addEventListener('resize', rebuild, { passive: true });
 }
