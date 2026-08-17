@@ -147,10 +147,12 @@ const schema = {
     <slot />
     <ContactDock locale={lang} canonicalPath={canonicalPath} />
     <script>
+      import { initExperienceRefinementMotion } from '../scripts/experience-refinement';
       import { initPinnedScrollCues } from '../scripts/pinned-cues';
       import { initSiteUI } from '../scripts/site';
       initSiteUI();
       initPinnedScrollCues();
+      initExperienceRefinementMotion();
     </script>
   </body>
 </html>
