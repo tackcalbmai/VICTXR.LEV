@@ -7,6 +7,17 @@
   .home-shell .home-v2-work__title span {
     white-space: nowrap;
   }
+
+  /* Tight display line-height lets the visible glyphs extend beyond the h2's
+   * normal line box. Reserve real space before the explanatory row so the last
+   * statement never visually touches the rule/copy underneath. */
+  .home-shell .home-v2-perspective h2 {
+    padding-bottom: clamp(1.05rem, 2.1vh, 1.35rem);
+  }
+
+  html[lang='lv'] .home-shell .home-v2-perspective h2 {
+    padding-bottom: clamp(1.3rem, 2.6vh, 1.65rem);
+  }
 }
 
 /* At ~760px usable height the Windows taskbar/browser chrome leaves almost no
