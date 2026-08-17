@@ -1,0 +1,41 @@
+/* XO WEB geometry guardrails
+ * Hard invariants that should survive every responsive composition:
+ * authored display lines stay authored, media does not eat copy, controls stay human-sized.
+ */
+
+@media (min-width: 761px) {
+  .home-shell .home-v2-work__title {
+    width: 100%;
+    max-width: none;
+  }
+
+  .home-shell .home-v2-work__title span,
+  .home-shell .home-v2-perspective h2 span {
+    white-space: nowrap;
+  }
+
+  .home-shell .home-v2-projects {
+    inset: clamp(18rem, 32vh, 24rem) 0 clamp(5.8rem, 10.5vh, 7rem);
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    max-width: none;
+  }
+}
+
+.contact-brief__actions > a::before,
+.contact-brief__actions > button::before {
+  z-index: 0;
+}
+
+.contact-brief__actions > a > *,
+.contact-brief__actions > button > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 760px) {
+  .home-shell .home-v2-perspective h2 span {
+    white-space: normal;
+  }
+}
