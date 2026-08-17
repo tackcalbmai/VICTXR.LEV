@@ -8,3 +8,23 @@
     white-space: nowrap;
   }
 }
+
+/* At ~760px usable height the Windows taskbar/browser chrome leaves almost no
+ * spare vertical space. Recompose the project layer rather than allowing the
+ * cards to graze the title and footer. */
+@media (min-width: 1180px) and (max-height: 820px) {
+  .home-shell .home-v2-projects {
+    inset: clamp(14.3rem, 31.5vh, 15.25rem) 0 clamp(5.7rem, 12vh, 6.4rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    top: 0;
+    width: min(32vw, 54svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: 0.5vw;
+    bottom: 5%;
+    width: min(34vw, 57svh);
+  }
+}
