@@ -8,9 +8,16 @@
     white-space: nowrap;
   }
 
-  /* Tight display line-height lets the visible glyphs extend beyond the h2's
-   * normal line box. Reserve real space before the explanatory row so the last
-   * statement never visually touches the rule/copy underneath. */
+  /* The large desktop statement reveal moves every line down by 110% and
+   * rotates the full-width span. In a low-height viewport that transition can
+   * cross the supporting row even though the final layout is valid. Keep the
+   * section-level reveal, but remove the unsafe per-line transform here. */
+  .home-shell .home-v2-perspective [data-statement] span {
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* Tight display line-height still benefits from a deliberate optical gap. */
   .home-shell .home-v2-perspective h2 {
     padding-bottom: clamp(1.05rem, 2.1vh, 1.35rem);
   }
