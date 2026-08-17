@@ -1,0 +1,359 @@
+/* Short-desktop / laptop adaptation ------------------------------------------
+ * Wide screens with limited vertical space are a distinct layout class.
+ * Width-only desktop rules were making typography, pinned scenes and project
+ * takeovers too tall for common 1366x768 / 1536x864 / laptop browser viewports.
+ */
+
+@media (min-width: 761px) and (max-height: 900px) {
+  /* HOME / HERO --------------------------------------------------------- */
+  .home-shell .hero {
+    min-height: 100svh;
+    padding-top: calc(var(--header-height) + 0.35rem);
+    padding-bottom: clamp(0.85rem, 1.8vh, 1.25rem);
+  }
+
+  .home-shell .hero__title {
+    padding-block: clamp(1.35rem, 3.1vh, 2.2rem) clamp(0.85rem, 1.7vh, 1.3rem);
+    font-size: clamp(4rem, min(8.8vw, 15.5vh), 8.25rem);
+    line-height: 0.78;
+  }
+
+  .home-shell .hero__meta {
+    padding-top: 0.2rem;
+    font-size: 0.57rem;
+  }
+
+  .home-shell .hero__footer {
+    padding-top: 0.65rem;
+  }
+
+  .home-shell .hero__intro {
+    max-width: 26rem;
+    font-size: clamp(0.85rem, 1vw, 0.98rem);
+    line-height: 1.24;
+  }
+
+  .home-shell .hero__actions {
+    gap: clamp(0.8rem, 2vw, 1.7rem);
+    font-size: 0.59rem;
+  }
+
+  .home-shell .scroll-rail {
+    grid-template-rows: auto 3.9rem auto;
+  }
+
+  .home-shell .scroll-rail__window {
+    height: 3.9rem;
+  }
+
+  .home-shell .hero__side-note {
+    top: 48%;
+    max-height: 18rem;
+    font-size: 0.56rem;
+  }
+
+  /* DISRUPTION --------------------------------------------------------- */
+  /* The short-desktop motion controller does not pin this scene. Give it
+   * enough height to read as a deliberate act without becoming a scroll tax. */
+  .home-shell .disruption,
+  .home-shell .disruption__stage {
+    min-height: 78svh;
+  }
+
+  .home-shell .disruption__stage {
+    padding: clamp(2.5rem, 5vh, 4rem) var(--gutter);
+  }
+
+  .home-shell .disruption__line {
+    left: 7vw;
+    width: 86vw;
+    font-size: clamp(3rem, min(6.6vw, 12.6vh), 6.55rem);
+    line-height: 0.9;
+    letter-spacing: -0.062em;
+  }
+
+  .home-shell .disruption__line--one {
+    top: 15%;
+  }
+
+  .home-shell .disruption__line--two {
+    top: 49%;
+  }
+
+  .home-shell .disruption__x {
+    font-size: min(24vw, 52vh);
+  }
+
+  .home-shell .disruption__caption {
+    bottom: clamp(0.85rem, 2vh, 1.4rem);
+    max-width: 22rem;
+    font-size: 0.63rem;
+  }
+
+  /* HOME / WORK TAKEOVER ---------------------------------------------- */
+  .home-shell .home-v2-work {
+    min-height: 112svh;
+  }
+
+  .home-shell .home-v2-work__sticky {
+    padding-top: calc(var(--header-height) + 0.55rem);
+    padding-bottom: clamp(0.8rem, 1.8vh, 1.25rem);
+  }
+
+  .home-shell .home-v2-work__title {
+    max-width: 10ch;
+    margin-top: clamp(1.25rem, 2.8vh, 2rem);
+    font-size: clamp(3rem, min(6.2vw, 11.2vh), 6rem);
+    line-height: 0.84;
+  }
+
+  .home-shell .home-v2-projects {
+    inset: clamp(6.6rem, 13.5vh, 8rem) 0 clamp(4.8rem, 10vh, 6.4rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    top: 12%;
+    left: 4vw;
+    width: min(45vw, 78svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: -1.5vw;
+    bottom: 2%;
+    width: min(49vw, 84svh);
+  }
+
+  .home-shell .home-v2-project__summary {
+    max-width: min(22rem, 70%);
+    font-size: 0.7rem;
+  }
+
+  .home-shell .home-v2-work__bottom {
+    gap: 1.2rem 4vw;
+    padding-top: 0.75rem;
+  }
+
+  .home-shell .home-v2-work__bottom p {
+    font-size: clamp(0.83rem, 1vw, 0.98rem);
+    line-height: 1.4;
+  }
+
+  /* HOME / INFORMATIONAL SECTIONS ------------------------------------- */
+  .home-shell .home-v2-capabilities {
+    padding-block: clamp(3.4rem, 6vh, 5rem);
+  }
+
+  .home-shell .home-v2-capabilities__head {
+    padding-block: clamp(2rem, 4vh, 3.1rem);
+  }
+
+  .home-shell .home-v2-capabilities__head h2 {
+    font-size: clamp(3rem, min(5.8vw, 10.5vh), 5.9rem);
+    line-height: 0.86;
+  }
+
+  .home-shell .home-v2-capability {
+    min-height: 10.5rem;
+    padding: 1.1rem;
+  }
+
+  .home-shell .home-v2-capability h3 {
+    font-size: clamp(1.35rem, 2vw, 2.2rem);
+  }
+
+  .home-shell .home-v2-perspective {
+    min-height: 76svh;
+    padding-block: clamp(3.5rem, 6vh, 5rem);
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    margin-top: clamp(2rem, 4vh, 3.2rem);
+    font-size: clamp(3rem, min(6.2vw, 11.2vh), 6.2rem);
+    line-height: 0.84;
+  }
+
+  .home-shell .home-v2-perspective__bottom {
+    margin-top: clamp(2rem, 4vh, 3.2rem);
+  }
+
+  .home-shell .home-v2-perspective__xo {
+    width: min(34vw, 58vh);
+    height: min(34vw, 58vh);
+  }
+
+  .home-shell .home-v2-perspective__xo span {
+    font-size: min(29vw, 50vh);
+  }
+
+  .home-shell .home-v2-close {
+    min-height: 70svh;
+    padding-block: clamp(3.5rem, 6vh, 5rem) 1rem;
+  }
+
+  .home-shell .home-v2-close h2 {
+    font-size: clamp(3.1rem, min(6.4vw, 11.5vh), 6.4rem);
+    line-height: 0.84;
+  }
+
+  .home-shell .home-v2-close__footer {
+    margin-top: clamp(2rem, 4vh, 3rem);
+  }
+
+  /* INTERNAL PAGE HEROES ---------------------------------------------- */
+  .mp-page .mp-hero,
+  .contact-page .contact-hero {
+    min-height: 82svh;
+  }
+
+  .mp-page .mp-hero h1,
+  .contact-page .contact-hero h1 {
+    padding-block: clamp(1.8rem, 4vh, 3rem) clamp(1.35rem, 3vh, 2.2rem);
+    font-size: clamp(3.6rem, min(7.2vw, 13.6vh), 7.4rem);
+    line-height: 0.83;
+  }
+
+  .mp-page .mp-hero__bottom {
+    gap: 1.25rem 4vw;
+  }
+
+  /* WORK --------------------------------------------------------------- */
+  .mp-work .work-exhibit,
+  .mp-work .work-exhibit__link {
+    min-height: 86svh;
+  }
+
+  .mp-work .work-exhibit__media {
+    max-height: 50svh;
+  }
+
+  .mp-work .work-exhibit__name {
+    font-size: clamp(6.5rem, min(16vw, 31vh), 15rem);
+  }
+
+  .mp-work .work-exhibit__caption h2 {
+    font-size: clamp(2rem, min(3.5vw, 6.7vh), 3.8rem);
+  }
+
+  /* ABOUT -------------------------------------------------------------- */
+  .mp-about .about-definition {
+    min-height: 62svh;
+  }
+
+  .mp-about .about-definition h2 {
+    font-size: clamp(2.9rem, min(5.5vw, 10vh), 5.6rem);
+  }
+
+  .mp-about .about-principle {
+    min-height: 34svh;
+    padding-block: clamp(2rem, 4vh, 3.2rem);
+  }
+
+  .mp-about .about-principle h2 {
+    font-size: clamp(2.35rem, min(4.3vw, 8vh), 4.5rem);
+  }
+
+  .mp-about .about-standard,
+  .mp-about .about-standard__inner {
+    min-height: 64svh;
+  }
+
+  .mp-about .about-standard__inner {
+    padding-block: clamp(3rem, 6vh, 4.8rem);
+  }
+
+  .mp-about .about-standard h2 {
+    margin-top: clamp(2rem, 4vh, 3rem);
+    font-size: clamp(3rem, min(5.5vw, 10vh), 5.7rem);
+  }
+
+  /* SERVICES ----------------------------------------------------------- */
+  .mp-services .mp-services__hero {
+    min-height: 76svh;
+  }
+
+  .mp-services .service-decision__head {
+    min-height: clamp(6.2rem, 15vh, 8rem);
+  }
+
+  .mp-services .service-decision__head h2 {
+    font-size: clamp(2.1rem, min(4vw, 7.5vh), 4rem);
+  }
+
+  .mp-services .services-anti__inner,
+  .mp-services .services-process {
+    padding-block: clamp(3.5rem, 6vh, 5rem);
+  }
+
+  /* CONTACT ------------------------------------------------------------ */
+  .contact-page .contact-intents {
+    padding-block: clamp(3.4rem, 6vh, 5rem);
+  }
+
+  .contact-page .contact-intent {
+    min-height: clamp(7.6rem, 16vh, 10rem);
+  }
+
+  .contact-page .contact-intent__title {
+    font-size: clamp(1.9rem, min(3.6vw, 6.8vh), 3.8rem);
+  }
+
+  .contact-page .contact-talk,
+  .contact-page .contact-brief {
+    padding-block: clamp(3.5rem, 6vh, 5rem);
+  }
+
+  .contact-talk__heading,
+  .contact-brief__head {
+    padding-block: clamp(2.8rem, 5vh, 4rem) clamp(2rem, 4vh, 3rem);
+  }
+
+  .contact-talk__heading h2,
+  .contact-brief__head h2 {
+    font-size: clamp(3rem, min(6vw, 11vh), 6.2rem);
+  }
+
+  /* CASE STUDIES ------------------------------------------------------- */
+  .case-page .case-hero {
+    min-height: 86svh;
+  }
+
+  .case-page .case-hero h1 {
+    font-size: clamp(6.5rem, min(16vw, 30vh), 16rem);
+  }
+
+  .case-page .case-narrative__row {
+    padding-block: clamp(2rem, 4vh, 3rem);
+  }
+}
+
+/* Extra-shallow browser windows: preserve content before spectacle. */
+@media (min-width: 761px) and (max-height: 690px) {
+  .home-shell .hero__side-note {
+    display: none;
+  }
+
+  .home-shell .hero__title {
+    font-size: clamp(3.6rem, min(7.8vw, 14vh), 6.6rem);
+  }
+
+  .home-shell .hero__intro {
+    font-size: 0.82rem;
+  }
+
+  .home-shell .disruption,
+  .home-shell .disruption__stage {
+    min-height: 84svh;
+  }
+
+  .home-shell .home-v2-work__title {
+    font-size: clamp(2.75rem, min(5.4vw, 10vh), 5rem);
+  }
+
+  .home-shell .home-v2-project--catrin {
+    width: min(42vw, 68svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    width: min(46vw, 74svh);
+  }
+}
