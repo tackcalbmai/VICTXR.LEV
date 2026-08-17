@@ -2,6 +2,22 @@
  * Small, repeatable responses carry the quality. Large motion stays rare.
  */
 
+.contact-dock__trigger {
+  min-height: 3.05rem;
+  padding: 0.34rem 0.85rem 0.34rem 0.34rem;
+}
+
+.contact-dock__trigger-mark { width: 2.22rem; }
+
+.contact-dock__panel {
+  width: min(27rem, calc(100vw - 2rem));
+  padding: 0.95rem;
+}
+
+.contact-dock__intro { padding-block: 1.25rem; }
+.contact-dock__channels { margin-top: 1rem; }
+.contact-dock__channels > a { min-height: 3.8rem; }
+
 .contact-talk__primary,
 .contact-talk__secondary > a,
 .contact-dock__channels > a,
@@ -66,6 +82,7 @@
 
 .contact-dock__channels > a {
   position: relative;
+  isolation: isolate;
   padding-inline: 0.25rem;
   overflow: hidden;
 }
@@ -78,6 +95,12 @@
   content: '';
   transform: translateX(-102%);
   transition: transform 420ms var(--ease-out);
+}
+
+.contact-talk__secondary strong,
+.contact-dock__icon,
+.contact-dock__glyph {
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease;
 }
 
 .service-decision__head {
@@ -136,6 +159,15 @@
 }
 
 @media (max-width: 760px) {
+  .contact-dock__trigger {
+    min-height: 3rem;
+    padding: 0.32rem 0.78rem 0.32rem 0.32rem;
+  }
+
+  .contact-dock__trigger-mark { width: 2.2rem; }
+  .contact-dock__panel { padding: 0.85rem; }
+  .contact-dock__channels > a { min-height: 3.55rem; }
+
   .contact-talk__primary:active,
   .contact-talk__secondary > a:active,
   .contact-dock__channels > a:active,
