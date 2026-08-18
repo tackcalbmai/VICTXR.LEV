@@ -14,7 +14,7 @@
     "audit:quality": "node tests/quality-gates.mjs",
     "audit:contacts": "node tests/contact-channels.mjs",
     "cross-browser": "node tests/cross-browser.mjs",
-    "visual:core": "npm run audit:static && node tests/multipage.mjs && node tests/multipage-services-hero.mjs && node tests/multipage-about-layout.mjs && node tests/multipage-navigation.mjs && node tests/services-layout.mjs && node tests/mobile-work-takeover.mjs && node tests/contact-router.mjs && node tests/lv-typography.mjs 2> artifacts/visual/lv-typography-error.log && node tests/lv-display-rhythm.mjs && node tests/desktop-type-safety.mjs && node tests/laptop-layout.mjs && node tests/viewport-motion.mjs && node tests/short-desktop-composition.mjs && node tests/experience-density.mjs && node tests/cinematic-intro.mjs && node tests/brand-motion.mjs && node tests/visual.mjs",
+    "visual:core": "npm run audit:static && node tests/multipage.mjs && node tests/multipage-services-hero.mjs && node tests/multipage-about-layout.mjs && node tests/multipage-navigation.mjs && node tests/services-layout.mjs && node tests/mobile-work-takeover.mjs && node tests/contact-router.mjs && node tests/lv-typography.mjs 2> artifacts/visual/lv-typography-error.log && node tests/desktop-type-safety.mjs && node tests/laptop-layout.mjs && node tests/viewport-motion.mjs && node tests/short-desktop-composition.mjs && node tests/experience-density.mjs && node tests/cinematic-intro.mjs && node tests/brand-motion.mjs && node tests/visual.mjs",
     "visual": "npm run visual:core && npm run cross-browser && npm run audit:quality",
     "test": "npm run check && npm run build && npm run visual",
     "deploy": "npm run check && npm run build && wrangler deploy"
