@@ -1,7 +1,6 @@
-/* Latvian display rhythm safety.
- * Latvian uppercase diacritics extend above the Latin cap height, so the
- * ultra-tight EN display leading can make macrons/caron collide across lines.
- * Keep this LV-only and compact: enough clearance without opening the layout.
+/* Latvian display typography safety.
+ * Keep the original compact XO WEB rhythm, but protect macrons/caron marks
+ * from both neighbouring lines and section dividers.
  */
 
 html[lang='lv'] body :is(
@@ -26,11 +25,37 @@ html[lang='lv'] body :is(
   .contact-talk__primary strong,
   .contact-brief__head h2
 ) {
-  line-height: 0.94;
+  line-height: 0.86;
+  overflow: visible;
+}
+
+/* Single-line display headings inside bordered rows need optical breathing
+ * room above the cap height. Padding changes the paint area, not the intended
+ * tight leading, so dividers no longer cut through Ā/Ē/Ī/Ū/Č/Š/Ž.
+ */
+html[lang='lv'] body :is(
+  .service-decision__head h2,
+  .about-principle h2,
+  .contact-intent__title,
+  .contact-talk__primary strong,
+  .work-exhibit__caption h2
+) {
+  padding-block: 0.12em;
+}
+
+html[lang='lv'] body :is(
+  .service-decision__head,
+  .about-principle,
+  .contact-intent,
+  .contact-talk__primary,
+  .work-exhibit__caption
+) {
+  overflow: visible;
 }
 
 html[lang='lv'] body .contact-dock__intro strong {
-  line-height: 0.96;
+  line-height: 0.9;
+  overflow: visible;
 }
 
 @media (max-width: 760px) {
@@ -56,6 +81,6 @@ html[lang='lv'] body .contact-dock__intro strong {
     .contact-talk__primary strong,
     .contact-brief__head h2
   ) {
-    line-height: 0.96;
+    line-height: 0.88;
   }
 }
