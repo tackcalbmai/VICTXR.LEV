@@ -59,6 +59,36 @@ for (const viewport of [
       );
     }
 
+    /* Do not rely only on a hand-maintained selector list. Find any large,
+     * genuinely multiline H1/H2/H3 containing Latvian marks and enforce the
+     * same floor. This catches future localized display blocks automatically. */
+    const discovered = await page.locator('h1, h2, h3').evaluateAll((elements) => {
+      const latvianMarks = /[ĀČĒĢĪĶĻŅŠŪŽāčēģīķļņšūž]/;
+      return elements.flatMap((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        const text = element.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+        const fontSize = Number.parseFloat(style.fontSize);
+        const lineHeight = Number.parseFloat(style.lineHeight);
+        const visible = style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        const multiline = Number.isFinite(lineHeight) && rect.height > lineHeight * 1.35;
+        if (!visible || !latvianMarks.test(text) || fontSize < 30 || !multiline || !Number.isFinite(lineHeight)) return [];
+        return [{
+          tag: element.tagName,
+          selectorHint: element.className || element.id || element.tagName,
+          text,
+          ratio: lineHeight / fontSize,
+        }];
+      });
+    });
+
+    for (const heading of discovered) {
+      assert(
+        heading.ratio + 0.003 >= viewport.floor,
+        `${viewport.name} ${path} auto-scan found unsafe LV leading ${heading.ratio.toFixed(3)} in “${heading.text}” (${heading.tag} ${heading.selectorHint})`,
+      );
+    }
+
     if (suffix === '/') {
       const perspective = page.locator('.home-v2-perspective').first();
       await perspective.scrollIntoViewIfNeeded();
