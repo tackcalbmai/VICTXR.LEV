@@ -1,9 +1,9 @@
 /* Latvian display rhythm and diacritic safety.
  *
- * Reference: keep the dense XO WEB leading (roughly the same visual gap as
- * TURPMĀKA / ATTĪSTĪBA), but never let macrons/caron marks touch a divider.
- * This file is loaded last from BaseLayout and intentionally owns the final
- * LV display leading. EN remains untouched.
+ * Keep XO WEB dense. The reference is the visually correct
+ * TURPMĀKA / ATTĪSTĪBA spacing: almost touching, never colliding.
+ * Divider clearance is solved on the container, not by opening the leading.
+ * This LV-only layer is loaded last from BaseLayout; EN stays untouched.
  */
 
 html[lang='lv'] body :is(
@@ -13,7 +13,6 @@ html[lang='lv'] body :is(
   .about-definition h2,
   .about-principle h2,
   .about-standard h2,
-  .service-decision__head h2,
   .services-anti h2,
   .services-process h2,
   .page-contact h2,
@@ -36,9 +35,29 @@ html[lang='lv'] body :is(
   overflow: visible;
 }
 
-/* The services rows were the real divider collision: density refinements had
- * reduced the row to ~6–8rem while keeping large two-line headings. Protect
- * the cap-height with container space instead of opening the line-height.
+/* Services use automatic wrapping, so one numeric line-height does not look
+ * identical for every Latvian word pair. Preserve the user's correct visual
+ * reference for the regular rows, then optically tighten the long 04 title.
+ */
+html[lang='lv'] body .mp-services .service-decision__head h2 {
+  line-height: 0.86 !important;
+  overflow: visible;
+}
+
+html[lang='lv'] body .mp-services .service-decision:nth-child(4) .service-decision__head h2 {
+  line-height: 0.80 !important;
+}
+
+/* Same translated service names also appear on Home. Keep the fourth item
+ * optically tight there as well, without changing the other cards.
+ */
+html[lang='lv'] body .home-v2-capability:nth-child(4) h3 {
+  line-height: 0.82 !important;
+}
+
+/* The divider collision around SEO UN TEHNISKĀ BĀZE came from the compact
+ * service-row geometry, not from the glyph itself. Give every service heading
+ * a protected cap-height zone while keeping the internal lines tight.
  */
 html[lang='lv'] body .mp-services .service-decision__head {
   min-height: clamp(7rem, 9.8vw, 8.4rem) !important;
@@ -51,9 +70,6 @@ html[lang='lv'] body .mp-services .services-decision {
   overflow: visible;
 }
 
-/* Other bordered display rows already have enough overall height; keep a
- * small paint-area allowance so a diacritic is never clipped by the element.
- */
 html[lang='lv'] body :is(
   .about-principle h2,
   .contact-intent__title,
@@ -76,7 +92,6 @@ html[lang='lv'] body .contact-dock__intro strong {
     .about-definition h2,
     .about-principle h2,
     .about-standard h2,
-    .service-decision__head h2,
     .services-anti h2,
     .services-process h2,
     .page-contact h2,
@@ -96,6 +111,14 @@ html[lang='lv'] body .contact-dock__intro strong {
     .not-found h1
   ) {
     line-height: 0.84 !important;
+  }
+
+  html[lang='lv'] body .mp-services .service-decision__head h2 {
+    line-height: 0.86 !important;
+  }
+
+  html[lang='lv'] body .mp-services .service-decision:nth-child(4) .service-decision__head h2 {
+    line-height: 0.82 !important;
   }
 
   html[lang='lv'] body .mp-services .service-decision__head {
