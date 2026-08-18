@@ -1,18 +1,24 @@
-/* Latvian display rhythm and diacritic safety.
+/* Latvian display typography — optical correction only.
  *
- * Keep XO WEB dense. The reference is the visually correct
- * TURPMĀKA / ATTĪSTĪBA spacing: almost touching, never colliding.
- * Divider clearance is solved on the container, not by opening the leading.
- * This LV-only layer is loaded last from BaseLayout; EN stays untouched.
+ * Baseline: keep the composition from the 2026-08-18 density refinement intact.
+ * The target rhythm is the user's good TURPMĀKA / ATTĪSTĪBA reference:
+ * compact, with only a minimal visible gap around macrons/caron marks.
+ *
+ * Do not compensate by globally opening sections, shifting titles, or changing
+ * font sizes. EN remains untouched.
  */
 
+/* The compact EN leading (roughly .84-.86 in several components) is too tight
+ * for Latvian uppercase diacritics. .90 is the small optical correction: enough
+ * room for Ā/Ē/Ī/Ū/Č/Š/Ž, without the loose .94-.96 spacing from the first pass.
+ */
 html[lang='lv'] body :is(
-  .hero__title,
   .mp-hero h1,
   .mp-closing h2,
   .about-definition h2,
   .about-principle h2,
   .about-standard h2,
+  .service-decision__head h2,
   .services-anti h2,
   .services-process h2,
   .page-contact h2,
@@ -27,102 +33,39 @@ html[lang='lv'] body :is(
   .contact-intent__title,
   .contact-direct__body h2,
   .contact-talk__heading h2,
-  .contact-talk__primary strong,
-  .contact-brief__head h2,
-  .not-found h1
+  .contact-brief__head h2
 ) {
-  line-height: 0.82 !important;
+  line-height: 0.9 !important;
   overflow: visible;
 }
 
-/* Services use automatic wrapping, so one numeric line-height does not look
- * identical for every Latvian word pair. Preserve the user's correct visual
- * reference for the regular rows, then optically tighten the long 04 title.
- */
-html[lang='lv'] body .mp-services .service-decision__head h2 {
-  line-height: 0.86 !important;
-  overflow: visible;
-}
-
-html[lang='lv'] body .mp-services .service-decision:nth-child(4) .service-decision__head h2 {
-  line-height: 0.80 !important;
-}
-
-/* Same translated service names also appear on Home. Keep the fourth item
- * optically tight there as well, without changing the other cards.
- */
-html[lang='lv'] body .home-v2-capability:nth-child(4) h3 {
-  line-height: 0.82 !important;
-}
-
-/* The divider collision around SEO UN TEHNISKĀ BĀZE came from the compact
- * service-row geometry, not from the glyph itself. Give every service heading
- * a protected cap-height zone while keeping the internal lines tight.
+/* Service rows are the one place where the divider can still touch a macron.
+ * Keep the title's internal leading at .90 and create the clearance by giving
+ * the ROW a few extra pixels. This moves the divider away from the glyph instead
+ * of pushing lines inside the heading apart.
  */
 html[lang='lv'] body .mp-services .service-decision__head {
-  min-height: clamp(7rem, 9.8vw, 8.4rem) !important;
-  padding-block: clamp(0.8rem, 1.15vw, 1rem) !important;
-  overflow: visible;
+  min-height: calc(clamp(6rem, 9vw, 7.8rem) + 0.5rem) !important;
 }
 
-html[lang='lv'] body .mp-services .service-decision,
-html[lang='lv'] body .mp-services .services-decision {
-  overflow: visible;
+/* The compact Home service cards are the visual reference for this rhythm.
+ * No nth-child exceptions: every translated service title follows one system.
+ */
+html[lang='lv'] body .home-v2-capability h3,
+html[lang='lv'] body .mp-services .service-decision__head h2 {
+  line-height: 0.9 !important;
 }
 
-html[lang='lv'] body :is(
-  .about-principle h2,
-  .contact-intent__title,
-  .work-exhibit__caption h2,
-  .home-v2-capability h3
-) {
-  padding-block: 0.04em;
-}
-
-html[lang='lv'] body .contact-dock__intro strong {
-  line-height: 0.84 !important;
-  overflow: visible;
-}
+/* The cinematic Home hero already has its own Latvian line masks/padding.
+ * Deliberately leave .hero__title alone so the previous intro composition and
+ * motion remain exactly as approved.
+ */
 
 @media (max-width: 760px) {
-  html[lang='lv'] body :is(
-    .hero__title,
-    .mp-hero h1,
-    .mp-closing h2,
-    .about-definition h2,
-    .about-principle h2,
-    .about-standard h2,
-    .services-anti h2,
-    .services-process h2,
-    .page-contact h2,
-    .page-contact-cta h2,
-    .home-v2-work__title,
-    .home-v2-capabilities__head h2,
-    .home-v2-capability h3,
-    .home-v2-perspective h2,
-    .home-v2-close h2,
-    .contact-hero h1,
-    .contact-intents__heading h2,
-    .contact-intent__title,
-    .contact-direct__body h2,
-    .contact-talk__heading h2,
-    .contact-talk__primary strong,
-    .contact-brief__head h2,
-    .not-found h1
-  ) {
-    line-height: 0.84 !important;
-  }
-
-  html[lang='lv'] body .mp-services .service-decision__head h2 {
-    line-height: 0.86 !important;
-  }
-
-  html[lang='lv'] body .mp-services .service-decision:nth-child(4) .service-decision__head h2 {
-    line-height: 0.82 !important;
-  }
-
+  /* Mobile keeps the same optical rhythm; only the service-row box needs the
+   * existing mobile height plus the same small divider safety margin.
+   */
   html[lang='lv'] body .mp-services .service-decision__head {
-    min-height: 9rem !important;
-    padding-block: 0.9rem !important;
+    min-height: 9.5rem !important;
   }
 }
