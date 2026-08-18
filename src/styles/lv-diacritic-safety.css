@@ -8,9 +8,10 @@
  * font sizes. EN remains untouched.
  */
 
-/* The compact EN leading (roughly .84-.86 in several components) is too tight
- * for Latvian uppercase diacritics. .90 is the small optical correction: enough
- * room for Ā/Ē/Ī/Ū/Č/Š/Ž, without the loose .94-.96 spacing from the first pass.
+/* Screenshot measurement: the current .90 rhythm leaves the macron immediately
+ * adjacent to the previous line (0 empty pixel rows). Add exactly 2px to the
+ * line box so Latvian diacritics keep a 1–2px optical gap without visibly
+ * opening the composition.
  */
 html[lang='lv'] body :is(
   .mp-hero h1,
@@ -35,14 +36,14 @@ html[lang='lv'] body :is(
   .contact-talk__heading h2,
   .contact-brief__head h2
 ) {
-  line-height: 0.9 !important;
+  line-height: calc(0.9em + 2px) !important;
   overflow: visible;
 }
 
 /* Service rows are the one place where the divider can still touch a macron.
- * Keep the title's internal leading at .90 and create the clearance by giving
+ * Keep the title's internal rhythm unchanged and create the clearance by giving
  * the ROW a few extra pixels. This moves the divider away from the glyph instead
- * of pushing lines inside the heading apart.
+ * of pushing the heading itself around.
  */
 html[lang='lv'] body .mp-services .service-decision__head {
   min-height: calc(clamp(6rem, 9vw, 7.8rem) + 0.5rem) !important;
@@ -53,7 +54,7 @@ html[lang='lv'] body .mp-services .service-decision__head {
  */
 html[lang='lv'] body .home-v2-capability h3,
 html[lang='lv'] body .mp-services .service-decision__head h2 {
-  line-height: 0.9 !important;
+  line-height: calc(0.9em + 2px) !important;
 }
 
 /* The cinematic Home hero already has its own Latvian line masks/padding.
