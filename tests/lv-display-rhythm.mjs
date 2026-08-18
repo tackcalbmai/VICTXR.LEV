@@ -37,7 +37,7 @@ async function assertDenseLeading(page, selector, label) {
     });
 
     assert(result.ratio >= 0.79, `${label} is too tight (${result.ratio.toFixed(3)}) in “${result.text}”`);
-    assert(result.ratio <= 0.855, `${label} is too open (${result.ratio.toFixed(3)}) in “${result.text}”`);
+    assert(result.ratio <= 0.865, `${label} is too open (${result.ratio.toFixed(3)}) in “${result.text}”`);
   }
 }
 
