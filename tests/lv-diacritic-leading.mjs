@@ -1,6 +1,9 @@
 import { chromium } from 'playwright';
+import { mkdir } from 'node:fs/promises';
 
 const baseURL = process.env.VISUAL_BASE_URL ?? 'http://127.0.0.1:4321';
+const outDir = 'artifacts/visual';
+await mkdir(outDir, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 
 function assert(condition, message) {
@@ -26,7 +29,7 @@ for (const viewport of [
   const page = await context.newPage();
 
   for (const [suffix, selector] of routes) {
-    const path = `/lv${suffix}`.replace('/lv/', '/lv/');
+    const path = `/lv${suffix}`;
     const response = await page.goto(new URL(path, baseURL).toString(), { waitUntil: 'domcontentloaded' });
     assert(response?.ok(), `${viewport.name} ${path} returned ${response?.status()}`);
     await page.evaluate(() => document.fonts.ready);
@@ -54,6 +57,17 @@ for (const viewport of [
         metric.ratio + 0.003 >= viewport.floor,
         `${viewport.name} ${path} has unsafe LV leading ${metric.ratio.toFixed(3)} in “${metric.text}” (${metric.selectorHint})`,
       );
+    }
+
+    if (suffix === '/') {
+      const perspective = page.locator('.home-v2-perspective').first();
+      await perspective.scrollIntoViewIfNeeded();
+      await perspective.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-home-perspective.png` });
+    }
+    if (suffix === '/darbi/') {
+      const closing = page.locator('.mp-closing').first();
+      await closing.scrollIntoViewIfNeeded();
+      await closing.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-work-closing.png` });
     }
   }
 
