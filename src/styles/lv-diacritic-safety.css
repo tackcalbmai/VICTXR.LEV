@@ -1,9 +1,13 @@
-/* Latvian display typography safety.
- * Keep the original compact XO WEB rhythm, but protect macrons/caron marks
- * from both neighbouring lines and section dividers.
+/* Latvian display rhythm and diacritic safety.
+ *
+ * Reference: keep the dense XO WEB leading (roughly the same visual gap as
+ * TURPMĀKA / ATTĪSTĪBA), but never let macrons/caron marks touch a divider.
+ * This file is loaded last from BaseLayout and intentionally owns the final
+ * LV display leading. EN remains untouched.
  */
 
 html[lang='lv'] body :is(
+  .hero__title,
   .mp-hero h1,
   .mp-closing h2,
   .about-definition h2,
@@ -15,6 +19,8 @@ html[lang='lv'] body :is(
   .page-contact h2,
   .page-contact-cta h2,
   .home-v2-work__title,
+  .home-v2-capabilities__head h2,
+  .home-v2-capability h3,
   .home-v2-perspective h2,
   .home-v2-close h2,
   .contact-hero h1,
@@ -23,43 +29,48 @@ html[lang='lv'] body :is(
   .contact-direct__body h2,
   .contact-talk__heading h2,
   .contact-talk__primary strong,
-  .contact-brief__head h2
+  .contact-brief__head h2,
+  .not-found h1
 ) {
-  line-height: 0.86;
+  line-height: 0.82 !important;
   overflow: visible;
 }
 
-/* Single-line display headings inside bordered rows need optical breathing
- * room above the cap height. Padding changes the paint area, not the intended
- * tight leading, so dividers no longer cut through Ā/Ē/Ī/Ū/Č/Š/Ž.
+/* The services rows were the real divider collision: density refinements had
+ * reduced the row to ~6–8rem while keeping large two-line headings. Protect
+ * the cap-height with container space instead of opening the line-height.
+ */
+html[lang='lv'] body .mp-services .service-decision__head {
+  min-height: clamp(7rem, 9.8vw, 8.4rem) !important;
+  padding-block: clamp(0.8rem, 1.15vw, 1rem) !important;
+  overflow: visible;
+}
+
+html[lang='lv'] body .mp-services .service-decision,
+html[lang='lv'] body .mp-services .services-decision {
+  overflow: visible;
+}
+
+/* Other bordered display rows already have enough overall height; keep a
+ * small paint-area allowance so a diacritic is never clipped by the element.
  */
 html[lang='lv'] body :is(
-  .service-decision__head h2,
   .about-principle h2,
   .contact-intent__title,
-  .contact-talk__primary strong,
-  .work-exhibit__caption h2
+  .work-exhibit__caption h2,
+  .home-v2-capability h3
 ) {
-  padding-block: 0.12em;
-}
-
-html[lang='lv'] body :is(
-  .service-decision__head,
-  .about-principle,
-  .contact-intent,
-  .contact-talk__primary,
-  .work-exhibit__caption
-) {
-  overflow: visible;
+  padding-block: 0.04em;
 }
 
 html[lang='lv'] body .contact-dock__intro strong {
-  line-height: 0.9;
+  line-height: 0.84 !important;
   overflow: visible;
 }
 
 @media (max-width: 760px) {
   html[lang='lv'] body :is(
+    .hero__title,
     .mp-hero h1,
     .mp-closing h2,
     .about-definition h2,
@@ -71,6 +82,8 @@ html[lang='lv'] body .contact-dock__intro strong {
     .page-contact h2,
     .page-contact-cta h2,
     .home-v2-work__title,
+    .home-v2-capabilities__head h2,
+    .home-v2-capability h3,
     .home-v2-perspective h2,
     .home-v2-close h2,
     .contact-hero h1,
@@ -79,8 +92,14 @@ html[lang='lv'] body .contact-dock__intro strong {
     .contact-direct__body h2,
     .contact-talk__heading h2,
     .contact-talk__primary strong,
-    .contact-brief__head h2
+    .contact-brief__head h2,
+    .not-found h1
   ) {
-    line-height: 0.88;
+    line-height: 0.84 !important;
+  }
+
+  html[lang='lv'] body .mp-services .service-decision__head {
+    min-height: 9rem !important;
+    padding-block: 0.9rem !important;
   }
 }
