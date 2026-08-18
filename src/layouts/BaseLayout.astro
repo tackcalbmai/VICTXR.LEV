@@ -5,6 +5,9 @@ import '../styles/commercial-density.css';
 import '../styles/laptop-responsive.css';
 import '../styles/short-desktop-composition.css';
 import '../styles/short-desktop-final.css';
+import '../styles/experience-refinement.css';
+import '../styles/experience-geometry.css';
+import '../styles/experience-interactions.css';
 import ContactDock from '../components/ContactDock.astro';
 import { contacts, getSocialContactLinks } from '../data/contacts';
 
@@ -146,10 +149,12 @@ const schema = {
     <slot />
     <ContactDock locale={lang} canonicalPath={canonicalPath} />
     <script>
+      import { initExperienceRefinementMotion } from '../scripts/experience-refinement';
       import { initPinnedScrollCues } from '../scripts/pinned-cues';
       import { initSiteUI } from '../scripts/site';
       initSiteUI();
       initPinnedScrollCues();
+      initExperienceRefinementMotion();
     </script>
   </body>
 </html>

@@ -1,0 +1,194 @@
+/* XO WEB interaction polish
+ * Small, repeatable responses carry the quality. Large motion stays rare.
+ */
+
+.contact-dock__trigger {
+  min-height: 3.05rem;
+  padding: 0.34rem 0.85rem 0.34rem 0.34rem;
+}
+
+.contact-dock__trigger-mark { width: 2.22rem; }
+
+.contact-dock__panel {
+  width: min(27rem, calc(100vw - 2rem));
+  padding: 0.95rem;
+}
+
+.contact-dock__intro { padding-block: 1.25rem; }
+.contact-dock__channels { margin-top: 1rem; }
+.contact-dock__channels > a { min-height: 3.8rem; }
+
+.contact-talk__primary,
+.contact-talk__secondary > a,
+.contact-dock__channels > a,
+.contact-brief__row,
+.service-decision__head,
+.work-exhibit__cta {
+  transition:
+    background-color 300ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    transform 420ms var(--ease-out);
+}
+
+.contact-talk__primary .arrow,
+.contact-talk__secondary .arrow,
+.contact-dock__channels .arrow,
+.service-decision__head .arrow,
+.work-exhibit__cta .arrow,
+.home-v2-link .arrow,
+.mp-text-link .arrow,
+.page-contact-cta a .arrow,
+.case-live-link .arrow,
+.case-result a .arrow {
+  transition: transform 420ms var(--ease-out), color 220ms ease;
+}
+
+.contact-talk__primary-mark {
+  transition:
+    color 260ms ease,
+    border-color 260ms ease,
+    background-color 320ms ease,
+    transform 520ms var(--ease-out);
+}
+
+.contact-brief__row label {
+  transition: color 220ms ease, transform 360ms var(--ease-out);
+}
+
+.contact-brief__row:focus-within {
+  background: rgb(var(--ink-rgb) / 2.8%);
+}
+
+.contact-brief__row:focus-within label {
+  color: var(--accent);
+  transform: translateX(0.15rem);
+}
+
+.contact-brief__row input,
+.contact-brief__row textarea {
+  transition: color 220ms ease, opacity 220ms ease;
+}
+
+.contact-brief__row input::placeholder,
+.contact-brief__row textarea::placeholder {
+  transition: color 220ms ease;
+}
+
+.contact-brief__row:focus-within input::placeholder,
+.contact-brief__row:focus-within textarea::placeholder {
+  color: rgb(var(--ink-rgb) / 28%);
+}
+
+.contact-dock__channels > a {
+  position: relative;
+  isolation: isolate;
+  padding-inline: 0.25rem;
+  overflow: hidden;
+}
+
+.contact-dock__channels > a::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgb(var(--paper-rgb) / 5%);
+  content: '';
+  transform: translateX(-102%);
+  transition: transform 420ms var(--ease-out);
+}
+
+.contact-talk__secondary strong,
+.contact-dock__icon,
+.contact-dock__glyph {
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.service-decision__head {
+  position: relative;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact-talk__primary:hover {
+    background: rgb(var(--paper-rgb) / 4%);
+  }
+
+  .contact-talk__primary:hover .contact-talk__primary-mark {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--ink);
+    transform: rotate(-7deg) scale(0.96);
+  }
+
+  .contact-talk__primary:hover .arrow,
+  .contact-talk__secondary > a:hover .arrow,
+  .contact-dock__channels > a:hover .arrow,
+  .service-decision__head:hover .arrow,
+  .work-exhibit__cta:hover .arrow,
+  .home-v2-link:hover .arrow,
+  .mp-text-link:hover .arrow,
+  .page-contact-cta a:hover .arrow,
+  .case-live-link:hover .arrow,
+  .case-result a:hover .arrow {
+    transform: translateX(0.28rem);
+  }
+
+  .contact-talk__secondary > a:hover {
+    background: rgb(var(--paper-rgb) / 4%);
+  }
+
+  .contact-talk__secondary > a:hover strong {
+    color: var(--accent);
+  }
+
+  .contact-dock__channels > a:hover::before {
+    transform: translateX(0);
+  }
+
+  .contact-dock__channels > a:hover .contact-dock__icon,
+  .contact-dock__channels > a:hover .contact-dock__glyph {
+    border-color: var(--accent);
+  }
+
+  .service-decision__head:hover {
+    background: rgb(var(--ink-rgb) / 2.4%);
+  }
+
+  .work-exhibit__cta:hover {
+    color: var(--accent);
+  }
+}
+
+@media (max-width: 760px) {
+  .contact-dock__trigger {
+    min-height: 3rem;
+    padding: 0.32rem 0.78rem 0.32rem 0.32rem;
+  }
+
+  .contact-dock__trigger-mark { width: 2.2rem; }
+  .contact-dock__panel { padding: 0.85rem; }
+  .contact-dock__channels > a { min-height: 3.55rem; }
+
+  .contact-talk__primary:active,
+  .contact-talk__secondary > a:active,
+  .contact-dock__channels > a:active,
+  .contact-brief__actions > a:active,
+  .contact-brief__actions > button:active {
+    transform: scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-talk__primary,
+  .contact-talk__secondary > a,
+  .contact-dock__channels > a,
+  .contact-brief__row,
+  .contact-talk__primary-mark,
+  .contact-talk__primary .arrow,
+  .contact-talk__secondary .arrow,
+  .service-decision__head,
+  .work-exhibit__cta,
+  .home-v2-link .arrow,
+  .mp-text-link .arrow {
+    transition-duration: 0.01ms !important;
+  }
+}

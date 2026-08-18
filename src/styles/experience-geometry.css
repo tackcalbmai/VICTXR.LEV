@@ -1,0 +1,76 @@
+/* XO WEB geometry guardrails
+ * Hard invariants that should survive every responsive composition:
+ * authored display lines stay authored, media does not eat copy, controls stay human-sized.
+ */
+
+@media (min-width: 761px) {
+  .home-shell .home-v2-work__title {
+    width: 100%;
+    max-width: none;
+  }
+
+  .home-shell .home-v2-work__title span,
+  .home-shell .home-v2-perspective h2 span {
+    white-space: nowrap;
+  }
+
+  .home-shell .home-v2-projects {
+    inset: clamp(19rem, 34vh, 25rem) 0 clamp(6rem, 11vh, 7.2rem);
+  }
+
+  .home-shell .home-v2-perspective {
+    padding-top: max(clamp(3.8rem, 6vw, 5.8rem), calc(var(--header-height) + 1.35rem));
+  }
+
+  .home-shell .home-v2-perspective h2 {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1180px) and (max-height: 900px) {
+  .home-shell .home-v2-project--catrin {
+    width: min(34vw, 56svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    right: 0.8vw;
+    bottom: 7%;
+    width: min(36vw, 58svh);
+  }
+}
+
+@media (min-width: 1180px) and (max-height: 820px) {
+  .home-shell .home-v2-projects {
+    inset: 18.5rem 0 6.3rem;
+  }
+
+  .home-shell .home-v2-project--catrin {
+    width: min(32vw, 52svh);
+  }
+
+  .home-shell .home-v2-project--anelika {
+    bottom: 9%;
+    width: min(34vw, 54svh);
+  }
+}
+
+.contact-brief__actions > a::before,
+.contact-brief__actions > button::before {
+  z-index: 0;
+}
+
+.contact-brief__actions > a > *,
+.contact-brief__actions > button > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 760px) {
+  .home-shell .home-v2-perspective {
+    padding-top: max(var(--xo-section-y), calc(var(--header-height) + 1rem));
+  }
+
+  .home-shell .home-v2-perspective h2 span {
+    white-space: normal;
+  }
+}
