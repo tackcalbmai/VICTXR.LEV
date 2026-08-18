@@ -65,9 +65,18 @@ for (const viewport of [
       await perspective.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-home-perspective.png` });
     }
     if (suffix === '/darbi/') {
+      const hero = page.locator('.mp-hero').first();
+      await hero.scrollIntoViewIfNeeded();
+      await hero.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-work-hero.png` });
+
       const closing = page.locator('.mp-closing').first();
       await closing.scrollIntoViewIfNeeded();
       await closing.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-work-closing.png` });
+    }
+    if (suffix === '/kontakti/') {
+      const hero = page.locator('.contact-hero').first();
+      await hero.scrollIntoViewIfNeeded();
+      await hero.screenshot({ path: `${outDir}/lv-diacritics-${viewport.name}-contact-hero.png` });
     }
   }
 
