@@ -15,6 +15,7 @@ import '../styles/motion-bindings.css';
 import '../styles/home-mobile-work.css';
 import '../styles/no-indexes.css';
 import '../styles/commercial-hardening.css';
+import '../styles/aaa-upgrade.css';
 
 interface Props {
   locale: Locale;
@@ -60,7 +61,7 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
       window.setTimeout(() => {
         if (!document.querySelector('[data-cinematic-intro]')) releaseFallback();
       }, 2000);
-      window.setTimeout(() => releaseFallback(true), 6800);
+      window.setTimeout(() => releaseFallback(true), 5600);
     })();
   </script>
 
@@ -108,18 +109,30 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
         <div class="home-v2-projects" aria-label={locale === 'lv' ? 'Atlasīto projektu priekšskatījumi' : 'Selected project previews'}>
           <a class="home-v2-project home-v2-project--catrin" href={copy.work.projects.catrin.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="catrin">
             <span class="home-v2-project__label">CATRIN / {copy.work.projects.catrin.sector}</span>
+            <span class="home-v2-project__name" aria-hidden="true">CATRIN</span>
             <ResponsiveProjectImage desktop={catrin.hero} mobile={catrin.mobile} alt={locale === 'lv' ? 'CATRIN projekta priekšskatījums' : 'CATRIN project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 86vw, 58vw" />
             <span class="home-v2-project__summary">{copy.work.projects.catrin.summary}</span>
+            <span class="home-v2-project__logic">
+              <span><b aria-hidden="true">X</b><small>{v2.workScenes.wrongLabel}</small><strong>{v2.workScenes.catrin.wrong}</strong></span>
+              <span><b aria-hidden="true">O</b><small>{v2.workScenes.focusLabel}</small><strong>{v2.workScenes.catrin.focus}</strong></span>
+            </span>
+            <span class="home-v2-project__cta">{copy.work.caseStudy}<Arrow direction="right" /></span>
           </a>
           <a class="home-v2-project home-v2-project--anelika" href={copy.work.projects.anelika.href} data-takeover-layer data-analytics-event="case_study_click" data-project-id="anelika">
             <span class="home-v2-project__label">ANELIKA / {copy.work.projects.anelika.sector}</span>
+            <span class="home-v2-project__name" aria-hidden="true">ANELIKA</span>
             <ResponsiveProjectImage desktop={anelika.hero} mobile={anelika.mobile} alt={locale === 'lv' ? 'ANELIKA projekta priekšskatījums' : 'ANELIKA project preview'} loading="lazy" quality={84} sizes="(max-width: 760px) 91vw, 62vw" />
             <span class="home-v2-project__summary">{copy.work.projects.anelika.summary}</span>
+            <span class="home-v2-project__logic">
+              <span><b aria-hidden="true">X</b><small>{v2.workScenes.wrongLabel}</small><strong>{v2.workScenes.anelika.wrong}</strong></span>
+              <span><b aria-hidden="true">O</b><small>{v2.workScenes.focusLabel}</small><strong>{v2.workScenes.anelika.focus}</strong></span>
+            </span>
+            <span class="home-v2-project__cta">{copy.work.caseStudy}<Arrow direction="right" /></span>
           </a>
         </div>
         <div class="home-v2-work__bottom">
           <p>{v2.workText}</p>
-          <a class="home-v2-link" href={routes.work}>{v2.workCta}<Arrow direction="right" /></a>
+          <a class="home-v2-link" href={routes.work} data-analytics-event="view_work_click">{v2.workCta}<Arrow direction="right" /></a>
         </div>
       </div>
     </section>
@@ -134,7 +147,7 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
       </div>
       <div class="home-v2-capabilities__grid">
         {copy.services.items.map(([index, title, text]) => (
-          <article class="home-v2-capability">
+          <article class="home-v2-capability" data-service-id={index}>
             <span class="home-v2-capability__index">{index}</span>
             <h3>{title}</h3>
             <p>{text}</p>
@@ -142,7 +155,7 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
         ))}
       </div>
       <div class="home-v2-capabilities__footer">
-        <a class="home-v2-link" href={routes.services}>{v2.servicesCta}<Arrow direction="right" /></a>
+        <a class="home-v2-link" href={routes.services} data-analytics-event="services_page_click">{v2.servicesCta}<Arrow direction="right" /></a>
       </div>
     </section>
 
@@ -179,7 +192,11 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
   import { initHomeMotion } from '../scripts/home';
   import { initLaptopResponsiveMotion } from '../scripts/laptop-responsive';
   import { initArchitectureMotion } from '../scripts/architecture-motion';
+  import { initExperienceRefinementMotion } from '../scripts/experience-refinement';
+  import { initPinnedScrollCues } from '../scripts/pinned-cues';
   initHomeMotion();
   initArchitectureMotion();
   initLaptopResponsiveMotion();
+  initPinnedScrollCues();
+  initExperienceRefinementMotion();
 </script>

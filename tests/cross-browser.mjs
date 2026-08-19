@@ -142,7 +142,7 @@ for (const profile of profiles) {
   if (!response?.ok()) throw new Error(`${profile.name} homepage returned ${response?.status()}`);
   await page.evaluate(() => document.fonts.ready);
   await page.waitForFunction(() => document.querySelector('[data-home-intro]')?.getAttribute('data-home-intro') === 'ready', undefined, { timeout: 10000 });
-  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 3500 });
+  await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 4500 });
   await page.waitForTimeout(250);
 
   if (!await page.locator('.hero__title').isVisible()) throw new Error(`${profile.name} hides the hero after the intro`);

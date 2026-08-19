@@ -9,6 +9,7 @@ import '../styles/architecture-v2.css';
 import '../styles/contact-lv-optical.css';
 import '../styles/contact-router.css';
 import '../styles/motion-bindings.css';
+import '../styles/contact-aaa.css';
 
 interface Props {
   locale: Locale;
@@ -19,7 +20,7 @@ const page = getContactPageCopy(locale);
 const router = getContactRouterCopy(locale);
 const site = getSiteCopy(locale);
 const alternateHref = locale === 'lv' ? contactRoutes.en : contactRoutes.lv;
-const defaultIntent = page.options[2];
+const defaultIntent = page.options.find((option) => option.id === 'unsure') ?? page.options.at(-1)!;
 const whatsappNumber = contacts.whatsapp.replace(/\D/g, '');
 const socialLinks = getSocialContactLinks(locale);
 const instagram = socialLinks.find((link) => link.channel === 'instagram');
@@ -51,14 +52,15 @@ const routerConfig = JSON.stringify({ starters: router.starters, prompts: router
         <h2 id="contact-intents-title">{page.chooseLabel}</h2>
       </div>
       <div class="contact-intents__list">
-        {page.options.map((option, index) => (
+        {page.options.map((option) => (
           <button
-            class:list={['contact-intent', index === 2 && 'is-active']}
+            class:list={['contact-intent', option.id === defaultIntent.id && 'is-active']}
             type="button"
             data-contact-intent={option.id}
             data-contact-subject={option.subject}
             data-analytics-event="contact_intent_select"
-            aria-pressed={index === 2 ? 'true' : 'false'}
+            data-analytics-intent={option.id}
+            aria-pressed={option.id === defaultIntent.id ? 'true' : 'false'}
           >
             <span class="contact-intent__index">{option.index}</span>
             <span class="contact-intent__title">{option.title}</span>

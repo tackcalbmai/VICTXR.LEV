@@ -9,6 +9,7 @@
     "postbuild": "node scripts/postbuild.mjs",
     "check": "astro check",
     "preview": "astro preview",
+    "assets:social": "node scripts/generate-social-previews.mjs",
     "audit:deps": "npm audit --audit-level=high",
     "audit:static": "node tests/static-audit.mjs",
     "audit:quality": "node tests/quality-gates.mjs",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "playwright": "^1.60.0",
+    "sharp": "^0.35.3",
     "typescript": "^5.9.3",
     "wrangler": "^4.115.0"
   }

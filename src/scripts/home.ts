@@ -60,6 +60,7 @@ export function initHomeMotion() {
   let brandCycle: gsap.core.Timeline | undefined;
   let journeyTween: gsap.core.Tween | undefined;
   const pointerCleanups: Array<() => void> = [];
+  const cinematicIntentCleanups: Array<() => void> = [];
 
   const scheduleBrandCycle = (delay = 7.8) => {
     brandIdle?.kill();
@@ -198,6 +199,7 @@ export function initHomeMotion() {
   }
 
   const releaseCinematic = () => {
+    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     document.documentElement.classList.remove('is-cinematic-intro');
     cinematicNode?.remove();
     cinematicNode = undefined;
@@ -385,6 +387,28 @@ export function initHomeMotion() {
       }, [], 4.42)
       .to(headerSecondary, { autoAlpha: 1, duration: 0.34, stagger: 0.04, ease: 'power2.out' }, 4.44)
       .to(cinematicNode, { autoAlpha: 0, duration: 0.24, ease: 'power1.out' }, 4.8);
+
+    // The intro is a brand beat, never a gate. A clear navigation intent
+    // returns control immediately and preserves the once-per-session rule.
+    const skipCinematic = () => {
+      if (!introTimeline || !cinematicNode) return;
+      introTimeline.kill();
+      markIntroSeen();
+      markIntroReady();
+      shell.setAttribute('data-home-intro', 'ready');
+      releaseCinematic();
+    };
+    const skipCinematicOnKey = (event: KeyboardEvent) => {
+      if (['ArrowDown', 'PageDown', ' ', 'Escape'].includes(event.key)) skipCinematic();
+    };
+    window.addEventListener('wheel', skipCinematic, { passive: true });
+    window.addEventListener('touchmove', skipCinematic, { passive: true });
+    window.addEventListener('keydown', skipCinematicOnKey);
+    cinematicIntentCleanups.push(
+      () => window.removeEventListener('wheel', skipCinematic),
+      () => window.removeEventListener('touchmove', skipCinematic),
+      () => window.removeEventListener('keydown', skipCinematicOnKey),
+    );
   };
 
   startCinematic();
@@ -529,22 +553,25 @@ export function initHomeMotion() {
       });
     });
 
-    const anti = gsap.timeline({
-      scrollTrigger: {
-        trigger: '[data-anti-sales]',
-        start: 'top top',
-        end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
-        scrub: 0.8,
-        pin: true,
-        anticipatePin: 1,
-      },
-    });
-    anti
-      .to({}, { duration: 0.25 })
-      .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
-      .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
-      .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
-      .to({}, { duration: 0.25 });
+    const antiSales = document.querySelector<HTMLElement>('[data-anti-sales]');
+    if (antiSales) {
+      const anti = gsap.timeline({
+        scrollTrigger: {
+          trigger: antiSales,
+          start: 'top top',
+          end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
+          scrub: 0.8,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+      anti
+        .to({}, { duration: 0.25 })
+        .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
+        .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
+        .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
+        .to({}, { duration: 0.25 });
+    }
 
     if (window.matchMedia('(pointer: fine)').matches) {
       document.querySelectorAll<HTMLElement>('[data-perspective-card]').forEach((card) => {
@@ -578,6 +605,7 @@ export function initHomeMotion() {
 
   return () => {
     introTimeline?.kill();
+    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     cinematicNode?.remove();
     document.documentElement.classList.remove('is-cinematic-intro');
     brandIdle?.kill();

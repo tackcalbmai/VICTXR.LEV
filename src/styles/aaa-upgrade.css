@@ -1,0 +1,669 @@
+/* XO WEB AAA experience pass
+ * One motion language, one brand hierarchy, two deliberately different worlds.
+ */
+
+:root {
+  --xo-motion-fast: 160ms;
+  --xo-motion-standard: 360ms;
+  --xo-motion-reveal: 720ms;
+  --xo-motion-cinematic: 960ms;
+  --xo-ease-ui: cubic-bezier(0.2, 0.75, 0.25, 1);
+  --xo-ease-cinematic: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Hero: reaction stays beneath conscious attention. ------------------- */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .home-shell .hero__title {
+    transform: perspective(80rem) translate3d(var(--hero-shift-x, 0), var(--hero-shift-y, 0), 0) rotateX(var(--hero-rx, 0deg)) rotateY(var(--hero-ry, 0deg));
+    transform-origin: 50% 48%;
+    transition: transform var(--xo-motion-reveal) var(--xo-ease-ui);
+  }
+
+  .home-shell .hero[data-hero-reactive='active'] .hero__title {
+    transition-duration: var(--xo-motion-standard);
+  }
+
+  .home-shell .hero__side-note {
+    transform: translate3d(var(--hero-counter-x, 0px), var(--hero-counter-y, 0px), 0);
+    transition: transform var(--xo-motion-reveal) var(--xo-ease-ui);
+  }
+}
+
+/* New scene information stays out of the legacy/no-JS desktop fallback. */
+.home-shell .home-v2-project__name,
+.home-shell .home-v2-project__logic,
+.home-shell .home-v2-project__cta {
+  display: none;
+}
+
+/* Project Takeover: desktop / cinematic. ------------------------------ */
+@media (min-width: 901px) {
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] {
+    --scene-copy: #332721;
+    --scene-muted: #685951;
+    min-height: 260svh;
+    background: #d8ccc0;
+    color: #1b1512;
+    transition:
+      background-color var(--xo-motion-reveal) var(--xo-ease-cinematic),
+      color var(--xo-motion-standard) var(--xo-ease-ui);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'][data-active-project='anelika'] {
+    --scene-copy: #e8f5f7;
+    --scene-muted: #91aab0;
+    background: #072331;
+    color: #edf7f8;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] > .home-v2-work__sticky {
+    position: sticky;
+    top: 0;
+    display: grid;
+    min-height: 100svh;
+    grid-template-rows: auto 1fr auto;
+    padding: calc(var(--header-height) + 0.75rem) var(--gutter) max(1rem, var(--safe-bottom));
+    overflow: clip;
+    background: transparent;
+    color: inherit;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__topline {
+    position: relative;
+    z-index: 20;
+    border-color: color-mix(in srgb, currentColor 24%, transparent);
+    color: inherit;
+    transition: border-color var(--xo-motion-standard) ease, color var(--xo-motion-standard) ease;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__title {
+    position: relative;
+    z-index: 20;
+    align-self: center;
+    width: min(100%, 15ch);
+    max-width: 15ch;
+    margin: 0;
+    color: inherit;
+    font-size: clamp(4rem, min(8vw, 13vh), 8.5rem);
+    line-height: 0.81;
+    opacity: var(--takeover-heading-opacity, 1);
+    pointer-events: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__title span:last-child {
+    padding-left: 6vw;
+    color: var(--scene-muted);
+    transition: color var(--xo-motion-standard) ease;
+  }
+
+  html[lang='lv']:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__title {
+    font-size: clamp(3.7rem, min(6.7vw, 11.5vh), 7.2rem);
+    letter-spacing: -0.075em;
+  }
+
+  html[lang='lv']:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__title span:last-child {
+    padding-left: 3vw;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-projects {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    color: inherit;
+    transform: none;
+    transform-origin: center;
+    will-change: auto;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--catrin {
+    z-index: 2;
+    opacity: var(--catrin-opacity, 0);
+    pointer-events: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika {
+    z-index: 3;
+    opacity: var(--anelika-opacity, 0);
+    pointer-events: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'][data-active-project='catrin'] .home-v2-project--catrin,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'][data-active-project='anelika'] .home-v2-project--anelika {
+    pointer-events: auto;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project:focus-visible {
+    outline: 0;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project:focus-visible .home-v2-project__cta {
+    outline: 2px solid currentColor;
+    outline-offset: 0.35rem;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__name {
+    position: absolute;
+    z-index: 0;
+    display: block;
+    color: currentColor;
+    text-transform: uppercase;
+    line-height: 0.72;
+    letter-spacing: -0.09em;
+    opacity: 0.09;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--catrin .home-v2-project__name {
+    top: 26%;
+    left: -1vw;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(9rem, 20vw, 23rem);
+    font-weight: 390;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika .home-v2-project__name {
+    top: 25%;
+    left: 1vw;
+    font-size: clamp(8rem, 17vw, 20rem);
+    font-weight: 850;
+    letter-spacing: -0.075em;
+    opacity: 0.075;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project picture,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project .responsive-project-image {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: min(60vw, 70rem);
+    height: clamp(15rem, 55vh, 43rem);
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 2.5rem 7rem rgb(18 12 9 / 20%);
+    transform: translate3d(var(--xo-layer-x, 0), var(--xo-layer-y, 0), 0);
+    transform-origin: center;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project picture img,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project .responsive-project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--catrin picture,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--catrin .responsive-project-image {
+    top: clamp(10rem, 22vh, 13rem);
+    left: 4vw;
+    clip-path: inset(var(--catrin-inset, 7%) var(--catrin-inset, 7%));
+    transform: translate3d(var(--xo-layer-x, 0), var(--xo-layer-y, 0), 0) scale(var(--catrin-scale, 0.94));
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--catrin img {
+    object-position: 50% 20%;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika picture,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika .responsive-project-image {
+    top: clamp(9.5rem, 20vh, 12rem);
+    right: 3vw;
+    width: min(65vw, 76rem);
+    border: 1px solid rgb(134 226 240 / 38%);
+    clip-path: inset(var(--anelika-inset, 6%));
+    box-shadow: 0 2.5rem 7rem rgb(0 0 0 / 30%);
+    transform: translate3d(var(--xo-layer-x, 0), var(--xo-layer-y, 0), 0) scale(var(--anelika-scale, 0.93));
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__label {
+    position: absolute;
+    z-index: 4;
+    top: calc(var(--header-height) + 4.2rem);
+    left: var(--gutter);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--scene-muted);
+    font-size: 0.58rem;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__summary {
+    position: absolute;
+    z-index: 4;
+    top: 29%;
+    right: 3.5vw;
+    bottom: auto;
+    width: min(24vw, 22rem);
+    max-width: 22rem;
+    padding: 0;
+    background: transparent;
+    color: var(--scene-copy);
+    font-size: clamp(1rem, 1.25vw, 1.22rem);
+    line-height: 1.42;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika .home-v2-project__summary {
+    right: auto;
+    left: 4vw;
+    width: min(24vw, 21rem);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic {
+    position: absolute;
+    z-index: 4;
+    top: 48%;
+    right: 3.5vw;
+    display: grid;
+    width: min(24vw, 22rem);
+    border-top: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika .home-v2-project__logic {
+    right: auto;
+    left: 4vw;
+    width: min(24vw, 21rem);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic > span {
+    display: grid;
+    min-height: 4.6rem;
+    grid-template-columns: 1.65rem 1fr;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 0.2rem 0.6rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic b {
+    grid-row: 1 / span 2;
+    color: var(--accent);
+    font-size: 1.35rem;
+    line-height: 1;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic > span:last-child b {
+    color: currentColor;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic small {
+    color: var(--scene-muted);
+    text-transform: uppercase;
+    font-size: 0.5rem;
+    font-weight: 760;
+    letter-spacing: 0.1em;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic strong {
+    color: var(--scene-copy);
+    font-size: clamp(0.78rem, 0.9vw, 0.9rem);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__cta {
+    position: absolute;
+    right: 3.5vw;
+    bottom: clamp(5.7rem, 13vh, 8.5rem);
+    z-index: 4;
+    display: inline-flex;
+    width: min(24vw, 22rem);
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    text-transform: uppercase;
+    font-size: 0.6rem;
+    font-weight: 780;
+    letter-spacing: 0.1em;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project--anelika .home-v2-project__cta {
+    right: auto;
+    left: 4vw;
+    width: min(24vw, 21rem);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__bottom {
+    z-index: 20;
+    border-color: color-mix(in srgb, currentColor 24%, transparent);
+    color: inherit;
+    transition: border-color var(--xo-motion-standard) ease, color var(--xo-motion-standard) ease;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__bottom p {
+    color: var(--scene-muted);
+    transition: color var(--xo-motion-standard) ease;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-work__bottom a {
+    color: inherit;
+  }
+}
+
+/* Tablet and mobile: natural scroll, two complete scenes. -------------- */
+@media (max-width: 900px) {
+  .home-shell .home-v2-work {
+    min-height: 0;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .home-shell .home-v2-work > .home-v2-work__sticky {
+    position: relative;
+    top: auto;
+    display: block;
+    min-height: 0;
+    padding: calc(var(--header-height) + 0.85rem) var(--gutter) clamp(4rem, 10vw, 6rem);
+    overflow: clip;
+  }
+
+  .home-shell .home-v2-work .home-v2-work__title {
+    width: 100%;
+    max-width: 12ch;
+    margin-top: clamp(2.3rem, 7vw, 4.5rem);
+    /* The EN second line is the widest optical case. Keep a deliberate
+     * tablet scale instead of letting its final glyph cross the viewport at
+     * the 768px boundary. Mobile and desktop retain their own larger cuts. */
+    font-size: clamp(3rem, 7.35vw, 4.15rem);
+  }
+
+  .home-shell .home-v2-work .home-v2-projects {
+    position: relative;
+    inset: auto;
+    display: grid;
+    gap: clamp(1.5rem, 5vw, 3rem);
+    margin: clamp(3rem, 9vw, 5.5rem) calc(var(--gutter) * -1) 0;
+    background: transparent;
+  }
+
+  .home-shell .home-v2-work .home-v2-project {
+    position: relative;
+    inset: auto;
+    display: grid;
+    width: 100%;
+    min-height: min(86svh, 58rem);
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: clamp(0.85rem, 2.8vw, 1.35rem);
+    padding: clamp(1rem, 3vw, 1.6rem);
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .home-shell .home-v2-work .home-v2-project--catrin {
+    background: #d8ccc0;
+    color: #211814;
+  }
+
+  .home-shell .home-v2-work .home-v2-project--anelika {
+    background: #072331;
+    color: #edf7f8;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__name { display: none; }
+
+  .home-shell .home-v2-work .home-v2-project__label {
+    position: static;
+    width: 100%;
+    padding: 0 0 0.65rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 26%, transparent);
+    background: transparent;
+    color: inherit;
+    font-size: 0.56rem;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .home-shell .home-v2-work .home-v2-project picture,
+  .home-shell .home-v2-work .home-v2-project .responsive-project-image {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    background: #111;
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 18%);
+    transform: none;
+    will-change: auto;
+  }
+
+  .home-shell .home-v2-work .home-v2-project picture img,
+  .home-shell .home-v2-work .home-v2-project .responsive-project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .home-shell .home-v2-work .home-v2-project--catrin img { object-position: 50% 20%; }
+  .home-shell .home-v2-work .home-v2-project--anelika img { object-position: 50% 13%; }
+
+  .home-shell .home-v2-work .home-v2-project__summary {
+    position: static;
+    width: 100%;
+    max-width: 36rem;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-size: clamp(0.9rem, 2.4vw, 1.06rem);
+    line-height: 1.42;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic {
+    display: grid;
+    align-self: end;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic > span {
+    display: grid;
+    min-height: 6.4rem;
+    grid-template-columns: 1.6rem 1fr;
+    grid-template-rows: auto 1fr;
+    align-content: center;
+    gap: 0.25rem 0.5rem;
+    padding: 0.8rem 0;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic > span + span {
+    padding-left: 0.8rem;
+    border-left: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic b {
+    grid-row: 1 / span 2;
+    color: var(--accent);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic > span:last-child b { color: currentColor; }
+
+  .home-shell .home-v2-work .home-v2-project__logic small {
+    align-self: end;
+    text-transform: uppercase;
+    font-size: 0.47rem;
+    font-weight: 760;
+    letter-spacing: 0.09em;
+    opacity: 0.62;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic strong {
+    font-size: clamp(0.68rem, 1.85vw, 0.84rem);
+    font-weight: 590;
+    line-height: 1.32;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__cta {
+    display: inline-flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    text-transform: uppercase;
+    font-size: 0.58rem;
+    font-weight: 780;
+    letter-spacing: 0.1em;
+  }
+
+  .home-shell .home-v2-work .home-v2-work__bottom {
+    margin-top: clamp(3rem, 9vw, 5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .home-shell .home-v2-work .home-v2-project {
+    min-height: 82svh;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic {
+    grid-template-columns: 1fr;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic > span {
+    min-height: 4.8rem;
+  }
+
+  .home-shell .home-v2-work .home-v2-project__logic > span + span {
+    padding-left: 0;
+    border-top: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+    border-left: 0;
+  }
+}
+
+/* Page-level Astro chunks load after the shared layout chunk. These few
+ * composition invariants intentionally carry extra specificity so the mobile
+ * art direction cannot regress to overlapping desktop cards after bundling. */
+@media (max-width: 900px) {
+  html body .home-shell .home-v2-work > .home-v2-work__sticky {
+    position: relative;
+    top: auto;
+    display: block;
+    min-height: 0;
+    padding: calc(var(--header-height) + 0.85rem) var(--gutter) clamp(4rem, 10vw, 6rem);
+  }
+
+  html body .home-shell .home-v2-work .home-v2-work__title {
+    max-width: 12ch;
+    margin-top: clamp(2.3rem, 7vw, 4.5rem);
+    font-size: clamp(3rem, 7.35vw, 4.15rem);
+  }
+
+  html[lang='lv'] body .home-shell .home-v2-work .home-v2-work__title {
+    font-size: clamp(2.85rem, 7vw, 4rem);
+  }
+
+  html body .home-shell .home-v2-work .home-v2-projects {
+    position: relative;
+    inset: auto;
+    gap: clamp(1.5rem, 5vw, 3rem);
+    margin: clamp(3rem, 9vw, 5.5rem) calc(var(--gutter) * -1) 0;
+  }
+
+  html body .home-shell .home-v2-work .home-v2-project,
+  html body .home-shell .home-v2-work .home-v2-project--catrin,
+  html body .home-shell .home-v2-work .home-v2-project--anelika {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-height: min(86svh, 58rem);
+    justify-self: stretch;
+    padding: clamp(1rem, 3vw, 1.6rem);
+    overflow: hidden;
+    transform: none;
+    will-change: auto;
+  }
+
+  html body .home-shell .home-v2-work .home-v2-project__label {
+    position: static;
+    width: 100%;
+    padding: 0 0 0.65rem;
+    border-color: color-mix(in srgb, currentColor 26%, transparent);
+    background: transparent;
+    color: inherit;
+  }
+
+  html body .home-shell .home-v2-work .home-v2-project picture,
+  html body .home-shell .home-v2-work .home-v2-project .responsive-project-image {
+    position: relative;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    transform: none;
+  }
+
+  html body .home-shell .home-v2-work .home-v2-project__summary {
+    position: static;
+    width: 100%;
+    max-width: 36rem;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+  }
+}
+
+:lang(lv) .home-v2-project__logic strong {
+  letter-spacing: -0.035em;
+  overflow-wrap: normal;
+  hyphens: none;
+}
+
+@media (min-width: 901px) and (max-height: 720px) {
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project picture,
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project .responsive-project-image {
+    top: clamp(8.5rem, 20vh, 10rem);
+    height: clamp(13rem, 50vh, 21rem);
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__summary {
+    top: 27%;
+    font-size: 0.9rem;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic {
+    top: 45%;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__logic > span {
+    min-height: 3.8rem;
+  }
+
+  html:not(.no-js) .home-shell .home-v2-work[data-takeover-ready='true'] .home-v2-project__cta {
+    bottom: 5.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-shell .hero__title,
+  .home-shell .hero__side-note,
+  .home-shell .home-v2-work,
+  .home-shell .home-v2-project {
+    transition: none !important;
+  }
+}

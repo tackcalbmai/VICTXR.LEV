@@ -80,7 +80,7 @@ const lvMessage = 'Sveiki! Apskatīju xoweb.lv un vēlos pārrunāt mājaslapas 
   await page.waitForTimeout(120);
   await assertRouterChannels(page, 'Hi! I’m not sure what web solution I need yet.');
   const intentCount = await page.locator('[data-contact-intent]').count();
-  assert(intentCount === 3, `English Contact should expose three starting points, got ${intentCount}`);
+  assert(intentCount === 4, `English Contact should expose four starting points, got ${intentCount}`);
   assert(await page.locator('[data-contact-brief]').count() === 1, 'English Contact is missing the short brief builder');
   await page.screenshot({ path: `${outDir}/future-contacts-en-desktop.png`, fullPage: false });
   await context.close();

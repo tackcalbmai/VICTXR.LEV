@@ -89,8 +89,13 @@ for (const [name, viewport] of laptopMatrix) {
   await page.screenshot({ path: `${outDir}/${name}-disruption.png`, fullPage: false });
 
   const workTop = await page.locator('.home-v2-work').evaluate((element) => element.getBoundingClientRect().top + scrollY);
-  await page.evaluate((y) => scrollTo({ top: y, behavior: 'instant' }), workTop + viewport.height * 0.08);
+  const workTravel = await page.locator('.home-v2-work').evaluate((element) => Math.max(element.getBoundingClientRect().height - innerHeight, 1));
+  await page.evaluate(({ top, travel }) => scrollTo({ top: top + travel * 0.22, behavior: 'instant' }), { top: workTop, travel: workTravel });
   await page.waitForTimeout(220);
+  const activeProject = await page.locator('.home-v2-work').getAttribute('data-active-project');
+  if (activeProject !== 'catrin') throw new Error(`${name}: CATRIN did not take over the first project beat`);
+  const catrinOpacity = Number(await page.locator('.home-v2-project--catrin').evaluate((element) => getComputedStyle(element).opacity));
+  if (catrinOpacity < 0.7) throw new Error(`${name}: CATRIN is not readable in its takeover beat (${catrinOpacity})`);
   const catrinRatio = await visibleRatio(page, '.home-v2-project--catrin');
   const anelikaRatio = await visibleRatio(page, '.home-v2-project--anelika');
   if (catrinRatio < 0.62 || anelikaRatio < 0.62) {

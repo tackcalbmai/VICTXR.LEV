@@ -26,7 +26,7 @@ const workHref = `${pageRoutes[locale].work}#work`;
 const projectTransitionName = `xo-project-${projectId}`;
 ---
 
-<div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} id="top">
+<div class:list={['case-page', `case-page--${project.theme}`]} data-theme={project.theme} data-project-id={projectId} id="top">
   <SiteHeader locale={locale} alternateHref={alternateHref} multipageNavigation />
   <main id="main-content" tabindex="-1">
     <section class="case-hero" aria-labelledby="case-title">

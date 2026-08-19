@@ -276,7 +276,7 @@ for (const [path, lang, alternate] of contactCases) {
   await assertCoreDocument(page, path, lang);
   if (await page.locator('[data-cinematic-intro]').count()) throw new Error(`${path} incorrectly launches the Home cinematic`);
   if (await page.locator('[data-contact-dock]').count()) throw new Error(`${path} duplicates the global Contact dock on the dedicated Contact route`);
-  if (await page.locator('[data-contact-intent]').count() !== 3) throw new Error(`${path} must expose three project starting points`);
+  if (await page.locator('[data-contact-intent]').count() !== 4) throw new Error(`${path} must expose four project starting points`);
   if (await page.locator('[data-contact-intent].is-active').count() !== 1) throw new Error(`${path} must expose one initial focus state`);
   if (await page.locator('.site-language').getAttribute('href') !== alternate) throw new Error(`${path} language switch loses Contact context`);
 
@@ -343,7 +343,7 @@ for (const [path, lang, title, alternate, back] of caseRoutes) {
   if (!response?.ok()) throw new Error(`${path} returned ${response?.status()}`);
   await assertCoreDocument(routePage, path, lang);
   if ((await routePage.locator('h1').innerText()).trim() !== title) throw new Error(`${path} has the wrong case title`);
-  if (await routePage.locator('.case-narrative__row').count() !== 6) throw new Error(`${path} is missing the six-stage case narrative`);
+  if (await routePage.locator('.case-narrative__row').count() !== 6) throw new Error(`${path} is missing the Problem → Observation → Decision → Design → Development → Result narrative`);
   if (await routePage.locator('.site-language').getAttribute('href') !== alternate) throw new Error(`${path} language switch loses case context`);
   if (await routePage.locator('.case-next a').first().getAttribute('href') !== back) throw new Error(`${path} does not return to its Work exhibition`);
   if (await routePage.locator('.page-contact-cta').count() !== 1) throw new Error(`${path} does not end with the compact Contact transition`);
