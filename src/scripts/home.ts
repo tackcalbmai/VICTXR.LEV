@@ -227,11 +227,6 @@ export function initHomeMotion() {
       <div class="cinematic-intro__iris" data-cinematic-iris></div>
       <div class="cinematic-intro__light-slit" data-cinematic-light-slit></div>
       <div class="cinematic-intro__brand-stage" data-cinematic-stage>
-        <div class="cinematic-intro__assembly" data-cinematic-assembly aria-hidden="true">
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
-        </div>
         <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
           <span class="cinematic-intro__xo-pair" data-cinematic-xo-pair><span class="cinematic-intro__xo-x" data-cinematic-xo-x>X</span><span class="cinematic-intro__xo-o" data-cinematic-xo-o>O</span></span><span class="cinematic-intro__web-mask" data-cinematic-web-mask><span class="cinematic-intro__web" data-cinematic-web>WEB</span></span>
         </div>
@@ -256,17 +251,14 @@ export function initHomeMotion() {
     const introWeb = cinematicNode.querySelector<HTMLElement>('[data-cinematic-web]');
     const introWebMask = cinematicNode.querySelector<HTMLElement>('[data-cinematic-web-mask]');
     const descriptorWrap = cinematicNode.querySelector<HTMLElement>('[data-cinematic-descriptor-wrap]');
-    const slices = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-slice]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!backdrop || !lightSlit || !iris || !wordmark || !introXoPair || !introXoX || !introXoO || !introWeb || !introWebMask || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
+    if (!backdrop || !lightSlit || !iris || !wordmark || !introXoPair || !introXoX || !introXoO || !introWeb || !introWebMask || !descriptorWrap || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
       markIntroReady();
       releaseCinematic();
       return;
     }
-
-    const [topSlice, middleSlice, bottomSlice] = Array.from(slices);
 
     siteHeader.classList.add('is-intro-settled');
     gsap.set(siteHeader, { autoAlpha: 0 });
@@ -292,13 +284,11 @@ export function initHomeMotion() {
       }
     };
     fitWordmark();
-    const centeredMonogramOffset = (introWebMask.getBoundingClientRect().width + Number.parseFloat(getComputedStyle(wordmark).columnGap || '0')) / 2;
-    gsap.set(wordmark, { x: centeredMonogramOffset });
+    const expandedWebWidth = introWebMask.getBoundingClientRect().width;
+    gsap.set(introWebMask, { width: 0 });
+    gsap.set(wordmark, { scale: 0.86, filter: 'blur(6px)' });
     gsap.set(lightSlit, { autoAlpha: 0, scaleX: 0.02, scaleY: 0.18 });
     gsap.set(iris, { autoAlpha: 0, scale: 0.36 });
-    gsap.set(topSlice, { autoAlpha: 0, x: compact ? -15 : -34, y: compact ? -1 : -2, filter: 'blur(2px)' });
-    gsap.set(middleSlice, { autoAlpha: 0, x: compact ? 7 : 14, y: 0, filter: 'blur(1px)' });
-    gsap.set(bottomSlice, { autoAlpha: 0, x: compact ? 17 : 38, y: compact ? 1 : 2, filter: 'blur(2px)' });
     gsap.set(descriptorWrap, { autoAlpha: 0, y: 8, filter: 'blur(2px)' });
     gsap.set(introWeb, { autoAlpha: 0, xPercent: -34, clipPath: 'inset(0 100% 0 0)', filter: 'blur(5px)' });
     gsap.set(introXoX, { xPercent: 38, scale: 0.92, autoAlpha: 0.9 });
@@ -332,24 +322,20 @@ export function initHomeMotion() {
     });
 
     introTimeline
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.06)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'ignition'; }, [], 0.06)
       .to(iris, { autoAlpha: 0.72, scale: 1, duration: 1.1, ease: 'power3.out' }, 0.02)
       .to(lightSlit, { autoAlpha: 0.8, scaleX: 1, scaleY: 1, duration: 0.72, ease: 'power4.out' }, 0.02)
-      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.62, ease: 'power4.out' }, 0.12)
-      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.56, ease: 'power4.out' }, 0.18)
-      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.66, ease: 'power4.out' }, 0.1)
-      .set(wordmark, { autoAlpha: 1 }, 0.68)
-      .to(slices, { autoAlpha: 0, duration: 0.2, ease: 'power1.out' }, 0.68)
+      .to(wordmark, { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.78, ease: 'power4.out' }, 0.18)
       .to(lightSlit, { autoAlpha: 0.18, scaleX: 0.12, duration: 0.55, ease: 'power3.inOut' }, 0.72)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'monogram'; }, [], 0.76)
-      .to(introXoO, { autoAlpha: 0.72, scale: 0.9, duration: 0.48, ease: 'power2.out' }, 0.78)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'separate'; }, [], 1.28)
-      .to(introXoX, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.72, ease: 'power4.inOut' }, 1.3)
-      .to(introXoO, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.72, ease: 'power4.inOut' }, 1.3)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'monogram'; }, [], 0.94)
+      .to(introXoO, { autoAlpha: 0.72, scale: 0.9, duration: 0.36, ease: 'power2.out' }, 0.96)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'separate'; }, [], 1.36)
+      .to(introXoX, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.66, ease: 'power4.inOut' }, 1.38)
+      .to(introXoO, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.66, ease: 'power4.inOut' }, 1.38)
       .to(lightSlit, { autoAlpha: 0.48, scaleX: 0.48, duration: 0.35, yoyo: true, repeat: 1, ease: 'power2.inOut' }, 1.52)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'word-reveal'; }, [], 2.12)
-      .to(wordmark, { x: 0, duration: 0.82, ease: 'power4.inOut' }, 2.14)
-      .to(introWeb, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', filter: 'blur(0px)', duration: 0.82, ease: 'power4.out' }, 2.14)
+      .to(introWebMask, { width: expandedWebWidth, duration: 0.82, ease: 'power4.inOut' }, 2.14)
+      .to(introWeb, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', filter: 'blur(0px)', duration: 0.82, ease: 'power4.inOut' }, 2.14)
       .to(iris, { autoAlpha: 0.38, scale: 1.16, duration: 0.82, ease: 'power2.inOut' }, 2.14)
       .call(syncDescriptorGeometry, [], 2.98)
       .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.46, ease: 'power3.out' }, 3.0)

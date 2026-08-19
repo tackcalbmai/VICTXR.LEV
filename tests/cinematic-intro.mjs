@@ -65,13 +65,12 @@ async function assertCinematicIntro(name, viewport) {
   const backdropColor = await page.locator('[data-cinematic-backdrop]').evaluate((element) => getComputedStyle(element).backgroundColor);
   if (!backdropColor.includes('8, 8, 8')) throw new Error(`${name} intro does not open on the intended black field (${backdropColor})`);
 
-  await waitPhase(page, 'assemble');
-  stamp('assemble');
-  if (await page.locator('[data-cinematic-slice]').count() !== 3) throw new Error(`${name} opening assembly must use three controlled slices`);
-  await page.waitForTimeout(220);
-  const sliceOpacities = await page.locator('[data-cinematic-slice]').evaluateAll((elements) => elements.map((element) => Number.parseFloat(getComputedStyle(element).opacity)));
-  if (sliceOpacities.filter((opacity) => opacity > 0.15).length < 2) throw new Error(`${name} opening assembly is not visibly building the wordmark`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-assemble.png`, fullPage: false });
+  await waitPhase(page, 'ignition');
+  stamp('ignition');
+  await page.waitForTimeout(300);
+  const ignitionOpacity = Number.parseFloat(await page.locator('[data-cinematic-wordmark]').evaluate((element) => getComputedStyle(element).opacity));
+  if (ignitionOpacity < 0.15) throw new Error(`${name} XO does not emerge during the light ignition`);
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-ignition.png`, fullPage: false });
 
   await waitPhase(page, 'monogram');
   stamp('monogram');
@@ -87,6 +86,18 @@ async function assertCinematicIntro(name, viewport) {
 
   await waitPhase(page, 'word-reveal');
   stamp('word-reveal');
+  const revealCenters = [];
+  for (let frame = 0; frame < 7; frame += 1) {
+    await page.waitForTimeout(90);
+    const frameBox = await page.locator('[data-cinematic-wordmark]').boundingBox();
+    if (!frameBox) throw new Error(`${name} lost the wordmark during WEB reveal`);
+    revealCenters.push(frameBox.x + frameBox.width / 2);
+    if (frameBox.x < 12 || frameBox.x + frameBox.width > viewport.width - 12) {
+      throw new Error(`${name} WEB reveal escapes the viewport on frame ${frame}`);
+    }
+  }
+  const revealDrift = Math.max(...revealCenters.map((center) => Math.abs(center - viewport.width / 2)));
+  if (revealDrift > 2.5) throw new Error(`${name} WEB reveal drifts ${revealDrift.toFixed(1)}px off center`);
 
   await waitPhase(page, 'lockup');
   stamp('lockup');
@@ -159,8 +170,8 @@ async function assertCinematicIntro(name, viewport) {
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed-slot.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    ['assemble', 'monogram', 560],
-    ['monogram', 'separate', 380],
+    ['ignition', 'monogram', 700],
+    ['monogram', 'separate', 340],
     ['separate', 'word-reveal', 650],
     ['word-reveal', 'lockup', 760],
     ['lockup', 'handoff', 250],
@@ -214,9 +225,11 @@ const viewportMatrix = [
   ['mobile-360', { width: 360, height: 800 }],
   ['mobile-393', { width: 393, height: 852 }],
   ['mobile-430', { width: 430, height: 932 }],
+  ['mobile-landscape-812', { width: 812, height: 375 }],
   ['tablet-768', { width: 768, height: 1024 }],
   ['laptop-1024', { width: 1024, height: 768 }],
   ['desktop-1366', { width: 1366, height: 768 }],
+  ['desktop-1920', { width: 1920, height: 1080 }],
 ];
 const results = [];
 for (const [name, viewport] of viewportMatrix) results.push(await assertCinematicIntro(name, viewport));
@@ -233,4 +246,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Premium XO WEB intro stays centered and resolves into the header across seven display classes (${Math.min(...durations)}–${Math.max(...durations)}ms).`);
+console.log(`Premium XO WEB intro stays centered and resolves into the header across nine display classes (${Math.min(...durations)}–${Math.max(...durations)}ms).`);

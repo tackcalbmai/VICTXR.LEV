@@ -115,8 +115,7 @@ html.is-cinematic-intro body {
   pointer-events: none;
 }
 
-.cinematic-intro__wordmark,
-.cinematic-intro__slice-wordmark {
+.cinematic-intro__wordmark {
   position: relative;
   grid-area: 1 / 1;
   display: inline-flex;
@@ -133,49 +132,15 @@ html.is-cinematic-intro body {
 }
 
 .cinematic-intro__wordmark {
-  gap: 0.085em;
+  gap: 0;
   opacity: 0;
   visibility: hidden;
   transform-origin: 50% 50%;
   will-change: transform, opacity, filter, clip-path;
 }
 
-.cinematic-intro__wordmark > span,
-.cinematic-intro__slice-wordmark > span {
+.cinematic-intro__wordmark > span {
   display: inline-block;
-}
-
-.cinematic-intro__assembly {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-
-.cinematic-intro__slice-wordmark {
-  opacity: 0;
-  will-change: transform, opacity, filter;
-}
-
-.cinematic-intro__slice-wordmark--top {
-  clip-path: inset(0 0 67% 0);
-}
-
-.cinematic-intro__slice-wordmark--middle {
-  clip-path: inset(33% 0 33% 0);
-}
-
-.cinematic-intro__slice-wordmark--bottom {
-  clip-path: inset(67% 0 0 0);
-}
-
-.cinematic-intro__slice-x {
-  width: 0.66em;
-  margin-inline: -0.02em -0.015em;
-  color: var(--accent);
-  text-align: center;
 }
 
 .cinematic-intro__xo-pair {
@@ -190,11 +155,13 @@ html.is-cinematic-intro body {
 .cinematic-intro__web-mask {
   display: inline-block;
   overflow: hidden;
-  padding-right: 0.04em;
+  flex: 0 0 auto;
 }
 
 .cinematic-intro__web {
   display: inline-block;
+  margin-left: 0.085em;
+  padding-right: 0.04em;
   will-change: transform, opacity, filter, clip-path;
 }
 
@@ -206,8 +173,7 @@ html.is-cinematic-intro body {
   will-change: transform, opacity, filter;
 }
 
-.cinematic-intro__xo-pair > span:first-child,
-.cinematic-intro__slice-x {
+.cinematic-intro__xo-pair > span:first-child {
   color: var(--accent);
 }
 
@@ -248,8 +214,7 @@ html.is-cinematic-intro body {
 }
 
 @media (max-width: 760px) {
-  .cinematic-intro__wordmark,
-  .cinematic-intro__slice-wordmark {
+  .cinematic-intro__wordmark {
     max-width: calc(100vw - 1.5rem);
     font-size: clamp(2.7rem, 12.5vw, 5.6rem);
   }
@@ -276,8 +241,7 @@ html.is-cinematic-intro body {
 }
 
 @media (max-width: 380px) {
-  .cinematic-intro__wordmark,
-  .cinematic-intro__slice-wordmark {
+  .cinematic-intro__wordmark {
     font-size: 13.3vw;
   }
 
