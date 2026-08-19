@@ -24,6 +24,18 @@ type LocalizedCase = {
   liveLabel: string;
   backLabel: string;
   nextLabel: string;
+  decision: {
+    rejectedLabel: string;
+    rejectedTitle: string;
+    rejectedText: string;
+    chosenLabel: string;
+    chosenTitle: string;
+    chosenText: string;
+  };
+  proof: Array<{
+    value: string;
+    label: string;
+  }>;
   sections: Array<{
     label: string;
     title: string;
@@ -64,34 +76,48 @@ export const projects: Record<ProjectId, Project> = {
         liveLabel: 'Visit CATRIN',
         backLabel: 'Back to work',
         nextLabel: 'Next case — ANELIKA',
+        decision: {
+          rejectedLabel: 'X / rejected default',
+          rejectedTitle: 'A generic bridal catalogue.',
+          rejectedText: 'More cards and filters would show inventory, but flatten the emotional reason people choose the salon.',
+          chosenLabel: 'O / chosen direction',
+          chosenTitle: 'An editorial journey to a fitting.',
+          chosenText: 'Atmosphere earns attention; practical answers and direct booking paths turn that attention into a confident next step.',
+        },
+        proof: [
+          { value: 'LIVE', label: 'Public website' },
+          { value: '03', label: 'Language routes' },
+          { value: '100%', label: 'Responsive system' },
+          { value: 'INDEXABLE', label: 'Localized pages' },
+        ],
         sections: [
           {
-            label: 'Problem',
+            label: '01 / Problem',
             title: 'Make the digital experience feel as considered as the product.',
             text: 'A bridal salon sells trust, taste and a very personal appointment — not a catalogue. The website needed to carry that feeling while still explaining dresses, alterations, care and booking clearly.',
           },
           {
-            label: 'Observation',
+            label: '02 / Observation',
             title: 'The strongest asset was not a feature. It was atmosphere.',
             text: 'The photography and the salon’s personal service already had emotional weight. The right move was to remove visual noise, give the imagery room and make every practical path feel calm and deliberate.',
           },
           {
-            label: 'Decision',
-            title: 'Do not build a catalogue. Build a digital fitting room.',
-            text: 'The experience would lead with feeling, then reveal practical information exactly when it becomes useful. The route to a fitting had to stay direct without turning the whole brand into a conversion template.',
+            label: '03 / Decision',
+            title: 'Reject the catalogue. Build around confidence.',
+            text: 'The site would not compete with large dress directories. It would make the salon’s taste, care and fitting experience tangible, then remove uncertainty around the visit.',
           },
           {
-            label: 'Design',
-            title: 'Editorial pacing with quiet, deliberate routes.',
-            text: 'A curated lookbook, restrained typography and generous image space carry the emotional layer. Service details, reviews and booking paths stay calm, legible and easy to reach.',
+            label: '04 / Design',
+            title: 'Editorial restraint with practical information always within reach.',
+            text: 'Large imagery, quiet typography and controlled pacing create the emotional layer. Clear service, fitting, care and contact paths keep the experience useful instead of merely atmospheric.',
           },
           {
-            label: 'Development',
-            title: 'Three real language versions — not a translation widget.',
-            text: 'Latvian, English and Russian content is rendered as responsive, indexable pages with stable navigation, metadata and direct contact routes. Optimized imagery preserves the atmosphere without making the experience heavy.',
+            label: '05 / Development',
+            title: 'Localization treated as architecture, not an overlay.',
+            text: 'Latvian, English and Russian have dedicated routes, navigation and metadata. Responsive images, semantic content and direct contact paths keep the experience fast, accessible and indexable across devices.',
           },
           {
-            label: 'Result',
+            label: '06 / Result',
             title: 'One coherent experience from first impression to fitting request.',
             text: 'CATRIN now has a complete multilingual presence that can carry premium imagery, answer practical questions and move a visitor toward a fitting without flattening the brand into a generic salon template.',
           },
@@ -110,34 +136,48 @@ export const projects: Record<ProjectId, Project> = {
         liveLabel: 'Apmeklēt CATRIN',
         backLabel: 'Atpakaļ pie darbiem',
         nextLabel: 'Nākamais projekts — ANELIKA',
+        decision: {
+          rejectedLabel: 'X / noraidītais standarts',
+          rejectedTitle: 'Vispārīgs kāzu kleitu katalogs.',
+          rejectedText: 'Vairāk kartīšu un filtru parādītu piedāvājumu, bet pazaudētu emocionālo iemeslu, kāpēc kliente izvēlas tieši šo salonu.',
+          chosenLabel: 'O / izvēlētais virziens',
+          chosenTitle: 'Redakcionāls ceļš līdz pielaikošanai.',
+          chosenText: 'Atmosfēra piesaista uzmanību, bet praktiskas atbildes un tiešs ceļš uz pierakstu pārvērš to pārliecinošā nākamajā solī.',
+        },
+        proof: [
+          { value: 'LIVE', label: 'Publiska mājaslapa' },
+          { value: '03', label: 'Valodu maršruti' },
+          { value: '100%', label: 'Responsīva sistēma' },
+          { value: 'INDEKSĒJAMA', label: 'Lokalizētas lapas' },
+        ],
         sections: [
           {
-            label: 'Problēma',
+            label: '01 / Problēma',
             title: 'Panākt, lai digitālā pieredze būtu tikpat pārdomāta kā pats produkts.',
             text: 'Kāzu salonā svarīgas ir uzticība, gaume un ļoti personīga pieredze — nevis katalogs. Mājaslapai bija jārada tā pati sajūta un vienlaikus skaidri jāpastāsta par kleitām, to pielāgošanu, kopšanu un pierakstu.',
           },
           {
-            label: 'Novērojums',
+            label: '02 / Novērojums',
             title: 'Spēcīgākā priekšrocība nebija funkcija. Tā bija atmosfēra.',
             text: 'Fotogrāfijas un salona personīgā attieksme jau radīja vajadzīgo noskaņu. Pareizais solis bija mazināt vizuālo troksni, dot attēliem telpu un katru praktisko soli padarīt skaidru un pārdomātu.',
           },
           {
-            label: 'Lēmums',
-            title: 'Nevis katalogs, bet digitāla pielaikošanas telpa.',
-            text: 'Pieredzei vispirms jārada sajūta un tikai tad jāatklāj praktiskā informācija. Ceļam uz pielaikošanu jābūt tiešam, nepārvēršot visu zīmolu par tipisku pārdošanas veidni.',
+            label: '03 / Lēmums',
+            title: 'Atteikties no kataloga. Veidot ap pārliecību.',
+            text: 'Mājaslapai nebija jāsacenšas ar lieliem kleitu katalogiem. Tai bija jāpadara redzama salona gaume, attieksme un pielaikošanas pieredze, pēc tam jānovērš neskaidrība par vizīti.',
           },
           {
-            label: 'Dizains',
-            title: 'Redakcionāls ritms un mierīgi, apzināti ceļi.',
-            text: 'Pārdomāta kleitu izlase, atturīga tipogrāfija un plaša vieta attēliem veido emocionālo slāni. Pakalpojumi, atsauksmes un pieraksta iespējas paliek skaidras un viegli atrodamas.',
+            label: '04 / Dizains',
+            title: 'Redakcionāls atturīgums ar praktisko informāciju rokas stiepiena attālumā.',
+            text: 'Lieli attēli, mierīga tipogrāfija un kontrolēts ritms veido emocionālo slāni. Skaidri pakalpojumu, pielaikošanas, kopšanas un saziņas ceļi saglabā pieredzi noderīgu.',
           },
           {
-            label: 'Izstrāde',
-            title: 'Trīs īstas valodu versijas — nevis tulkošanas logrīks.',
-            text: 'Saturs latviešu, angļu un krievu valodā ir veidots kā responsīvas un indeksējamas lapas ar stabilu navigāciju, metadatiem un tiešiem saziņas ceļiem. Optimizēti attēli saglabā atmosfēru, nepadarot pieredzi smagu.',
+            label: '05 / Izstrāde',
+            title: 'Lokalizācija kā arhitektūra, nevis virsū uzlikts logrīks.',
+            text: 'Latviešu, angļu un krievu valodai ir atsevišķi maršruti, navigācija un metadati. Responsīvi attēli, semantisks saturs un tieši saziņas ceļi saglabā vietni ātru, piekļūstamu un indeksējamu.',
           },
           {
-            label: 'Rezultāts',
+            label: '06 / Rezultāts',
             title: 'Viena vienota pieredze no pirmā iespaida līdz pierakstam.',
             text: 'CATRIN tagad ir pilnvērtīga mājaslapa vairākās valodās. Tā izceļ kvalitatīvus attēlus, atbild uz praktiskiem jautājumiem un ved apmeklētāju uz pielaikošanu, nezaudējot zīmola raksturu.',
           },
@@ -167,34 +207,48 @@ export const projects: Record<ProjectId, Project> = {
         liveLabel: 'Visit ANELIKA',
         backLabel: 'Back to work',
         nextLabel: 'Back to CATRIN',
+        decision: {
+          rejectedLabel: 'X / rejected default',
+          rejectedTitle: 'One page that lists everything.',
+          rejectedText: 'A long service dump would make a broad offer look simpler to build, but harder for customers and search engines to understand.',
+          chosenLabel: 'O / chosen direction',
+          chosenTitle: 'A task-led service architecture.',
+          chosenText: 'Separate service routes identify the job quickly, build trust in context and keep the next action obvious.',
+        },
+        proof: [
+          { value: 'LIVE', label: 'Public website' },
+          { value: '03', label: 'Service systems' },
+          { value: 'MULTI', label: 'Language routes' },
+          { value: 'DIRECT', label: 'Enquiry paths' },
+        ],
         sections: [
           {
-            label: 'Problem',
+            label: '01 / Problem',
             title: 'Three service worlds. One business. Zero room for confusion.',
             text: 'Cleaning, territory maintenance and minor repair work attract different searches and different customers. A single generic services page would hide the range; a sprawling site would make it harder to choose.',
           },
           {
-            label: 'Observation',
+            label: '02 / Observation',
             title: 'People do not browse property services for fun. They arrive with a job.',
             text: 'The site had to identify that job quickly, establish coverage and trust, then offer the shortest sensible path to a call or a detailed enquiry.',
           },
           {
-            label: 'Decision',
-            title: 'Organize the website around jobs, not company departments.',
-            text: 'Each service world needed a distinct entry point while sharing one commercial logic: identify the task, establish relevance and proof, then make the next action obvious.',
+            label: '03 / Decision',
+            title: 'Organize around customer jobs, not the company’s internal list.',
+            text: 'Each main service world needed its own clear route while remaining visibly part of one business. The structure had to scale without creating a maze.',
           },
           {
-            label: 'Design',
-            title: 'Orientation before persuasion.',
-            text: 'A harder grid, modular service layers and clear coverage cues replace atmosphere with direction. Trust signals and calls to action appear where a visitor has enough context to use them.',
+            label: '04 / Design',
+            title: 'A rational interface with trust and action built into the hierarchy.',
+            text: 'Sharper geometry, modular service blocks, visible coverage and restrained brand cues keep orientation fast. Every page explains the job before asking for an enquiry.',
           },
           {
-            label: 'Development',
-            title: 'An indexable service architecture built to grow.',
-            text: 'Distinct service hubs, supporting pages, responsive lead forms and multilingual content share one technical system. Structured metadata, canonical URLs and indexable pages give search engines the same clarity as visitors.',
+            label: '05 / Development',
+            title: 'Reusable service modules with a technical search foundation.',
+            text: 'Service hubs, supporting pages, responsive lead forms and multilingual content share one system. Structured metadata, canonical URLs and indexable pages give search engines the same clarity as visitors.',
           },
           {
-            label: 'Result',
+            label: '06 / Result',
             title: 'A practical business tool that can grow without turning into a maze.',
             text: 'ANELIKA can present a broad offer across Latvia while keeping every page focused on a real task, a clear next step and a clear reason to trust the business.',
           },
@@ -213,34 +267,48 @@ export const projects: Record<ProjectId, Project> = {
         liveLabel: 'Apmeklēt ANELIKA',
         backLabel: 'Atpakaļ pie darbiem',
         nextLabel: 'Atpakaļ uz CATRIN',
+        decision: {
+          rejectedLabel: 'X / noraidītais standarts',
+          rejectedTitle: 'Viena lapa ar visu pakalpojumu sarakstu.',
+          rejectedText: 'Garš pakalpojumu uzskaitījums būtu vienkāršāk uzbūvējams, bet grūtāk saprotams gan klientiem, gan meklētājprogrammām.',
+          chosenLabel: 'O / izvēlētais virziens',
+          chosenTitle: 'Ar uzdevumiem vadīta pakalpojumu arhitektūra.',
+          chosenText: 'Atsevišķi pakalpojumu ceļi ātri identificē vajadzību, rada uzticību konkrētajā kontekstā un saglabā nākamo darbību acīmredzamu.',
+        },
+        proof: [
+          { value: 'LIVE', label: 'Publiska mājaslapa' },
+          { value: '03', label: 'Pakalpojumu sistēmas' },
+          { value: 'MULTI', label: 'Valodu maršruti' },
+          { value: 'TIEŠI', label: 'Pieteikumu ceļi' },
+        ],
         sections: [
           {
-            label: 'Problēma',
+            label: '01 / Problēma',
             title: 'Trīs pakalpojumu jomas. Viens uzņēmums. Apjukumam nav vietas.',
             text: 'Uzkopšanu, teritoriju kopšanu un sīkus remontdarbus meklē atšķirīgi klienti ar atšķirīgām vajadzībām. Viena vispārīga pakalpojumu lapa noslēptu daļu piedāvājuma, savukārt pārāk sadrumstalota vietne apgrūtinātu izvēli.',
           },
           {
-            label: 'Novērojums',
+            label: '02 / Novērojums',
             title: 'Cilvēki pakalpojumu lapas nepārlūko izklaidei. Viņiem ir konkrēts darbs.',
             text: 'Mājaslapai ātri jāpalīdz atrast vajadzīgo pakalpojumu, jāparāda apkalpošanas teritorija un jārada uzticība. Pēc tam jānodrošina īsākais loģiskais ceļš uz zvanu vai detalizētu pieteikumu.',
           },
           {
-            label: 'Lēmums',
-            title: 'Sakārtot mājaslapu pēc klienta uzdevumiem, nevis uzņēmuma nodaļām.',
-            text: 'Katrai pakalpojumu jomai vajadzēja savu skaidru ieejas punktu un vienotu komerciālo loģiku: atpazīt uzdevumu, parādīt atbilstību un uzticību, tad piedāvāt acīmredzamu nākamo soli.',
+            label: '03 / Lēmums',
+            title: 'Kārtot pēc klienta uzdevuma, nevis uzņēmuma iekšējā saraksta.',
+            text: 'Katrai galvenajai pakalpojumu jomai vajadzēja savu skaidru ceļu, vienlaikus saglabājot redzamu saikni ar vienu uzņēmumu. Struktūrai bija jāaug, neveidojot labirintu.',
           },
           {
-            label: 'Dizains',
-            title: 'Vispirms orientācija, tikai tad pārliecināšana.',
-            text: 'Stingrāks režģis, modulāri informācijas slāņi un skaidras apkalpošanas teritorijas norādes dod virzienu. Uzticības elementi un aicinājumi rīkoties parādās tad, kad apmeklētājam jau ir pietiekams konteksts.',
+            label: '04 / Dizains',
+            title: 'Racionāla saskarne ar uzticību un darbību pašā hierarhijā.',
+            text: 'Asāka ģeometrija, modulāri pakalpojumu bloki, redzama darbības teritorija un atturīgas zīmola zīmes ļauj ātri orientēties. Katra lapa vispirms izskaidro darbu un tikai tad prasa pieteikumu.',
           },
           {
-            label: 'Izstrāde',
-            title: 'Indeksējama pakalpojumu arhitektūra, kas var augt.',
-            text: 'Atsevišķas pakalpojumu sadaļas, papildu lapas, responsīvas pieteikumu formas un daudzvalodu saturs darbojas vienotā tehniskā sistēmā. Strukturēti metadati, kanoniskās adreses un indeksējamas lapas sniedz meklētājprogrammām tādu pašu skaidrību kā apmeklētājiem.',
+            label: '05 / Izstrāde',
+            title: 'Atkārtoti izmantojami pakalpojumu moduļi ar tehnisku pamatu meklēšanai.',
+            text: 'Pakalpojumu sadaļas, papildu lapas, responsīvas pieteikumu formas un daudzvalodu saturs darbojas vienotā sistēmā. Strukturēti metadati, kanoniskās adreses un indeksējamas lapas sniedz vienādu skaidrību cilvēkiem un meklētājprogrammām.',
           },
           {
-            label: 'Rezultāts',
+            label: '06 / Rezultāts',
             title: 'Praktisks biznesa rīks, kas var augt, nepārvēršoties labirintā.',
             text: 'ANELIKA var parādīt plašu piedāvājumu visā Latvijā, vienlaikus katrai lapai saglabājot skaidru uzdevumu, nākamo soli un iemeslu uzticēties uzņēmumam.',
           },

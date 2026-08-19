@@ -2,7 +2,7 @@
 import Arrow from './Arrow.astro';
 import PageContactCTA from './PageContactCTA.astro';
 import SiteHeader from './SiteHeader.astro';
-import { buildContactHref } from '../data/contact-router';
+import { buildContactHref, type ContactIntentId } from '../data/contact-router';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
 import { getSiteCopy, type Locale } from '../data/site';
 import '../styles/multipage.css';
@@ -19,6 +19,7 @@ const site = getSiteCopy(locale);
 const routes = pageRoutes[locale];
 const alternateHref = locale === 'lv' ? pageRoutes.en.services : pageRoutes.lv.services;
 const contactHref = buildContactHref(locale, 'services', 'unsure', 'start');
+const serviceIntent = (index: string): ContactIntentId => ['02', '05', '06'].includes(index) ? 'fix' : 'zero';
 ---
 
 <div class="mp-page mp-services" id="top">
@@ -32,7 +33,9 @@ const contactHref = buildContactHref(locale, 'services', 'unsure', 'start');
     </section>
 
     <section class="services-decision" id="service-list" aria-label={page.eyebrow}>
-      {page.services.map((service) => (
+      {page.services.map((service) => {
+        const href = buildContactHref(locale, `service-${service.index}`, serviceIntent(service.index), 'talk');
+        return (
         <article class="service-decision" data-motion-reveal data-service-id={service.index}>
           <div class="service-decision__head">
             <span>{service.index}</span>
@@ -48,9 +51,13 @@ const contactHref = buildContactHref(locale, 'services', 'unsure', 'start');
               <span>{locale === 'lv' ? 'Ko tu saņem' : 'What changes'}</span>
               <p>{service.result}</p>
             </div>
+            <a class="service-decision__cta" href={href} data-analytics-event="service_contact_click" data-service-id={service.index}>
+              <span>{page.serviceCta}</span><Arrow direction="right" />
+            </a>
           </div>
         </article>
-      ))}
+        );
+      })}
     </section>
 
     <section class="services-anti" data-theme="dark" aria-labelledby="services-anti-title" data-motion-reveal>

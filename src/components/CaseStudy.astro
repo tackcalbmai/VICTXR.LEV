@@ -42,14 +42,60 @@ const projectTransitionName = `xo-project-${projectId}`;
       <ResponsiveProjectImage class="case-screen" desktop={project.hero} mobile={project.mobile} alt={`${content.title} ${locale === 'lv' ? 'mājaslapas responsīvie skati' : 'responsive website views'}`} loading="eager" fetchpriority="high" quality={88} sizes="calc(100vw - 2rem)" />
     </figure>
 
-    <section class="case-narrative section-pad" data-theme="light">
-      {content.sections.map((section) => (
-        <article class="case-narrative__row reveal" data-reveal>
-          <div><span>{section.label}</span></div>
-          <h2>{section.title}</h2>
-          <p>{section.text}</p>
-        </article>
+    <section class="case-proof" aria-label={locale === 'lv' ? 'Pārbaudāmi projekta fakti' : 'Verifiable project facts'}>
+      {content.proof.map((item) => (
+        <div class="case-proof__item">
+          <strong>{item.value}</strong>
+          <span>{item.label}</span>
+        </div>
       ))}
+    </section>
+
+    <section class="case-decision section-pad" data-theme="light" aria-labelledby="case-decision-title" data-motion-reveal>
+      <div class="case-decision__topline">
+        <span>{locale === 'lv' ? 'Lēmuma punkts' : 'Decision point'}</span>
+        <span>XO / DIFFERENT PERSPECTIVE</span>
+      </div>
+      <h2 id="case-decision-title" class="sr-only">{locale === 'lv' ? 'Noraidītais un izvēlētais virziens' : 'Rejected and chosen direction'}</h2>
+      <div class="case-decision__grid">
+        <article class="case-decision__option case-decision__option--rejected">
+          <span class="case-decision__glyph" aria-hidden="true">X</span>
+          <p>{content.decision.rejectedLabel}</p>
+          <h3>{content.decision.rejectedTitle}</h3>
+          <span>{content.decision.rejectedText}</span>
+        </article>
+        <article class="case-decision__option case-decision__option--chosen">
+          <span class="case-decision__glyph" aria-hidden="true">O</span>
+          <p>{content.decision.chosenLabel}</p>
+          <h3>{content.decision.chosenTitle}</h3>
+          <span>{content.decision.chosenText}</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="case-story section-pad" data-theme="light" data-case-story aria-label={locale === 'lv' ? 'Projekta lēmumu process' : 'Project decision process'}>
+      <nav class="case-story__rail" aria-label={locale === 'lv' ? 'Projekta posmi' : 'Case study stages'}>
+        <p>{locale === 'lv' ? 'No problēmas līdz rezultātam' : 'From problem to result'}</p>
+        <ol>
+          {content.sections.map((section, index) => (
+            <li>
+              <a class:list={[index === 0 && 'is-active']} href={`#case-stage-${index + 1}`} data-case-stage-link={index + 1} aria-current={index === 0 ? 'step' : undefined}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <i>{section.label.replace(/^\d+\s*\/\s*/, '')}</i>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <div class="case-narrative">
+        {content.sections.map((section, index) => (
+          <article class="case-narrative__row reveal" id={`case-stage-${index + 1}`} data-reveal data-case-stage={index + 1}>
+            <div><span>{section.label}</span></div>
+            <h2>{section.title}</h2>
+            <p>{section.text}</p>
+          </article>
+        ))}
+      </div>
     </section>
 
     {projectId === 'catrin' ? (
@@ -80,3 +126,8 @@ const projectTransitionName = `xo-project-${projectId}`;
     <PageContactCTA locale={locale} context="case" source={`case-${projectId}`} />
   </main>
 </div>
+
+<script>
+  import { initCaseStudyStory } from '../scripts/case-study-story';
+  initCaseStudyStory();
+</script>

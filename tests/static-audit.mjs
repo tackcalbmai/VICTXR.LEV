@@ -170,7 +170,10 @@ for (const [name, html, stages] of [
   ['ANELIKA LV', pages.anelikaLv, ['Problēma', 'Novērojums', 'Lēmums', 'Dizains', 'Izstrāde', 'Rezultāts']],
 ]) {
   assert((html.match(/class="case-narrative__row/g) ?? []).length === 6, `${name} does not expose the six-stage decision narrative`);
-  stages.forEach((stage) => assert(html.includes(`>${stage}</span>`), `${name} is missing ${stage}`));
+  stages.forEach((stage) => assert(
+    html.includes(`>${stage}</span>`) || html.includes(`/ ${stage}</span>`),
+    `${name} is missing ${stage}`,
+  ));
 }
 
 const pageContactCtaSource = await read('src/components/PageContactCTA.astro');
@@ -194,7 +197,7 @@ assert(analyticsSource.includes('window.zaraz.track') && analyticsSource.include
 assert(!analyticsSource.includes('values.problem') && !analyticsSource.includes('values.change'), 'Analytics must not transmit brief text');
 
 const homeMotionSource = await read('src/scripts/home.ts');
-assert(homeMotionSource.includes('DIFFERENT PERSPECTIVE') && !homeMotionSource.includes('<span>VICT</span>'), 'Cinematic intro still puts the author above the XO WEB brand');
+assert(homeMotionSource.includes('data-cinematic-wordmark') && homeMotionSource.includes('BY VICTXR.LEV') && !homeMotionSource.includes('<span>VICT</span>'), 'Cinematic intro still puts the author above the XO WEB brand');
 assert(homeMotionSource.includes('skipCinematic') && homeMotionSource.includes("trigger: antiSales"), 'Cinematic control handoff or stale GSAP-target guard is missing');
 
 const astroConfig = await read('astro.config.mjs');

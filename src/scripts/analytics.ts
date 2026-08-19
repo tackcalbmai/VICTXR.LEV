@@ -18,6 +18,11 @@ declare global {
 const pendingEvents: Array<{ name: string; payload: AnalyticsPayload }> = [];
 const emittedKeys = new Set<string>();
 
+function trackingIsAllowed() {
+  const privacyNavigator = navigator as Navigator & { globalPrivacyControl?: boolean };
+  return !privacyNavigator.globalPrivacyControl && navigator.doNotTrack !== '1';
+}
+
 function compactPayload(payload: AnalyticsPayload) {
   return Object.fromEntries(
     Object.entries(payload).filter(([, value]) => value !== '' && value !== false),
@@ -25,6 +30,9 @@ function compactPayload(payload: AnalyticsPayload) {
 }
 
 function sendToProvider(name: string, payload: AnalyticsPayload) {
+  // Keep the local QA event available while respecting explicit browser-level
+  // privacy signals for every external analytics provider.
+  if (!trackingIsAllowed()) return true;
   try {
     if (window.zaraz?.track) {
       window.zaraz.track(name, payload);
@@ -134,6 +142,72 @@ export function initAnalytics() {
   document.documentElement.dataset.analyticsReady = 'true';
 
   const source = new URLSearchParams(window.location.search).get('from')?.match(/^[a-z0-9-]{1,48}$/i)?.[0] ?? '';
+  trackAnalytics('xo_page_view', { source }, 'page');
+
+  let lcp = 0;
+  let cls = 0;
+  let inp = 0;
+  let vitalsFlushed = false;
+  const performanceObservers: PerformanceObserver[] = [];
+  const observe = (
+    type: string,
+    callback: (entry: PerformanceEntry & { value?: number; hadRecentInput?: boolean }) => void,
+    options: PerformanceObserverInit = { type, buffered: true },
+  ) => {
+    try {
+      const observer = new PerformanceObserver((list) => list.getEntries().forEach((entry) => callback(entry)));
+      observer.observe(options);
+      performanceObservers.push(observer);
+    } catch {
+      // Unsupported metrics are progressive enhancement, never a page error.
+    }
+  };
+  observe('largest-contentful-paint', (entry) => { lcp = entry.startTime; });
+  observe('layout-shift', (entry) => {
+    if (!entry.hadRecentInput) cls += entry.value ?? 0;
+  });
+  observe('event', (entry) => { inp = Math.max(inp, entry.duration); }, {
+    type: 'event',
+    buffered: true,
+    durationThreshold: 40,
+  } as PerformanceObserverInit);
+
+  const flushVitals = () => {
+    if (vitalsFlushed || (!lcp && !cls && !inp)) return;
+    vitalsFlushed = true;
+    trackAnalytics('web_vitals', {
+      lcp_ms: Math.round(lcp),
+      cls: Number(cls.toFixed(3)),
+      inp_ms: Math.round(inp),
+    }, 'page');
+  };
+  const vitalsTimer = window.setTimeout(flushVitals, 8000);
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') flushVitals();
+  };
+  window.addEventListener('pagehide', flushVitals, { once: true });
+  document.addEventListener('visibilitychange', onVisibilityChange);
+
+  const depthMarks = [25, 50, 75, 90];
+  const reachedDepths = new Set<number>();
+  let depthFrame = 0;
+  const updateDepth = () => {
+    depthFrame = 0;
+    const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+    const progress = Math.min(100, Math.round((window.scrollY / scrollable) * 100));
+    depthMarks.forEach((depth) => {
+      if (progress < depth || reachedDepths.has(depth)) return;
+      reachedDepths.add(depth);
+      trackAnalytics('scroll_depth', { depth }, String(depth));
+    });
+    if (reachedDepths.size === depthMarks.length) window.removeEventListener('scroll', requestDepth);
+  };
+  const requestDepth = () => {
+    if (depthFrame) return;
+    depthFrame = window.requestAnimationFrame(updateDepth);
+  };
+  window.addEventListener('scroll', requestDepth, { passive: true });
+
   const contactPage = document.querySelector<HTMLElement>('[data-contact-page]');
   if (contactPage) trackAnalytics('contact_page_view', { source }, 'page');
 
@@ -220,6 +294,12 @@ export function initAnalytics() {
     brief?.removeEventListener('input', onBriefInput);
     serviceObserver?.disconnect();
     window.removeEventListener('xo:takeover-change', onTakeoverChange);
+    window.removeEventListener('scroll', requestDepth);
+    window.removeEventListener('pagehide', flushVitals);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    window.clearTimeout(vitalsTimer);
+    if (depthFrame) window.cancelAnimationFrame(depthFrame);
+    performanceObservers.forEach((observer) => observer.disconnect());
     delete document.documentElement.dataset.analyticsReady;
   };
 }
