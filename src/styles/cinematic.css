@@ -142,6 +142,11 @@ html.is-cinematic-intro body {
   text-align: center;
 }
 
+.cinematic-intro__wordmark-space {
+  width: 0.22em;
+  flex: 0 0 0.22em;
+}
+
 .cinematic-intro__letter-wrap {
   position: relative;
   display: inline-block !important;

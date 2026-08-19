@@ -224,12 +224,12 @@ export function initHomeMotion() {
       <div class="cinematic-intro__backdrop" data-cinematic-backdrop></div>
       <div class="cinematic-intro__brand-stage" data-cinematic-stage>
         <div class="cinematic-intro__assembly" data-cinematic-assembly aria-hidden="true">
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span>VICT</span><span class="cinematic-intro__slice-x">X</span><span>R</span><span class="cinematic-intro__slice-dot">.</span><span>LEV</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
         </div>
         <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
-          <span>VICT</span><span class="cinematic-intro__letter-wrap" data-cinematic-letter-wrap><span data-cinematic-letter>X</span></span><span>R</span><span class="cinematic-intro__dot">.</span><span>LEV</span>
+          <span class="cinematic-intro__letter-wrap" data-cinematic-letter-wrap><span data-cinematic-letter>X</span></span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span>
         </div>
         <div class="cinematic-intro__descriptor-wrap" data-cinematic-descriptor-wrap>
           <p class="cinematic-intro__descriptor" data-cinematic-descriptor>
