@@ -229,7 +229,7 @@ export function initHomeMotion() {
           <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
         </div>
         <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
-          <span class="cinematic-intro__xo-pair" data-cinematic-xo-pair><span class="cinematic-intro__xo-x">X</span><span>O</span></span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span>
+          <span class="cinematic-intro__xo-pair" data-cinematic-xo-pair><span class="cinematic-intro__xo-x" data-cinematic-xo-x>X</span><span class="cinematic-intro__xo-o" data-cinematic-xo-o>O</span></span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span>
         </div>
         <div class="cinematic-intro__descriptor-wrap" data-cinematic-descriptor-wrap>
           <p class="cinematic-intro__descriptor" data-cinematic-descriptor>
@@ -245,11 +245,13 @@ export function initHomeMotion() {
     const backdrop = cinematicNode.querySelector<HTMLElement>('[data-cinematic-backdrop]');
     const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
     const introXoPair = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-pair]');
+    const introXoX = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-x]');
+    const introXoO = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-o]');
     const descriptorWrap = cinematicNode.querySelector<HTMLElement>('[data-cinematic-descriptor-wrap]');
     const slices = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-slice]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!backdrop || !wordmark || !introXoPair || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
+    if (!backdrop || !wordmark || !introXoPair || !introXoX || !introXoO || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
       markIntroReady();
       releaseCinematic();
@@ -276,7 +278,7 @@ export function initHomeMotion() {
     gsap.set(middleSlice, { autoAlpha: 0, x: compact ? 7 : 14, y: 0, filter: 'blur(1px)' });
     gsap.set(bottomSlice, { autoAlpha: 0, x: compact ? 17 : 38, y: compact ? 1 : 2, filter: 'blur(2px)' });
     gsap.set(descriptorWrap, { autoAlpha: 0, y: 6, filter: 'blur(1.5px)' });
-    gsap.set(introXoPair, { clearProps: 'transform,opacity,visibility' });
+    gsap.set([introXoPair, introXoX, introXoO], { clearProps: 'transform,opacity,visibility' });
 
     const syncDescriptorGeometry = () => {
       const rect = wordmark.getBoundingClientRect();
@@ -286,25 +288,26 @@ export function initHomeMotion() {
       descriptorWrap.style.top = `${rect.bottom + gap}px`;
     };
 
-    const introGlitch = (timeline: gsap.core.Timeline, position: number | string) => {
-      timeline.to(introXoPair, {
-        keyframes: [
-          { xPercent: 0, skewX: 0, autoAlpha: 1, duration: 0.01 },
-          { xPercent: compact ? 20 : 28, skewX: -15, autoAlpha: 0.36, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: compact ? -14 : -20, skewX: 10, autoAlpha: 1, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: 0, skewX: 0, autoAlpha: 1, duration: 0.065 },
-        ],
-      }, position);
+    const xoOverlap = () => Math.max(5, Math.min(compact ? 8 : 14, introXoPair.getBoundingClientRect().height * 0.18));
+    const xoGlitch = (timeline: gsap.core.Timeline, position: number | string) => {
+      timeline
+        .to(introXoX, { keyframes: [
+          { xPercent: 0, skewX: 0, duration: 0.01 },
+          { xPercent: 7, skewX: -8, duration: 0.035, ease: 'steps(1)' },
+          { xPercent: -5, skewX: 6, duration: 0.035, ease: 'steps(1)' },
+          { xPercent: 0, skewX: 0, duration: 0.06 },
+        ] }, position)
+        .to(introXoO, { keyframes: [
+          { xPercent: 0, skewX: 0, duration: 0.01 },
+          { xPercent: -7, skewX: 8, duration: 0.035, ease: 'steps(1)' },
+          { xPercent: 5, skewX: -6, duration: 0.035, ease: 'steps(1)' },
+          { xPercent: 0, skewX: 0, duration: 0.06 },
+        ] }, position);
     };
-
-    const firstFlightX = compact ? 11 : 20;
-    const firstFlightY = compact ? -10 : -17;
-    const secondFlightX = compact ? -10 : -18;
-    const secondFlightY = compact ? 8 : 14;
     let handoff = { x: 0, y: 0, scaleX: 1, scaleY: 1 };
 
     const settleIntroPair = () => {
-      gsap.set(introXoPair, { clearProps: 'transform,opacity,visibility' });
+      gsap.set([introXoPair, introXoX, introXoO], { clearProps: 'transform,opacity,visibility' });
     };
 
     const measureHandoff = () => {
@@ -334,97 +337,28 @@ export function initHomeMotion() {
       .call(syncDescriptorGeometry, [], 0.64)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.68)
       .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.33, ease: 'power2.out' }, 0.72);
-    introGlitch(introTimeline, 0.57);
+    xoGlitch(introTimeline, 0.57);
 
     introTimeline
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-shift'; }, [], 1.12)
-      .to(introXoPair, { rotation: -72, y: -1, duration: 0.32, ease: 'power1.in' }, 1.14)
-      .to(introXoPair, {
-        rotation: -248,
-        x: firstFlightX,
-        y: firstFlightY,
-        scale: 0.93,
-        duration: 0.2,
-        ease: 'power3.in',
-      }, 1.4);
-    introGlitch(introTimeline, 1.37);
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-approach'; }, [], 1.12)
+      .to(introXoX, { x: () => xoOverlap(), y: -0.5, scale: 0.96, duration: 0.28, ease: 'power2.inOut' }, 1.14)
+      .to(introXoO, { x: () => -xoOverlap(), y: 0.5, scale: 1.04, duration: 0.28, ease: 'power2.inOut' }, 1.14);
+    xoGlitch(introTimeline, 1.37);
     introTimeline
-      .to(introXoPair, {
-        rotation: -420,
-        x: firstFlightX * 1.08,
-        y: firstFlightY * 1.08,
-        autoAlpha: 0.42,
-        duration: 0.12,
-        ease: 'power4.in',
-      }, 1.58)
-      .set(introXoPair, {
-        rotation: -24,
-        x: firstFlightX * 0.66,
-        y: firstFlightY * 0.52,
-        xPercent: 0,
-        skewX: 0,
-        scale: 0.9,
-        autoAlpha: 0.52,
-      }, 1.68);
-    introGlitch(introTimeline, 1.68);
-    introTimeline
-      .to(introXoPair, {
-        x: 0,
-        y: 0,
-        xPercent: 0,
-        rotation: 0,
-        skewX: 0,
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.28,
-        ease: 'back.out(2.35)',
-      }, 1.8)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-overlap'; }, [], 1.58)
+      .to(introXoX, { x: () => xoOverlap() * 0.72, scale: 0.9, autoAlpha: 0.5, duration: 0.1, ease: 'power3.in' }, 1.58)
+      .to(introXoO, { x: () => -xoOverlap() * 0.72, scale: 1.08, autoAlpha: 1, duration: 0.1, ease: 'power3.in' }, 1.58)
+      .to([introXoX, introXoO], { x: 0, y: 0, xPercent: 0, skewX: 0, scale: 1, autoAlpha: 1, duration: 0.3, ease: 'back.out(1.8)' }, 1.72)
       .call(settleIntroPair, [], 2.08)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-rest'; }, [], 2.1)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-return'; }, [], 2.34)
-      .to(introXoPair, { rotation: -86, x: -1, y: 1, duration: 0.32, ease: 'power1.in' }, 2.34)
-      .to(introXoPair, {
-        rotation: -262,
-        x: secondFlightX,
-        y: secondFlightY,
-        scale: 0.93,
-        duration: 0.2,
-        ease: 'power3.in',
-      }, 2.6);
-    introGlitch(introTimeline, 2.57);
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-expand'; }, [], 2.34)
+      .to(introXoX, { x: () => xoOverlap() * 0.78, y: 0.5, scale: 1.03, duration: 0.24, ease: 'power2.inOut' }, 2.34)
+      .to(introXoO, { x: () => -xoOverlap() * 0.78, y: -0.5, scale: 0.96, duration: 0.24, ease: 'power2.inOut' }, 2.34);
+    xoGlitch(introTimeline, 2.57);
     introTimeline
-      .to(introXoPair, {
-        rotation: -420,
-        x: secondFlightX * 1.05,
-        y: secondFlightY * 1.06,
-        autoAlpha: 0.44,
-        duration: 0.12,
-        ease: 'power4.in',
-      }, 2.78)
-      .set(introXoPair, {
-        rotation: -22,
-        x: secondFlightX * 0.62,
-        y: secondFlightY * 0.48,
-        xPercent: 0,
-        skewX: 0,
-        scale: 0.9,
-        autoAlpha: 0.54,
-      }, 2.88);
-    introGlitch(introTimeline, 2.88);
-    introTimeline
-      .to(introXoPair, {
-        x: 0,
-        y: 0,
-        xPercent: 0,
-        rotation: 0,
-        skewX: 0,
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.28,
-        ease: 'back.out(2.35)',
-      }, 3.0)
-      .call(settleIntroPair, [], 3.28)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-final'; }, [], 3.3)
+      .to([introXoX, introXoO], { x: 0, y: 0, xPercent: 0, skewX: 0, scale: 1, autoAlpha: 1, duration: 0.28, ease: 'back.out(1.8)' }, 2.76)
+      .call(settleIntroPair, [], 3.08)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-final'; }, [], 3.1)
       .call(syncDescriptorGeometry, [], 3.43)
       .call(measureHandoff, [], 3.48)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 3.5)

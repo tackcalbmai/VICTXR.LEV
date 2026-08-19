@@ -96,18 +96,18 @@ async function assertCinematicIntro(name, viewport) {
   if (initialLogo !== 'XOWEB') throw new Error(`${name} initial XO WEB logo is malformed: ${initialLogo}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-logo.png`, fullPage: false });
 
-  await waitPhase(page, 'xo-shift');
-  stamp('xo-shift');
+  await waitPhase(page, 'xo-approach');
+  stamp('xo-approach');
 
-  await waitPhase(page, 'xo-rest');
-  stamp('xo-rest');
+  await waitPhase(page, 'xo-overlap');
+  stamp('xo-overlap');
   await page.waitForTimeout(100);
   const firstXoText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (firstXoText !== 'XOWEB') throw new Error(`${name} XO motion changed the wordmark content: ${firstXoText}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-xo-rest.png`, fullPage: false });
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-xo-overlap.png`, fullPage: false });
 
-  await waitPhase(page, 'xo-return');
-  stamp('xo-return');
+  await waitPhase(page, 'xo-expand');
+  stamp('xo-expand');
 
   await waitPhase(page, 'xo-final');
   stamp('xo-final');
@@ -154,10 +154,10 @@ async function assertCinematicIntro(name, viewport) {
 
   const minimumBeatSpacing = [
     ['assemble', 'logo', 380],
-    ['logo', 'xo-shift', 360],
-    ['xo-shift', 'xo-rest', 820],
-    ['xo-rest', 'xo-return', 180],
-    ['xo-return', 'xo-final', 820],
+    ['logo', 'xo-approach', 360],
+    ['xo-approach', 'xo-overlap', 360],
+    ['xo-overlap', 'xo-expand', 180],
+    ['xo-expand', 'xo-final', 500],
     ['xo-final', 'handoff', 150],
   ];
   for (const [from, to, minimum] of minimumBeatSpacing) {

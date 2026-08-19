@@ -149,10 +149,19 @@ html.is-cinematic-intro body {
 
 .cinematic-intro__xo-pair {
   display: inline-flex !important;
+  position: relative;
   gap: 0.025em;
   width: max-content !important;
   color: var(--paper);
   transform-origin: 50% 52%;
+}
+
+.cinematic-intro__xo-x,
+.cinematic-intro__xo-o {
+  display: inline-block !important;
+  position: relative;
+  transform-origin: 50% 52%;
+  will-change: transform, opacity, filter;
 }
 
 .cinematic-intro__xo-pair > span:first-child,
@@ -217,9 +226,10 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro[data-cinematic-phase='logo'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='xo-shift'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-approach'] .cinematic-intro__descriptor-wrap,
   .cinematic-intro[data-cinematic-phase='xo-rest'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='xo-return'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-overlap'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-expand'] .cinematic-intro__descriptor-wrap,
   .cinematic-intro[data-cinematic-phase='xo-final'] .cinematic-intro__descriptor-wrap {
     opacity: 1 !important;
     visibility: visible !important;
