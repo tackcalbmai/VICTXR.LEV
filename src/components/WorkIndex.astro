@@ -3,6 +3,7 @@ import Arrow from './Arrow.astro';
 import PageContactCTA from './PageContactCTA.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
+import TrustLedger from './TrustLedger.astro';
 import { getMultipageCopy, pageRoutes } from '../data/multipage';
 import { projects } from '../data/projects';
 import { getSiteCopy, type Locale } from '../data/site';
@@ -62,6 +63,8 @@ const projectIds = ['catrin', 'anelika'] as const;
         );
       })}
     </section>
+
+    <TrustLedger locale={locale} />
 
     <section class="mp-closing mp-closing--work section-pad" data-motion-reveal>
       <p class="mp-kicker">XO / DIFFERENT PERSPECTIVE</p>

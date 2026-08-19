@@ -343,7 +343,7 @@ for (const [path, lang, title, alternate, back] of caseRoutes) {
   if (!response?.ok()) throw new Error(`${path} returned ${response?.status()}`);
   await assertCoreDocument(routePage, path, lang);
   if ((await routePage.locator('h1').innerText()).trim() !== title) throw new Error(`${path} has the wrong case title`);
-  if (await routePage.locator('.case-narrative__row').count() !== 4) throw new Error(`${path} is missing case narrative sections`);
+  if (await routePage.locator('.case-narrative__row').count() !== 6) throw new Error(`${path} is missing the six-stage case narrative`);
   if (await routePage.locator('.site-language').getAttribute('href') !== alternate) throw new Error(`${path} language switch loses case context`);
   if (await routePage.locator('.case-next a').first().getAttribute('href') !== back) throw new Error(`${path} does not return to its Work exhibition`);
   if (await routePage.locator('.page-contact-cta').count() !== 1) throw new Error(`${path} does not end with the compact Contact transition`);

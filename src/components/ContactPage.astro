@@ -57,6 +57,7 @@ const routerConfig = JSON.stringify({ starters: router.starters, prompts: router
             type="button"
             data-contact-intent={option.id}
             data-contact-subject={option.subject}
+            data-analytics-event="contact_intent_select"
             aria-pressed={index === 2 ? 'true' : 'false'}
           >
             <span class="contact-intent__index">{option.index}</span>

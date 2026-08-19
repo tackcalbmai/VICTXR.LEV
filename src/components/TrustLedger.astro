@@ -1,0 +1,46 @@
+---
+import Arrow from './Arrow.astro';
+import { getTrustLedgerCopy } from '../data/trust';
+import { projects } from '../data/projects';
+import type { Locale } from '../data/site';
+import '../styles/trust-system.css';
+
+interface Props {
+  locale: Locale;
+  compact?: boolean;
+}
+
+const { locale, compact = false } = Astro.props;
+const copy = getTrustLedgerCopy(locale);
+const projectLinks = [projects.catrin, projects.anelika];
+---
+
+<section class:list={['trust-ledger', compact && 'trust-ledger--compact']} aria-labelledby={`trust-ledger-title-${compact ? 'compact' : 'full'}`} data-motion-reveal>
+  <div class="trust-ledger__topline">
+    <span>{copy.eyebrow}</span>
+    <span>XO / EVIDENCE</span>
+  </div>
+  <div class="trust-ledger__head">
+    <h2 class="trust-ledger__title" id={`trust-ledger-title-${compact ? 'compact' : 'full'}`}>
+      {copy.title.map((line, index) => <span class:list={[index === 1 && 'is-accent']}>{line}</span>)}
+    </h2>
+    <p>{copy.intro}</p>
+  </div>
+  <div class="trust-ledger__items">
+    {copy.items.map((item) => (
+      <article class="trust-ledger__item">
+        <span>{item.index}</span>
+        <h3>{item.title}</h3>
+        <p>{item.text}</p>
+      </article>
+    ))}
+  </div>
+  <div class="trust-ledger__live" aria-label={locale === 'lv' ? 'Publiskās projektu mājaslapas' : 'Live project websites'}>
+    {projectLinks.map((project) => (
+      <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" data-analytics-event="project_outbound_click" data-project-id={project.id}>
+        <span><b aria-hidden="true"></b>{project.content[locale].title}</span>
+        <span>{copy.liveLabel}<Arrow direction="right" /></span>
+      </a>
+    ))}
+  </div>
+</section>

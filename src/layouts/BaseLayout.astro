@@ -151,9 +151,11 @@ const schema = {
     <ContactDock locale={lang} canonicalPath={canonicalPath} />
     <script>
       import { initExperienceRefinementMotion } from '../scripts/experience-refinement';
+      import { initAnalytics } from '../scripts/analytics';
       import { initPinnedScrollCues } from '../scripts/pinned-cues';
       import { initSiteUI } from '../scripts/site';
       initSiteUI();
+      initAnalytics();
       initPinnedScrollCues();
       initExperienceRefinementMotion();
     </script>

@@ -2,6 +2,7 @@
 import Arrow from './Arrow.astro';
 import ResponsiveProjectImage from './ResponsiveProjectImage.astro';
 import SiteHeader from './SiteHeader.astro';
+import TrustLedger from './TrustLedger.astro';
 import { getHomeV2Copy } from '../data/architecture';
 import { buildContactHref } from '../data/contact-router';
 import { pageRoutes } from '../data/multipage';
@@ -122,6 +123,8 @@ const capabilityLabel = locale === 'lv' ? 'Pakalpojumi / īsumā' : 'Services / 
         </div>
       </div>
     </section>
+
+    <TrustLedger locale={locale} compact />
 
     <section class="home-v2-capabilities" aria-labelledby="home-v2-capabilities-title" data-motion-reveal>
       <div class="home-v2-capabilities__topline"><span>{capabilityLabel}</span><span>XO / BUSINESS OUTCOMES</span></div>
