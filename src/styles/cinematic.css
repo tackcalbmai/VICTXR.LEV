@@ -147,33 +147,17 @@ html.is-cinematic-intro body {
   flex: 0 0 0.22em;
 }
 
-.cinematic-intro__letter-wrap {
-  position: relative;
-  display: inline-block !important;
-  width: 0.66em;
-  height: 0.95em;
-  margin-inline: -0.02em -0.015em;
-  vertical-align: -0.02em;
-  transform-origin: 50% 52%;
-}
-
-.cinematic-intro__letter-wrap > span {
-  position: absolute;
-  top: calc(0.11em + 1px);
-  left: 0;
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
-  color: var(--accent);
-  line-height: 1;
-  transform: none;
-  transform-origin: 50% 52%;
-  will-change: transform, opacity, filter;
-}
-
-.cinematic-intro__letter-wrap > span.is-o {
+.cinematic-intro__xo-pair {
+  display: inline-flex !important;
+  gap: 0.025em;
+  width: max-content !important;
   color: var(--paper);
+  transform-origin: 50% 52%;
+}
+
+.cinematic-intro__xo-pair > span:first-child,
+.cinematic-intro__slice-x {
+  color: var(--accent);
 }
 
 .cinematic-intro__dot,
@@ -233,10 +217,10 @@ html.is-cinematic-intro body {
   }
 
   .cinematic-intro[data-cinematic-phase='logo'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='x-to-o'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='o-rest'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='o-to-x'] .cinematic-intro__descriptor-wrap,
-  .cinematic-intro[data-cinematic-phase='x-rest'] .cinematic-intro__descriptor-wrap {
+  .cinematic-intro[data-cinematic-phase='xo-shift'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-rest'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-return'] .cinematic-intro__descriptor-wrap,
+  .cinematic-intro[data-cinematic-phase='xo-final'] .cinematic-intro__descriptor-wrap {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translate3d(0, 0, 0) !important;
