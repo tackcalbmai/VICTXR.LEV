@@ -380,7 +380,10 @@
     width: 100%;
     max-width: 12ch;
     margin-top: clamp(2.3rem, 7vw, 4.5rem);
-    font-size: clamp(3rem, 7.8vw, 4.4rem);
+    /* The EN second line is the widest optical case. Keep a deliberate
+     * tablet scale instead of letting its final glyph cross the viewport at
+     * the 768px boundary. Mobile and desktop retain their own larger cuts. */
+    font-size: clamp(3rem, 7.35vw, 4.15rem);
   }
 
   .home-shell .home-v2-work .home-v2-projects {
@@ -569,7 +572,7 @@
   html body .home-shell .home-v2-work .home-v2-work__title {
     max-width: 12ch;
     margin-top: clamp(2.3rem, 7vw, 4.5rem);
-    font-size: clamp(3rem, 7.8vw, 4.4rem);
+    font-size: clamp(3rem, 7.35vw, 4.15rem);
   }
 
   html[lang='lv'] body .home-shell .home-v2-work .home-v2-work__title {
