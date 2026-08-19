@@ -185,9 +185,9 @@ html.is-cinematic-intro body {
 }
 
 .cinematic-intro[data-cinematic-phase='separate'] .cinematic-intro__xo-pair::before {
-  content: 'X';
-  color: var(--accent);
-  animation: cinematic-x-return 0.58s cubic-bezier(0.16, 1, 0.3, 1) both;
+  content: '';
+  opacity: 0;
+  animation: none;
 }
 
 .cinematic-intro[data-cinematic-phase='separate'] .cinematic-intro__xo-x {
@@ -305,31 +305,6 @@ html.is-cinematic-intro body {
     opacity: 0.9;
     filter: blur(0);
     transform: none;
-  }
-}
-
-@keyframes cinematic-x-return {
-  0% {
-    opacity: 0.35;
-    filter: blur(1.5px);
-    transform: translate(-0.08em, 0.05em) rotate(-86deg) scale(0.9);
-  }
-  34% {
-    opacity: 0.24;
-    transform: translate(-0.14em, 0.03em) skewX(18deg) rotate(-262deg) scale(0.92);
-  }
-  48% {
-    opacity: 1;
-    transform: translate(0.08em, -0.04em) skewX(-13deg) rotate(-330deg) scale(0.97);
-  }
-  72% {
-    opacity: 0.72;
-    transform: rotate(-390deg) scale(0.99);
-  }
-  100% {
-    opacity: 0;
-    filter: blur(0);
-    transform: rotate(-420deg) scale(1);
   }
 }
 
