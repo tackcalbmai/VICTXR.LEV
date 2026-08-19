@@ -92,18 +92,7 @@ html.is-cinematic-intro body {
 }
 
 .cinematic-intro__light-slit {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  width: min(76vw, 62rem);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 62%) 48%, var(--accent) 50%, rgb(255 255 255 / 62%) 52%, transparent);
-  box-shadow: 0 0 1.8rem rgb(255 74 48 / 28%), 0 0 4.5rem rgb(255 255 255 / 10%);
-  opacity: 0;
-  translate: -50% -50%;
-  transform-origin: center;
-  will-change: transform, opacity;
+  display: none !important;
 }
 
 .cinematic-intro__brand-stage {
@@ -122,6 +111,7 @@ html.is-cinematic-intro body {
   width: max-content;
   max-width: calc(100vw - 2rem);
   align-items: baseline;
+  overflow: visible;
   color: var(--paper);
   text-transform: uppercase;
   font-size: clamp(4rem, 9.6vw, 10.8rem);
@@ -129,6 +119,7 @@ html.is-cinematic-intro body {
   line-height: 1;
   letter-spacing: -0.055em;
   white-space: nowrap;
+  clip-path: none !important;
 }
 
 .cinematic-intro__wordmark {
@@ -136,7 +127,7 @@ html.is-cinematic-intro body {
   opacity: 0;
   visibility: hidden;
   transform-origin: 50% 50%;
-  will-change: transform, opacity, filter, clip-path;
+  will-change: transform, opacity, filter;
 }
 
 .cinematic-intro__wordmark > span {
@@ -148,13 +139,68 @@ html.is-cinematic-intro body {
   position: relative;
   gap: 0.025em;
   width: max-content !important;
+  overflow: visible;
   color: var(--paper);
   transform-origin: 50% 52%;
+  isolation: isolate;
+}
+
+.cinematic-intro__xo-pair::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  width: 0.7em;
+  height: 1em;
+  content: '';
+  font: inherit;
+  line-height: 1;
+  text-align: center;
+  opacity: 0;
+  translate: -50% -50%;
+  transform-origin: 50% 52%;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+
+.cinematic-intro[data-cinematic-phase='ignition'] .cinematic-intro__xo-x,
+.cinematic-intro[data-cinematic-phase='ignition'] .cinematic-intro__xo-o,
+.cinematic-intro[data-cinematic-phase='monogram'] .cinematic-intro__xo-x,
+.cinematic-intro[data-cinematic-phase='monogram'] .cinematic-intro__xo-o {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.cinematic-intro[data-cinematic-phase='ignition'] .cinematic-intro__xo-pair::before {
+  content: 'X';
+  color: var(--accent);
+  animation: cinematic-x-ignite 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-intro[data-cinematic-phase='monogram'] .cinematic-intro__xo-pair::before {
+  content: 'O';
+  color: var(--paper);
+  animation: cinematic-o-lock 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-intro[data-cinematic-phase='separate'] .cinematic-intro__xo-pair::before {
+  content: 'X';
+  color: var(--accent);
+  animation: cinematic-x-return 0.58s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-intro[data-cinematic-phase='separate'] .cinematic-intro__xo-x {
+  animation: cinematic-x-resolve 0.64s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cinematic-intro[data-cinematic-phase='separate'] .cinematic-intro__xo-o {
+  animation: cinematic-o-resolve 0.64s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .cinematic-intro__web-mask {
   display: inline-block;
-  overflow: hidden;
+  overflow: visible;
   flex: 0 0 auto;
 }
 
@@ -162,7 +208,9 @@ html.is-cinematic-intro body {
   display: inline-block;
   margin-left: 0.085em;
   padding-right: 0.04em;
-  will-change: transform, opacity, filter, clip-path;
+  clip-path: none !important;
+  transform-origin: 0 52%;
+  will-change: transform, opacity, filter;
 }
 
 .cinematic-intro__xo-x,
@@ -213,6 +261,116 @@ html.is-cinematic-intro body {
   padding-right: 0.02em;
 }
 
+@keyframes cinematic-x-ignite {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: rotate(-72deg) scale(0.86);
+  }
+  38% {
+    opacity: 0.88;
+    filter: blur(0);
+    transform: translate(0.08em, -0.04em) rotate(-248deg) scale(0.92);
+  }
+  48% {
+    opacity: 0.32;
+    transform: translate(0.14em, -0.02em) skewX(-18deg) rotate(-300deg) scale(0.94);
+  }
+  58% {
+    opacity: 1;
+    transform: translate(-0.08em, 0.03em) skewX(13deg) rotate(-332deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes cinematic-o-lock {
+  0% {
+    opacity: 0.45;
+    filter: blur(2px);
+    transform: translate(0.08em, -0.05em) rotate(-24deg) scale(0.9);
+  }
+  38% {
+    opacity: 0.28;
+    transform: translate(-0.06em, 0.03em) skewX(12deg) rotate(-12deg) scale(0.94);
+  }
+  56% {
+    opacity: 1;
+    transform: translate(0.04em, -0.02em) skewX(-9deg) rotate(-6deg) scale(0.98);
+  }
+  100% {
+    opacity: 0.9;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes cinematic-x-return {
+  0% {
+    opacity: 0.35;
+    filter: blur(1.5px);
+    transform: translate(-0.08em, 0.05em) rotate(-86deg) scale(0.9);
+  }
+  34% {
+    opacity: 0.24;
+    transform: translate(-0.14em, 0.03em) skewX(18deg) rotate(-262deg) scale(0.92);
+  }
+  48% {
+    opacity: 1;
+    transform: translate(0.08em, -0.04em) skewX(-13deg) rotate(-330deg) scale(0.97);
+  }
+  72% {
+    opacity: 0.72;
+    transform: rotate(-390deg) scale(0.99);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(0);
+    transform: rotate(-420deg) scale(1);
+  }
+}
+
+@keyframes cinematic-x-resolve {
+  0% {
+    opacity: 0;
+    transform: translateX(0.24em) rotate(-24deg) scale(0.9);
+  }
+  34% {
+    opacity: 0.38;
+    transform: translateX(0.14em) skewX(-16deg) rotate(-12deg) scale(0.94);
+  }
+  48% {
+    opacity: 1;
+    transform: translateX(-0.06em) skewX(10deg) rotate(-5deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cinematic-o-resolve {
+  0% {
+    opacity: 0;
+    transform: translateX(-0.28em) rotate(22deg) scale(0.88);
+  }
+  38% {
+    opacity: 0.32;
+    transform: translateX(-0.12em) skewX(12deg) rotate(10deg) scale(0.93);
+  }
+  54% {
+    opacity: 0.92;
+    transform: translateX(0.05em) skewX(-8deg) rotate(4deg) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (max-width: 760px) {
   .cinematic-intro__wordmark {
     max-width: calc(100vw - 1.5rem);
@@ -233,10 +391,6 @@ html.is-cinematic-intro body {
   .cinematic-intro__iris {
     width: min(128vw, 42rem);
     filter: blur(10px);
-  }
-
-  .cinematic-intro__light-slit {
-    width: calc(100vw - 2rem);
   }
 }
 
