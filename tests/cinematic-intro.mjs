@@ -73,9 +73,20 @@ async function assertCinematicIntro(name, viewport) {
   if (sliceOpacities.filter((opacity) => opacity > 0.15).length < 2) throw new Error(`${name} opening assembly is not visibly building the wordmark`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-assemble.png`, fullPage: false });
 
-  await waitPhase(page, 'logo');
-  stamp('logo');
+  await waitPhase(page, 'monogram');
+  stamp('monogram');
   await page.waitForTimeout(230);
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-monogram.png`, fullPage: false });
+
+  await waitPhase(page, 'separate');
+  stamp('separate');
+
+  await waitPhase(page, 'word-reveal');
+  stamp('word-reveal');
+
+  await waitPhase(page, 'lockup');
+  stamp('lockup');
+  await page.waitForTimeout(120);
   const descriptor = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
   if (descriptor !== 'BY VICTXR.LEV') throw new Error(`${name} author descriptor is malformed: ${descriptor}`);
   if (descriptor.includes('WEB DESIGN')) throw new Error(`${name} obsolete WEB DESIGN descriptor is still rendered`);
@@ -84,6 +95,14 @@ async function assertCinematicIntro(name, viewport) {
   const wordmarkBox = await page.locator('[data-cinematic-wordmark]').boundingBox();
   const descriptorBox = await page.locator('[data-cinematic-descriptor-wrap]').boundingBox();
   if (!wordmarkBox || !descriptorBox) throw new Error(`${name} logo/descriptor geometry is missing`);
+  if (wordmarkBox.x < 14 || wordmarkBox.x + wordmarkBox.width > viewport.width - 14) {
+    throw new Error(`${name} XO WEB escapes the safe viewport (${wordmarkBox.x.toFixed(1)}..${(wordmarkBox.x + wordmarkBox.width).toFixed(1)} of ${viewport.width}px)`);
+  }
+  const xoBox = await page.locator('[data-cinematic-xo-pair]').boundingBox();
+  const webBox = await page.locator('[data-cinematic-web]').boundingBox();
+  if (!xoBox || !webBox) throw new Error(`${name} XO/WEB geometry is missing`);
+  const brandGap = webBox.x - (xoBox.x + xoBox.width);
+  if (brandGap < 0 || brandGap > wordmarkBox.height * 0.16) throw new Error(`${name} XO and WEB do not read as one lockup (${brandGap.toFixed(1)}px gap)`);
   const widthRatio = descriptorBox.width / wordmarkBox.width;
   if (widthRatio < 0.94 || widthRatio > 1.03) throw new Error(`${name} XO WEB descriptor does not span the wordmark slot (${widthRatio.toFixed(2)}×)`);
   const verticalGap = descriptorBox.y - (wordmarkBox.y + wordmarkBox.height);
@@ -94,29 +113,12 @@ async function assertCinematicIntro(name, viewport) {
 
   const initialLogo = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (initialLogo !== 'XOWEB') throw new Error(`${name} initial XO WEB logo is malformed: ${initialLogo}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-logo.png`, fullPage: false });
+  await page.screenshot({ path: `${outDir}/${name}-cinematic-lockup.png`, fullPage: false });
 
-  await waitPhase(page, 'xo-approach');
-  stamp('xo-approach');
-
-  await waitPhase(page, 'xo-overlap');
-  stamp('xo-overlap');
-  await page.waitForTimeout(100);
-  const firstXoText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
-  if (firstXoText !== 'XOWEB') throw new Error(`${name} XO motion changed the wordmark content: ${firstXoText}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-xo-overlap.png`, fullPage: false });
-
-  await waitPhase(page, 'xo-expand');
-  stamp('xo-expand');
-
-  await waitPhase(page, 'xo-final');
-  stamp('xo-final');
-  await page.waitForTimeout(100);
   const xText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
   if (xText !== 'XOWEB') throw new Error(`${name} XO motion did not resolve on XO WEB: ${xText}`);
   const descriptorAfterCycle = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
   if (descriptorAfterCycle !== 'BY VICTXR.LEV') throw new Error(`${name} intro author descriptor changed during XO motion: ${descriptorAfterCycle}`);
-  await page.screenshot({ path: `${outDir}/${name}-cinematic-xo-final.png`, fullPage: false });
 
   const headerBrandBox = await page.locator('.site-brand').boundingBox();
   if (!headerBrandBox) throw new Error(`${name} header brand has no geometry`);
@@ -153,12 +155,11 @@ async function assertCinematicIntro(name, viewport) {
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed-slot.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    ['assemble', 'logo', 380],
-    ['logo', 'xo-approach', 360],
-    ['xo-approach', 'xo-overlap', 360],
-    ['xo-overlap', 'xo-expand', 180],
-    ['xo-expand', 'xo-final', 500],
-    ['xo-final', 'handoff', 150],
+    ['assemble', 'monogram', 560],
+    ['monogram', 'separate', 380],
+    ['separate', 'word-reveal', 650],
+    ['word-reveal', 'lockup', 760],
+    ['lockup', 'handoff', 250],
   ];
   for (const [from, to, minimum] of minimumBeatSpacing) {
     const spacing = phases[to] - phases[from];

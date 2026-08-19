@@ -60,7 +60,6 @@ export function initHomeMotion() {
   let brandCycle: gsap.core.Timeline | undefined;
   let journeyTween: gsap.core.Tween | undefined;
   const pointerCleanups: Array<() => void> = [];
-  const cinematicIntentCleanups: Array<() => void> = [];
 
   const scheduleBrandCycle = (delay = 7.8) => {
     brandIdle?.kill();
@@ -199,7 +198,6 @@ export function initHomeMotion() {
   }
 
   const releaseCinematic = () => {
-    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     document.documentElement.classList.remove('is-cinematic-intro');
     cinematicNode?.remove();
     cinematicNode = undefined;
@@ -224,14 +222,15 @@ export function initHomeMotion() {
     cinematicNode.setAttribute('aria-hidden', 'true');
     cinematicNode.innerHTML = `
       <div class="cinematic-intro__backdrop" data-cinematic-backdrop></div>
+      <div class="cinematic-intro__light-slit" data-cinematic-light-slit></div>
       <div class="cinematic-intro__brand-stage" data-cinematic-stage>
         <div class="cinematic-intro__assembly" data-cinematic-assembly aria-hidden="true">
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
-          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span class="cinematic-intro__slice-x">X</span><span>O</span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--top" data-cinematic-slice="top"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--middle" data-cinematic-slice="middle"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
+          <div class="cinematic-intro__slice-wordmark cinematic-intro__slice-wordmark--bottom" data-cinematic-slice="bottom"><span class="cinematic-intro__slice-x">X</span><span>O</span></div>
         </div>
         <div class="cinematic-intro__wordmark" data-cinematic-wordmark>
-          <span class="cinematic-intro__xo-pair" data-cinematic-xo-pair><span class="cinematic-intro__xo-x" data-cinematic-xo-x>X</span><span class="cinematic-intro__xo-o" data-cinematic-xo-o>O</span></span><span class="cinematic-intro__wordmark-space"></span><span>WEB</span>
+          <span class="cinematic-intro__xo-pair" data-cinematic-xo-pair><span class="cinematic-intro__xo-x" data-cinematic-xo-x>X</span><span class="cinematic-intro__xo-o" data-cinematic-xo-o>O</span></span><span class="cinematic-intro__web-mask" data-cinematic-web-mask><span class="cinematic-intro__web" data-cinematic-web>WEB</span></span>
         </div>
         <div class="cinematic-intro__descriptor-wrap" data-cinematic-descriptor-wrap>
           <p class="cinematic-intro__descriptor" data-cinematic-descriptor>
@@ -245,15 +244,18 @@ export function initHomeMotion() {
     resetToTop();
 
     const backdrop = cinematicNode.querySelector<HTMLElement>('[data-cinematic-backdrop]');
+    const lightSlit = cinematicNode.querySelector<HTMLElement>('[data-cinematic-light-slit]');
     const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
     const introXoPair = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-pair]');
     const introXoX = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-x]');
     const introXoO = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-o]');
+    const introWeb = cinematicNode.querySelector<HTMLElement>('[data-cinematic-web]');
+    const introWebMask = cinematicNode.querySelector<HTMLElement>('[data-cinematic-web-mask]');
     const descriptorWrap = cinematicNode.querySelector<HTMLElement>('[data-cinematic-descriptor-wrap]');
     const slices = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-slice]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!backdrop || !wordmark || !introXoPair || !introXoX || !introXoO || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
+    if (!backdrop || !lightSlit || !wordmark || !introXoPair || !introXoX || !introXoO || !introWeb || !introWebMask || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
       markIntroReady();
       releaseCinematic();
@@ -276,11 +278,26 @@ export function initHomeMotion() {
       clipPath: 'inset(0 0 0 0)',
       transformOrigin: '50% 50%',
     });
+    const fitWordmark = () => {
+      wordmark.style.fontSize = '';
+      const available = Math.max(240, window.innerWidth - (compact ? 32 : 64));
+      const naturalWidth = wordmark.getBoundingClientRect().width;
+      if (naturalWidth > available) {
+        const naturalSize = Number.parseFloat(getComputedStyle(wordmark).fontSize);
+        wordmark.style.fontSize = `${naturalSize * available / naturalWidth}px`;
+      }
+    };
+    fitWordmark();
+    const centeredMonogramOffset = (introWebMask.getBoundingClientRect().width + Number.parseFloat(getComputedStyle(wordmark).columnGap || '0')) / 2;
+    gsap.set(wordmark, { x: centeredMonogramOffset });
+    gsap.set(lightSlit, { autoAlpha: 0, scaleX: 0.02, scaleY: 0.18 });
     gsap.set(topSlice, { autoAlpha: 0, x: compact ? -15 : -34, y: compact ? -1 : -2, filter: 'blur(2px)' });
     gsap.set(middleSlice, { autoAlpha: 0, x: compact ? 7 : 14, y: 0, filter: 'blur(1px)' });
     gsap.set(bottomSlice, { autoAlpha: 0, x: compact ? 17 : 38, y: compact ? 1 : 2, filter: 'blur(2px)' });
-    gsap.set(descriptorWrap, { autoAlpha: 0, y: 6, filter: 'blur(1.5px)' });
-    gsap.set([introXoPair, introXoX, introXoO], { clearProps: 'transform,opacity,visibility' });
+    gsap.set(descriptorWrap, { autoAlpha: 0, y: 8, filter: 'blur(2px)' });
+    gsap.set(introWeb, { autoAlpha: 0, xPercent: -34, clipPath: 'inset(0 100% 0 0)', filter: 'blur(5px)' });
+    gsap.set(introXoX, { xPercent: 38, scale: 0.92, autoAlpha: 0.9 });
+    gsap.set(introXoO, { xPercent: -38, scale: 0.82, autoAlpha: 0.28 });
 
     const syncDescriptorGeometry = () => {
       const rect = wordmark.getBoundingClientRect();
@@ -290,27 +307,7 @@ export function initHomeMotion() {
       descriptorWrap.style.top = `${rect.bottom + gap}px`;
     };
 
-    const xoOverlap = () => Math.max(5, Math.min(compact ? 8 : 14, introXoPair.getBoundingClientRect().height * 0.18));
-    const xoGlitch = (timeline: gsap.core.Timeline, position: number | string) => {
-      timeline
-        .to(introXoX, { keyframes: [
-          { xPercent: 0, skewX: 0, duration: 0.01 },
-          { xPercent: 7, skewX: -8, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: -5, skewX: 6, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: 0, skewX: 0, duration: 0.06 },
-        ] }, position)
-        .to(introXoO, { keyframes: [
-          { xPercent: 0, skewX: 0, duration: 0.01 },
-          { xPercent: -7, skewX: 8, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: 5, skewX: -6, duration: 0.035, ease: 'steps(1)' },
-          { xPercent: 0, skewX: 0, duration: 0.06 },
-        ] }, position);
-    };
     let handoff = { x: 0, y: 0, scaleX: 1, scaleY: 1 };
-
-    const settleIntroPair = () => {
-      gsap.set([introXoPair, introXoX, introXoO], { clearProps: 'transform,opacity,visibility' });
-    };
 
     const measureHandoff = () => {
       gsap.set(wordmark, { transformOrigin: '0 0' });
@@ -331,36 +328,26 @@ export function initHomeMotion() {
 
     introTimeline
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.06)
-      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.55, ease: 'power4.out' }, 0.08)
-      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power4.out' }, 0.12)
-      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.58, ease: 'power4.out' }, 0.07)
-      .set(wordmark, { autoAlpha: 1 }, 0.56)
-      .to(slices, { autoAlpha: 0, duration: 0.15, ease: 'power1.out' }, 0.56)
-      .call(syncDescriptorGeometry, [], 0.64)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'logo'; }, [], 0.68)
-      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.33, ease: 'power2.out' }, 0.72);
-    xoGlitch(introTimeline, 0.57);
-
-    introTimeline
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-approach'; }, [], 1.12)
-      .to(introXoX, { x: () => xoOverlap(), y: -0.5, scale: 0.96, duration: 0.28, ease: 'power2.inOut' }, 1.14)
-      .to(introXoO, { x: () => -xoOverlap(), y: 0.5, scale: 1.04, duration: 0.28, ease: 'power2.inOut' }, 1.14);
-    xoGlitch(introTimeline, 1.37);
-    introTimeline
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-overlap'; }, [], 1.58)
-      .to(introXoX, { x: () => xoOverlap() * 0.72, scale: 0.9, autoAlpha: 0.5, duration: 0.1, ease: 'power3.in' }, 1.58)
-      .to(introXoO, { x: () => -xoOverlap() * 0.72, scale: 1.08, autoAlpha: 1, duration: 0.1, ease: 'power3.in' }, 1.58)
-      .to([introXoX, introXoO], { x: 0, y: 0, xPercent: 0, skewX: 0, scale: 1, autoAlpha: 1, duration: 0.3, ease: 'back.out(1.8)' }, 1.72)
-      .call(settleIntroPair, [], 2.08)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-rest'; }, [], 2.1)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-expand'; }, [], 2.34)
-      .to(introXoX, { x: () => xoOverlap() * 0.78, y: 0.5, scale: 1.03, duration: 0.24, ease: 'power2.inOut' }, 2.34)
-      .to(introXoO, { x: () => -xoOverlap() * 0.78, y: -0.5, scale: 0.96, duration: 0.24, ease: 'power2.inOut' }, 2.34);
-    xoGlitch(introTimeline, 2.57);
-    introTimeline
-      .to([introXoX, introXoO], { x: 0, y: 0, xPercent: 0, skewX: 0, scale: 1, autoAlpha: 1, duration: 0.28, ease: 'back.out(1.8)' }, 2.76)
-      .call(settleIntroPair, [], 3.08)
-      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'xo-final'; }, [], 3.1)
+      .to(lightSlit, { autoAlpha: 0.8, scaleX: 1, scaleY: 1, duration: 0.72, ease: 'power4.out' }, 0.02)
+      .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.62, ease: 'power4.out' }, 0.12)
+      .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.56, ease: 'power4.out' }, 0.18)
+      .to(bottomSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.66, ease: 'power4.out' }, 0.1)
+      .set(wordmark, { autoAlpha: 1 }, 0.68)
+      .to(slices, { autoAlpha: 0, duration: 0.2, ease: 'power1.out' }, 0.68)
+      .to(lightSlit, { autoAlpha: 0.18, scaleX: 0.12, duration: 0.55, ease: 'power3.inOut' }, 0.72)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'monogram'; }, [], 0.76)
+      .to(introXoO, { autoAlpha: 0.72, scale: 0.9, duration: 0.48, ease: 'power2.out' }, 0.78)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'separate'; }, [], 1.28)
+      .to(introXoX, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.72, ease: 'power4.inOut' }, 1.3)
+      .to(introXoO, { xPercent: 0, y: 0, scale: 1, autoAlpha: 1, duration: 0.72, ease: 'power4.inOut' }, 1.3)
+      .to(lightSlit, { autoAlpha: 0.48, scaleX: 0.48, duration: 0.35, yoyo: true, repeat: 1, ease: 'power2.inOut' }, 1.52)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'word-reveal'; }, [], 2.12)
+      .to(wordmark, { x: 0, duration: 0.82, ease: 'power4.inOut' }, 2.14)
+      .to(introWeb, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', filter: 'blur(0px)', duration: 0.82, ease: 'power4.out' }, 2.14)
+      .call(syncDescriptorGeometry, [], 2.72)
+      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' }, 2.78)
+      .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'lockup'; }, [], 3.08)
+      .to(wordmark, { scale: 1.018, duration: 0.18, yoyo: true, repeat: 1, ease: 'power2.inOut' }, 3.1)
       .call(syncDescriptorGeometry, [], 3.43)
       .call(measureHandoff, [], 3.48)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'handoff'; }, [], 3.5)
@@ -387,28 +374,6 @@ export function initHomeMotion() {
       }, [], 4.42)
       .to(headerSecondary, { autoAlpha: 1, duration: 0.34, stagger: 0.04, ease: 'power2.out' }, 4.44)
       .to(cinematicNode, { autoAlpha: 0, duration: 0.24, ease: 'power1.out' }, 4.8);
-
-    // The intro is a brand beat, never a gate. A clear navigation intent
-    // returns control immediately and preserves the once-per-session rule.
-    const skipCinematic = () => {
-      if (!introTimeline || !cinematicNode) return;
-      introTimeline.kill();
-      markIntroSeen();
-      markIntroReady();
-      shell.setAttribute('data-home-intro', 'ready');
-      releaseCinematic();
-    };
-    const skipCinematicOnKey = (event: KeyboardEvent) => {
-      if (['ArrowDown', 'PageDown', ' ', 'Escape'].includes(event.key)) skipCinematic();
-    };
-    window.addEventListener('wheel', skipCinematic, { passive: true });
-    window.addEventListener('touchmove', skipCinematic, { passive: true });
-    window.addEventListener('keydown', skipCinematicOnKey);
-    cinematicIntentCleanups.push(
-      () => window.removeEventListener('wheel', skipCinematic),
-      () => window.removeEventListener('touchmove', skipCinematic),
-      () => window.removeEventListener('keydown', skipCinematicOnKey),
-    );
   };
 
   startCinematic();
@@ -553,25 +518,22 @@ export function initHomeMotion() {
       });
     });
 
-    const antiSales = document.querySelector<HTMLElement>('[data-anti-sales]');
-    if (antiSales) {
-      const anti = gsap.timeline({
-        scrollTrigger: {
-          trigger: antiSales,
-          start: 'top top',
-          end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
-          scrub: 0.8,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
-      anti
-        .to({}, { duration: 0.25 })
-        .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
-        .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
-        .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
-        .to({}, { duration: 0.25 });
-    }
+    const anti = gsap.timeline({
+      scrollTrigger: {
+        trigger: '[data-anti-sales]',
+        start: 'top top',
+        end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
+        scrub: 0.8,
+        pin: true,
+        anticipatePin: 1,
+      },
+    });
+    anti
+      .to({}, { duration: 0.25 })
+      .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
+      .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
+      .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
+      .to({}, { duration: 0.25 });
 
     if (window.matchMedia('(pointer: fine)').matches) {
       document.querySelectorAll<HTMLElement>('[data-perspective-card]').forEach((card) => {
@@ -605,7 +567,6 @@ export function initHomeMotion() {
 
   return () => {
     introTimeline?.kill();
-    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     cinematicNode?.remove();
     document.documentElement.classList.remove('is-cinematic-intro');
     brandIdle?.kill();
