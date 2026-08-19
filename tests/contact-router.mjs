@@ -31,7 +31,7 @@ for (const scenario of [
   {
     path: '/contact/?from=services&intent=fix#talk',
     locale: 'en',
-    starter: 'Hi! I’d like to improve an existing website.',
+    starter: 'Hi! Something is not working on my current website.',
     business: 'North Star Studio',
     website: 'https://example.com',
     problem: 'People do not understand the offer quickly enough.',
@@ -41,7 +41,7 @@ for (const scenario of [
   {
     path: '/lv/kontakti/?from=pakalpojumi&intent=fix#talk',
     locale: 'lv',
-    starter: 'Sveiki! Vēlos uzlabot esošu mājaslapu.',
+    starter: 'Sveiki! Manā esošajā mājaslapā kaut kas nestrādā.',
     business: 'Ziemeļu Studija',
     website: 'https://example.lv',
     problem: 'Apmeklētāji pārāk lēni saprot piedāvājumu.',

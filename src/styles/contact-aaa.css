@@ -1,0 +1,31 @@
+/* Contact Router: four low-pressure starting points remain visible together
+ * on desktop, then return to the existing single-column mobile direction. */
+@media (min-width: 1051px) {
+  .contact-page .contact-intents__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .contact-page .contact-intent {
+    min-height: clamp(14.5rem, 18vw, 18.5rem);
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+    grid-template-rows: auto minmax(4.8rem, 1fr) auto;
+  }
+
+  .contact-page .contact-intent__title {
+    max-width: 13ch;
+    font-size: clamp(1.65rem, 2.15vw, 2.45rem);
+    line-height: 0.9;
+    text-wrap: balance;
+  }
+
+  .contact-page .contact-intent__text {
+    font-size: clamp(0.76rem, 0.78vw, 0.86rem);
+  }
+}
+
+:lang(lv) .contact-intent__title {
+  letter-spacing: -0.035em;
+  overflow-wrap: normal;
+  hyphens: none;
+}

@@ -23,7 +23,7 @@ const copy = isLv
 ---
 
 <main class="not-found" id="main-content" tabindex="-1">
-  <a class="not-found__brand" href={home} data-home-link>VICTXR.LEV</a>
+  <a class="not-found__brand" href={home} data-home-link><strong>XO WEB</strong><small>BY VICTXR.LEV</small></a>
   <p>{copy.lead}</p>
   <h1><span>{copy.reply}</span><strong>404</strong></h1>
   <a class="not-found__back" href={home} data-home-link><span data-not-found-back>{copy.back}</span> <Arrow direction="right" /></a>
@@ -39,9 +39,21 @@ const copy = isLv
   }
 
   .not-found__brand {
+    display: inline-grid;
+    width: max-content;
+    gap: 0.25rem;
     font-size: 1.1rem;
     font-weight: 800;
     letter-spacing: -0.05em;
+  }
+
+  .not-found__brand strong { font: inherit; }
+
+  .not-found__brand small {
+    font-size: 0.42rem;
+    font-weight: 680;
+    letter-spacing: 0.14em;
+    opacity: 0.62;
   }
 
   .not-found > p {

@@ -55,18 +55,24 @@ for (const [viewportName, viewport] of viewports) {
 
     if (path === '/') {
       await scrollTop(page, '.home-v2-work');
-      const work = await page.evaluate(() => {
-        const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
-        const title = document.querySelector('.home-v2-work__title')?.getBoundingClientRect();
-        const catrin = document.querySelector('.home-v2-project--catrin')?.getBoundingClientRect();
-        const anelika = document.querySelector('.home-v2-project--anelika')?.getBoundingClientRect();
-        return title && catrin && anelika ? { title: toRect(title), catrin: toRect(catrin), anelika: toRect(anelika) } : null;
-      });
-      if (!work) throw new Error(`${viewportName}: missing Home Work geometry`);
-      if (viewport.width > 760) {
-        const titleBottom = work.title.bottom;
-        const mediaTop = Math.min(work.catrin.top, work.anelika.top);
-        if (mediaTop - titleBottom < 8) throw new Error(`${viewportName}: Work media crowds title (${mediaTop - titleBottom}px)`);
+      if (viewport.width > 900) {
+        const range = await page.locator('.home-v2-work').evaluate((element) => ({
+          top: element.getBoundingClientRect().top + scrollY,
+          travel: Math.max(element.getBoundingClientRect().height - innerHeight, 1),
+          ready: element.getAttribute('data-takeover-ready'),
+        }));
+        if (range.ready !== 'true') throw new Error(`${viewportName}: cinematic takeover did not initialize`);
+        for (const [progress, expected] of [[0.22, 'catrin'], [0.72, 'anelika']]) {
+          await page.evaluate(({ top, travel, progress }) => scrollTo({ top: top + travel * progress, behavior: 'instant' }), { ...range, progress });
+          await page.waitForTimeout(180);
+          const active = await page.locator('.home-v2-work').getAttribute('data-active-project');
+          if (active !== expected) throw new Error(`${viewportName}: ${expected} never became the active takeover scene`);
+          const opacity = Number(await page.locator(`.home-v2-project--${expected}`).evaluate((element) => getComputedStyle(element).opacity));
+          if (opacity < 0.7) throw new Error(`${viewportName}: ${expected} takeover is not readable (${opacity})`);
+        }
+      } else {
+        const cards = await page.locator('.home-v2-project').evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().top));
+        if (cards.length !== 2 || cards[1] <= cards[0]) throw new Error(`${viewportName}: mobile/tablet project scenes are not in natural scroll order`);
       }
       await page.screenshot({ path: `${outDir}/density-${viewportName}-home-work.png`, fullPage: false });
 
@@ -89,7 +95,7 @@ for (const [viewportName, viewport] of viewports) {
         const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
         return nodes.map((node) => toRect(node.getBoundingClientRect()));
       });
-      if (intents.length !== 3) throw new Error(`${viewportName}: expected three contact intents`);
+      if (intents.length !== 4) throw new Error(`${viewportName}: expected four contact intents`);
       if (viewport.width > 1050) {
         if (Math.max(...intents.map((item) => item.top)) - Math.min(...intents.map((item) => item.top)) > 2) throw new Error(`${viewportName}: contact intents are not visible together`);
         if (intents.some((item) => item.height > viewport.height * 0.4)) throw new Error(`${viewportName}: contact intent card is too tall`);

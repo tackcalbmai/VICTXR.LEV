@@ -1,6 +1,7 @@
 import { readFile, readdir } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 
 const root = new URL('../', import.meta.url);
 const dist = new URL('../dist/', import.meta.url);
@@ -43,6 +44,13 @@ const pages = {
   notFoundLv: await readFile(new URL('lv/404.html', dist), 'utf8'),
 };
 
+for (const preview of ['public/xo-web-preview.png', 'public/social-preview.png', 'public/og/catrin.png', 'public/og/anelika.png']) {
+  const imagePath = fileURLToPath(new URL(`../${preview}`, import.meta.url));
+  const metadata = await sharp(imagePath).metadata();
+  assert(metadata.width === 1200 && metadata.height === 630, `${preview} is not a 1200×630 social preview`);
+  await sharp(imagePath).raw().toBuffer();
+}
+
 const routablePages = {
   '/': pages.homeEn,
   '/lv/': pages.homeLv,
@@ -67,6 +75,7 @@ for (const [name, html] of Object.entries(pages)) {
   assert(html.includes('<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'), `${name} is missing safe-area viewport support`);
   assert(html.includes('rel="canonical"'), `${name} is missing a canonical URL`);
   assert(html.includes('property="og:image"'), `${name} is missing an Open Graph image`);
+  assert(html.includes('property="og:image:type" content="image/png"'), `${name} is missing the Open Graph image type`);
   assert(html.includes('name="twitter:card"'), `${name} is missing Twitter card metadata`);
   assert((html.match(/hreflang=/g) ?? []).length >= 3, `${name} is missing hreflang coverage`);
   for (const image of html.matchAll(/<img\b[^>]*>/g)) {
@@ -145,6 +154,7 @@ assert(heroWorkAction.includes('<Arrow direction="right" />'), 'Homepage Work CT
 assert(heroContactAction.includes('<Arrow direction="right" />'), 'Homepage Contact CTA does not point forward to the Contact page');
 assert(homeSource.includes("buildContactHref(locale, 'home'"), 'Homepage Contact actions do not preserve Home as their source context');
 assert(homeSource.includes('class="home-v2-work"') && homeSource.includes('class="home-v2-perspective"') && homeSource.includes('class="home-v2-close"'), 'Homepage trailer architecture is incomplete');
+assert(homeSource.includes('home-v2-project__logic') && homeSource.includes('workScenes.catrin') && homeSource.includes('workScenes.anelika'), 'Selected Work lost its project-specific X/O decision language');
 assert(!homeSource.includes('class="about section-pad"') && !homeSource.includes('class="services section-pad"') && !homeSource.includes('class="anti-sales"'), 'Homepage still contains full duplicated landing sections');
 
 const caseSource = await read('src/components/CaseStudy.astro');
@@ -153,6 +163,15 @@ assert(caseLiveAction.includes('<Arrow direction="right" />'), 'Case-study outbo
 assert(!caseLiveAction.includes('<Arrow direction="up" />'), 'Case-study outbound link still uses an upward/diagonal arrow');
 assert(caseSource.includes('<PageContactCTA'), 'Case studies do not end with the compact dedicated-Contact transition');
 assert(caseSource.includes('source={`case-${projectId}`}'), 'Case-study Contact exits do not preserve the project source context');
+for (const [name, html, stages] of [
+  ['CATRIN EN', pages.catrinEn, ['Problem', 'Observation', 'Decision', 'Design', 'Development', 'Result']],
+  ['CATRIN LV', pages.catrinLv, ['Problēma', 'Novērojums', 'Lēmums', 'Dizains', 'Izstrāde', 'Rezultāts']],
+  ['ANELIKA EN', pages.anelikaEn, ['Problem', 'Observation', 'Decision', 'Design', 'Development', 'Result']],
+  ['ANELIKA LV', pages.anelikaLv, ['Problēma', 'Novērojums', 'Lēmums', 'Dizains', 'Izstrāde', 'Rezultāts']],
+]) {
+  assert((html.match(/class="case-narrative__row/g) ?? []).length === 6, `${name} does not expose the six-stage decision narrative`);
+  stages.forEach((stage) => assert(html.includes(`>${stage}</span>`), `${name} is missing ${stage}`));
+}
 
 const pageContactCtaSource = await read('src/components/PageContactCTA.astro');
 assert(pageContactCtaSource.includes('buildContactHref(locale'), 'Compact contact CTA does not use the localized context-aware Contact route builder');
@@ -164,6 +183,23 @@ const contactPageSource = await read('src/components/ContactPage.astro');
 assert(contactPageSource.includes('data-contact-intent') && contactPageSource.includes('data-contact-email'), 'Dedicated Contact page lost its starting-point interaction');
 assert(contactPageSource.includes('data-contact-brief') && contactPageSource.includes('data-router-whatsapp') && contactPageSource.includes('data-router-email'), 'Dedicated Contact page lost the short-brief channel router');
 assert(contactPageSource.includes('getContactPageCopy(locale)') && contactPageSource.includes('getContactRouterCopy(locale)'), 'Dedicated Contact page is not localized through shared copy');
+assert((pages.contactEn.match(/data-contact-intent=/g) ?? []).length === 4, 'English Contact router does not expose four low-pressure starting points');
+assert((pages.contactLv.match(/data-contact-intent=/g) ?? []).length === 4, 'Latvian Contact router does not expose four low-pressure starting points');
+
+const analyticsSource = await read('src/scripts/analytics.ts');
+for (const event of ['project_open', 'case_study_view', 'service_interaction', 'contact_page_view', 'whatsapp_click', 'email_click', 'brief_builder_start', 'brief_builder_complete', 'language_switch']) {
+  assert(analyticsSource.includes(event) || rendered.includes(`data-analytics-event="${event}"`), `Analytics coverage is missing ${event}`);
+}
+assert(analyticsSource.includes('window.zaraz.track') && analyticsSource.includes("window.dispatchEvent(new CustomEvent('xo:analytics'"), 'Analytics has no production provider bridge or observable QA event');
+assert(!analyticsSource.includes('values.problem') && !analyticsSource.includes('values.change'), 'Analytics must not transmit brief text');
+
+const homeMotionSource = await read('src/scripts/home.ts');
+assert(homeMotionSource.includes('DIFFERENT PERSPECTIVE') && !homeMotionSource.includes('<span>VICT</span>'), 'Cinematic intro still puts the author above the XO WEB brand');
+assert(homeMotionSource.includes('skipCinematic') && homeMotionSource.includes("trigger: antiSales"), 'Cinematic control handoff or stale GSAP-target guard is missing');
+
+const astroConfig = await read('astro.config.mjs');
+assert(astroConfig.includes("inlineStylesheets: 'auto'"), 'Shared CSS is still duplicated into every static document');
+assert(/rel="stylesheet" href="\/_astro\//.test(pages.homeEn), 'The cacheable production stylesheet is missing from Home');
 
 const dockSource = await read('src/components/ContactDock.astro');
 const layoutSource = await read('src/layouts/BaseLayout.astro');
@@ -187,6 +223,7 @@ for (const header of ['Content-Security-Policy:', 'Permissions-Policy:', 'Referr
   assert(headers.includes(header), `Production headers are missing ${header}`);
 }
 assert(headers.includes('/_astro/*') && headers.includes('immutable'), 'Hashed assets are missing immutable caching');
+assert(headers.includes('/xo-web-preview.png') && headers.includes('/og/*'), 'Social previews are missing explicit cache policy');
 
 const robots = await read('public/robots.txt');
 const sitemap = await readFile(new URL('sitemap-index.xml', dist), 'utf8');

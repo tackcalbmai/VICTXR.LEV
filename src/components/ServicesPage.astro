@@ -28,12 +28,12 @@ const contactHref = buildContactHref(locale, 'services', 'unsure', 'start');
       <div class="mp-hero__meta"><span>{page.eyebrow}</span><span>XO / PROBLEM FIRST</span></div>
       <h1 id="services-page-title" data-motion-shift>{page.title.map((line, index) => <span class:list={[index === 1 && 'is-shifted', index === 2 && 'is-accent']}>{line}</span>)}</h1>
       <p class="mp-services__intro">{page.intro}</p>
-      <a class="mp-services__jump" href="#service-list">{locale === 'lv' ? 'Skatīt variantus' : 'See the options'}<Arrow direction="down" /></a>
+      <a class="mp-services__jump" href="#service-list" data-analytics-event="services_explore_click">{locale === 'lv' ? 'Skatīt variantus' : 'See the options'}<Arrow direction="down" /></a>
     </section>
 
     <section class="services-decision" id="service-list" aria-label={page.eyebrow}>
       {page.services.map((service) => (
-        <article class="service-decision" data-motion-reveal>
+        <article class="service-decision" data-motion-reveal data-service-id={service.index}>
           <div class="service-decision__head">
             <span>{service.index}</span>
             <h2>{service.title}</h2>

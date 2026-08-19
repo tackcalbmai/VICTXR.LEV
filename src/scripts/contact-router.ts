@@ -1,4 +1,4 @@
-type IntentId = 'zero' | 'fix' | 'unsure';
+type IntentId = 'zero' | 'fix' | 'redesign' | 'unsure';
 
 type RouterConfig = {
   starters: Record<IntentId, string>;
@@ -9,6 +9,7 @@ type RouterConfig = {
     change: string;
     zeroFallback: string[];
     fixFallback: string[];
+    redesignFallback: string[];
     unsureFallback: string[];
   };
   copied: string;
@@ -82,7 +83,9 @@ export function initContactRouter() {
           ? config.prompts.zeroFallback
           : activeIntent === 'fix'
             ? config.prompts.fixFallback
-            : config.prompts.unsureFallback;
+            : activeIntent === 'redesign'
+              ? config.prompts.redesignFallback
+              : config.prompts.unsureFallback;
         lines.push(...fallback);
       }
 

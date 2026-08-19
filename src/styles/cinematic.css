@@ -91,10 +91,11 @@ html.is-cinematic-intro body {
   align-items: baseline;
   color: var(--paper);
   text-transform: uppercase;
-  font-size: clamp(4rem, 9.6vw, 10.8rem);
-  font-weight: 830;
+  gap: 0.3em;
+  font-size: clamp(5.2rem, 15.5vw, 17rem);
+  font-weight: 840;
   line-height: 1;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.065em;
   translate: -50% -50%;
   white-space: nowrap;
 }
@@ -109,6 +110,18 @@ html.is-cinematic-intro body {
 .cinematic-intro__wordmark > span,
 .cinematic-intro__slice-wordmark > span {
   display: inline-block;
+}
+
+.cinematic-intro__xo,
+.cinematic-intro__slice-xo {
+  display: inline-flex !important;
+  align-items: baseline;
+  gap: 0.025em;
+}
+
+.cinematic-intro__web,
+.cinematic-intro__slice-web {
+  letter-spacing: -0.045em;
 }
 
 .cinematic-intro__assembly {
@@ -212,7 +225,7 @@ html.is-cinematic-intro body {
   .cinematic-intro__slice-wordmark {
     top: 50%;
     max-width: calc(100vw - 1.5rem);
-    font-size: clamp(2.7rem, 12.5vw, 5.6rem);
+    font-size: clamp(3.4rem, 19vw, 6.5rem);
   }
 
   .cinematic-intro__descriptor-wrap {
@@ -258,7 +271,7 @@ html.is-cinematic-intro body {
 @media (max-width: 380px) {
   .cinematic-intro__wordmark,
   .cinematic-intro__slice-wordmark {
-    font-size: 13.3vw;
+    font-size: 19vw;
   }
 
   .cinematic-intro__descriptor-wrap {

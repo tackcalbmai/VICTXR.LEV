@@ -43,26 +43,48 @@ for (const [viewportName, viewport] of viewports) {
     await openReady(page, path);
     await assertNoHorizontalOverflow(page, `${name} initial`);
 
-    await scrollSectionToTop(page, '.home-v2-work');
-    const work = await page.evaluate(() => {
-      const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
-      const title = document.querySelector('.home-v2-work__title')?.getBoundingClientRect();
-      const catrin = document.querySelector('.home-v2-project--catrin')?.getBoundingClientRect();
-      const anelika = document.querySelector('.home-v2-project--anelika')?.getBoundingClientRect();
-      const footer = document.querySelector('.home-v2-work__bottom')?.getBoundingClientRect();
-      const spans = [...document.querySelectorAll('.home-v2-work__title span')].map((el) => ({ count: el.getClientRects().length, ...toRect(el.getBoundingClientRect()) }));
-      return title && catrin && anelika && footer ? { title: toRect(title), catrin: toRect(catrin), anelika: toRect(anelika), footer: toRect(footer), spans, vh: innerHeight } : null;
-    });
-    if (!work) throw new Error(`${name}: missing work geometry`);
-    if (work.spans.some((span) => span.count !== 1)) throw new Error(`${name}: work title wraps inside an authored line: ${JSON.stringify(work.spans)}`);
-    if (intersects(work.title, work.catrin, -4) || intersects(work.title, work.anelika, -4)) throw new Error(`${name}: work title collides with project media: ${JSON.stringify(work)}`);
-    if (intersects(work.footer, work.catrin, -4) || intersects(work.footer, work.anelika, -4)) throw new Error(`${name}: work footer collides with project media: ${JSON.stringify(work)}`);
-    for (const [key, card] of [['catrin', work.catrin], ['anelika', work.anelika]]) {
-      if (card.left < -8 || card.right > viewport.width + 8 || card.top < -8 || card.bottom > viewport.height + 8) throw new Error(`${name}: ${key} card escapes viewport: ${JSON.stringify(card)}`);
+    const workRange = await page.locator('.home-v2-work').evaluate((element) => ({
+      top: element.getBoundingClientRect().top + scrollY,
+      travel: Math.max(element.getBoundingClientRect().height - innerHeight, 1),
+    }));
+
+    const collectScene = async (progress) => {
+      await page.evaluate(({ top, travel, progress }) => scrollTo({ top: top + travel * progress, behavior: 'instant' }), { ...workRange, progress });
+      await page.waitForTimeout(220);
+      return page.evaluate(() => {
+        const toRect = (r) => ({ left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height });
+        const section = document.querySelector('.home-v2-work');
+        const active = section?.getAttribute('data-active-project');
+        const project = active ? document.querySelector(`.home-v2-project--${active}`) : null;
+        const media = project?.querySelector('picture')?.getBoundingClientRect();
+        const summary = project?.querySelector('.home-v2-project__summary')?.getBoundingClientRect();
+        const logic = project?.querySelector('.home-v2-project__logic')?.getBoundingClientRect();
+        const footer = document.querySelector('.home-v2-work__bottom')?.getBoundingClientRect();
+        const spans = [...document.querySelectorAll('.home-v2-work__title span')].map((el) => ({ count: el.getClientRects().length, ...toRect(el.getBoundingClientRect()) }));
+        return media && summary && logic && footer ? {
+          active,
+          media: toRect(media),
+          summary: toRect(summary),
+          logic: toRect(logic),
+          footer: toRect(footer),
+          spans,
+          vh: innerHeight,
+          vw: innerWidth,
+        } : null;
+      });
+    };
+
+    for (const [progress, expected] of [[0.22, 'catrin'], [0.72, 'anelika']]) {
+      const scene = await collectScene(progress);
+      if (!scene) throw new Error(`${name}: missing ${expected} takeover geometry`);
+      if (scene.active !== expected) throw new Error(`${name}: expected ${expected} at ${progress}, got ${scene.active}`);
+      if (scene.spans.some((span) => span.count !== 1)) throw new Error(`${name}: work title wraps inside an authored line: ${JSON.stringify(scene.spans)}`);
+      if (scene.media.left < -8 || scene.media.right > scene.vw + 8 || scene.media.top < -8 || scene.media.bottom > scene.vh + 8) throw new Error(`${name}: ${expected} media escapes viewport: ${JSON.stringify(scene.media)}`);
+      if (intersects(scene.media, scene.summary, 4) || intersects(scene.media, scene.logic, 4)) throw new Error(`${name}: ${expected} proof copy collides with media`);
+      if (intersects(scene.footer, scene.media, 2) || scene.footer.bottom > scene.vh + 3) throw new Error(`${name}: ${expected} media/footer composition is unstable`);
+      await page.screenshot({ path: `${outDir}/${name}-work-${expected}.png`, fullPage: false });
     }
-    if (work.footer.bottom > work.vh + 3) throw new Error(`${name}: work footer is below viewport`);
     await assertNoHorizontalOverflow(page, `${name} work`);
-    await page.screenshot({ path: `${outDir}/${name}-work.png`, fullPage: false });
 
     await scrollSectionToTop(page, '.home-v2-perspective');
     const perspective = await page.evaluate(() => {

@@ -1,7 +1,7 @@
 import { contactRoutes } from './architecture';
 import type { Locale } from './site';
 
-export type ContactIntentId = 'zero' | 'fix' | 'unsure';
+export type ContactIntentId = 'zero' | 'fix' | 'redesign' | 'unsure';
 export type ContactContext = 'home' | 'work' | 'about' | 'services' | 'case' | 'default';
 
 export const contactRouterCopy = {
@@ -48,7 +48,8 @@ export const contactRouterCopy = {
     },
     starters: {
       zero: 'Hi! I’m starting a website project from zero.',
-      fix: 'Hi! I’d like to improve an existing website.',
+      fix: 'Hi! Something is not working on my current website.',
+      redesign: 'Hi! I’d like to redesign an existing website.',
       unsure: 'Hi! I’m not sure what web solution I need yet.',
     },
     prompts: {
@@ -58,6 +59,7 @@ export const contactRouterCopy = {
       change: 'What should change',
       zeroFallback: ['Business:', 'What should the website help achieve:'],
       fixFallback: ['Current website:', 'Main problem:'],
+      redesignFallback: ['Current website:', 'What should feel or work differently:'],
       unsureFallback: ['The business problem is:'],
     },
   },
@@ -104,7 +106,8 @@ export const contactRouterCopy = {
     },
     starters: {
       zero: 'Sveiki! Vēlos sākt mājaslapas projektu no nulles.',
-      fix: 'Sveiki! Vēlos uzlabot esošu mājaslapu.',
+      fix: 'Sveiki! Manā esošajā mājaslapā kaut kas nestrādā.',
+      redesign: 'Sveiki! Vēlos pārveidot esošu mājaslapu.',
       unsure: 'Sveiki! Vēl nezinu, kāds web risinājums man ir vajadzīgs.',
     },
     prompts: {
@@ -114,6 +117,7 @@ export const contactRouterCopy = {
       change: 'Kam jāmainās',
       zeroFallback: ['Uzņēmums:', 'Ko mājaslapai būtu jāpalīdz sasniegt:'],
       fixFallback: ['Esošā mājaslapa:', 'Galvenā problēma:'],
+      redesignFallback: ['Esošā mājaslapa:', 'Kam būtu jāizskatās vai jāstrādā citādi:'],
       unsureFallback: ['Biznesa problēma ir:'],
     },
   },

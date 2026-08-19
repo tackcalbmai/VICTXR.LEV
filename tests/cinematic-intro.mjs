@@ -77,7 +77,7 @@ async function assertCinematicIntro(name, viewport) {
   stamp('logo');
   await page.waitForTimeout(230);
   const descriptor = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
-  if (descriptor !== 'XO·WEB BY VICTXR.LEV') throw new Error(`${name} XO WEB descriptor is malformed: ${descriptor}`);
+  if (descriptor !== 'DIFFERENT PERSPECTIVE BY VICTXR.LEV') throw new Error(`${name} XO WEB descriptor is malformed: ${descriptor}`);
   if (descriptor.includes('WEB DESIGN')) throw new Error(`${name} obsolete WEB DESIGN descriptor is still rendered`);
   if (await page.locator('[data-cinematic-descriptor-line]').count()) throw new Error(`${name} obsolete descriptor rule is still rendered`);
 
@@ -93,7 +93,7 @@ async function assertCinematicIntro(name, viewport) {
   if (descriptorSize < minimumDescriptorSize) throw new Error(`${name} XO WEB descriptor is too small (${descriptorSize}px)`);
 
   const initialLogo = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
-  if (initialLogo !== 'VICTXR.LEV') throw new Error(`${name} initial logo is malformed: ${initialLogo}`);
+  if (initialLogo !== 'XOWEB') throw new Error(`${name} initial XO WEB logo is malformed: ${initialLogo}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-logo.png`, fullPage: false });
 
   await waitPhase(page, 'x-to-o');
@@ -104,7 +104,7 @@ async function assertCinematicIntro(name, viewport) {
   stamp('o-rest');
   await page.waitForTimeout(100);
   const oText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
-  if (oText !== 'VICTOR.LEV') throw new Error(`${name} X→O cycle did not settle on VICTOR.LEV: ${oText}`);
+  if (oText !== 'OOWEB') throw new Error(`${name} X→O cycle did not settle inside the XO WEB system: ${oText}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-o-rest.png`, fullPage: false });
 
   await waitPhase(page, 'o-to-x');
@@ -115,9 +115,9 @@ async function assertCinematicIntro(name, viewport) {
   stamp('x-rest');
   await page.waitForTimeout(100);
   const xText = (await page.locator('[data-cinematic-wordmark]').textContent())?.replace(/\s+/g, '') ?? '';
-  if (xText !== 'VICTXR.LEV') throw new Error(`${name} full X/O cycle did not resolve on VICTXR.LEV: ${xText}`);
+  if (xText !== 'XOWEB') throw new Error(`${name} full X/O cycle did not resolve on XO WEB: ${xText}`);
   const descriptorAfterCycle = (await page.locator('[data-cinematic-descriptor]').innerText()).replace(/\s+/g, ' ').trim();
-  if (descriptorAfterCycle !== 'XO·WEB BY VICTXR.LEV') throw new Error(`${name} intro descriptor changed during X/O cycle: ${descriptorAfterCycle}`);
+  if (descriptorAfterCycle !== 'DIFFERENT PERSPECTIVE BY VICTXR.LEV') throw new Error(`${name} intro descriptor changed during X/O cycle: ${descriptorAfterCycle}`);
   await page.screenshot({ path: `${outDir}/${name}-cinematic-x-rest.png`, fullPage: false });
 
   const headerBrandBox = await page.locator('.site-brand').boundingBox();
@@ -131,7 +131,7 @@ async function assertCinematicIntro(name, viewport) {
   await waitPhase(page, 'reveal');
   stamp('reveal');
   const introReady = await page.evaluate(() => performance.getEntriesByName('xoweb:intro-ready').at(-1)?.startTime ?? 0);
-  if (introReady < 3600 || introReady > 4700) throw new Error(`${name} introReadyMs ${introReady.toFixed(0)}ms is outside the intended handoff window`);
+  if (introReady < 2700 || introReady > 3800) throw new Error(`${name} introReadyMs ${introReady.toFixed(0)}ms is outside the intended handoff window`);
   const backdrop = page.locator('[data-cinematic-backdrop]');
   if (!await backdrop.count()) throw new Error(`${name} cinematic field disappeared before reveal`);
   await page.waitForFunction(() => {
@@ -155,12 +155,12 @@ async function assertCinematicIntro(name, viewport) {
   await page.screenshot({ path: `${outDir}/${name}-cinematic-landed-slot.png`, fullPage: false });
 
   const minimumBeatSpacing = [
-    ['assemble', 'logo', 380],
-    ['logo', 'x-to-o', 360],
-    ['x-to-o', 'o-rest', 820],
-    ['o-rest', 'o-to-x', 180],
-    ['o-to-x', 'x-rest', 820],
-    ['x-rest', 'handoff', 150],
+    ['assemble', 'logo', 270],
+    ['logo', 'x-to-o', 260],
+    ['x-to-o', 'o-rest', 590],
+    ['o-rest', 'o-to-x', 125],
+    ['o-to-x', 'x-rest', 590],
+    ['x-rest', 'handoff', 105],
   ];
   for (const [from, to, minimum] of minimumBeatSpacing) {
     const spacing = phases[to] - phases[from];
@@ -171,7 +171,7 @@ async function assertCinematicIntro(name, viewport) {
   await page.waitForSelector('[data-cinematic-intro]', { state: 'detached', timeout: 1800 });
 
   const duration = Date.now() - startedAt;
-  if (duration < 4700 || duration > 5600) throw new Error(`${name} intro duration ${duration}ms is outside the intended five-second hook window`);
+  if (duration < 3500 || duration > 4500) throw new Error(`${name} intro duration ${duration}ms is outside the intended controlled hook window`);
 
   const stillLocked = await page.evaluate(() => document.documentElement.classList.contains('is-cinematic-intro'));
   if (stillLocked) throw new Error(`${name} page stayed scroll-locked after the intro`);
@@ -220,4 +220,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Premium VICTXR.LEV intro resolves into the XO WEB header with visible authorship once per session (${desktop.duration}ms / ${mobile.duration}ms).`);
+console.log(`Premium XO WEB intro resolves into the header with visible VICTXR.LEV authorship once per session (${desktop.duration}ms / ${mobile.duration}ms).`);
