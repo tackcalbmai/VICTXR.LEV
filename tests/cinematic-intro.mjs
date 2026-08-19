@@ -76,6 +76,10 @@ async function assertCinematicIntro(name, viewport) {
   await waitPhase(page, 'monogram');
   stamp('monogram');
   await page.waitForTimeout(230);
+  const monogramBox = await page.locator('[data-cinematic-xo-pair]').boundingBox();
+  if (!monogramBox || Math.abs(monogramBox.x + monogramBox.width / 2 - viewport.width / 2) > 2.5) {
+    throw new Error(`${name} opening XO monogram is not optically centered`);
+  }
   await page.screenshot({ path: `${outDir}/${name}-cinematic-monogram.png`, fullPage: false });
 
   await waitPhase(page, 'separate');
@@ -205,10 +209,20 @@ async function assertCinematicIntro(name, viewport) {
   return { duration, phases };
 }
 
-const desktop = await assertCinematicIntro('desktop-1366', { width: 1366, height: 768 });
-const mobile = await assertCinematicIntro('mobile-393', { width: 393, height: 852 });
-if (Math.abs(desktop.duration - mobile.duration) > 350) {
-  throw new Error(`Desktop/mobile premium intro timing diverged too far (${desktop.duration}ms vs ${mobile.duration}ms)`);
+const viewportMatrix = [
+  ['mobile-320', { width: 320, height: 568 }],
+  ['mobile-360', { width: 360, height: 800 }],
+  ['mobile-393', { width: 393, height: 852 }],
+  ['mobile-430', { width: 430, height: 932 }],
+  ['tablet-768', { width: 768, height: 1024 }],
+  ['laptop-1024', { width: 1024, height: 768 }],
+  ['desktop-1366', { width: 1366, height: 768 }],
+];
+const results = [];
+for (const [name, viewport] of viewportMatrix) results.push(await assertCinematicIntro(name, viewport));
+const durations = results.map(({ duration }) => duration);
+if (Math.max(...durations) - Math.min(...durations) > 350) {
+  throw new Error(`Premium intro timing diverged across displays (${durations.join(' / ')}ms)`);
 }
 
 const reduced = await browser.newContext({ viewport: { width: 393, height: 852 }, reducedMotion: 'reduce' });
@@ -219,4 +233,4 @@ if (await reducedPage.locator('[data-cinematic-intro]').count()) throw new Error
 await reduced.close();
 
 await browser.close();
-console.log(`Premium XO WEB intro resolves into the XO WEB header with visible Victxr Lev authorship once per session (${desktop.duration}ms / ${mobile.duration}ms).`);
+console.log(`Premium XO WEB intro stays centered and resolves into the header across seven display classes (${Math.min(...durations)}–${Math.max(...durations)}ms).`);

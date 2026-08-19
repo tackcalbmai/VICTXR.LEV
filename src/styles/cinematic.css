@@ -73,6 +73,24 @@ html.is-cinematic-intro body {
   pointer-events: none;
 }
 
+.cinematic-intro__iris {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: min(72vw, 58rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 5.5%) 0 7%, transparent 30%),
+    conic-gradient(from 45deg, transparent 0 22%, rgb(255 74 48 / 5%) 25%, transparent 28% 72%, rgb(255 255 255 / 3%) 75%, transparent 78%);
+  filter: blur(14px);
+  opacity: 0;
+  translate: -50% -50%;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
 .cinematic-intro__light-slit {
   position: absolute;
   top: 50%;
@@ -92,14 +110,15 @@ html.is-cinematic-intro body {
   position: absolute;
   inset: 0;
   z-index: 2;
+  display: grid;
+  place-items: center;
   pointer-events: none;
 }
 
 .cinematic-intro__wordmark,
 .cinematic-intro__slice-wordmark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position: relative;
+  grid-area: 1 / 1;
   display: inline-flex;
   width: max-content;
   max-width: calc(100vw - 2rem);
@@ -110,7 +129,6 @@ html.is-cinematic-intro body {
   font-weight: 830;
   line-height: 1;
   letter-spacing: -0.055em;
-  translate: -50% -50%;
   white-space: nowrap;
 }
 
@@ -131,6 +149,8 @@ html.is-cinematic-intro body {
   position: absolute;
   inset: 0;
   z-index: 3;
+  display: grid;
+  place-items: center;
   pointer-events: none;
 }
 
@@ -230,7 +250,6 @@ html.is-cinematic-intro body {
 @media (max-width: 760px) {
   .cinematic-intro__wordmark,
   .cinematic-intro__slice-wordmark {
-    top: 50%;
     max-width: calc(100vw - 1.5rem);
     font-size: clamp(2.7rem, 12.5vw, 5.6rem);
   }
@@ -242,6 +261,17 @@ html.is-cinematic-intro body {
   .cinematic-intro__descriptor {
     font-size: clamp(0.86rem, 3.45vw, 1rem);
     letter-spacing: 0.16em;
+  }
+}
+
+@media (max-width: 760px) {
+  .cinematic-intro__iris {
+    width: min(128vw, 42rem);
+    filter: blur(10px);
+  }
+
+  .cinematic-intro__light-slit {
+    width: calc(100vw - 2rem);
   }
 }
 

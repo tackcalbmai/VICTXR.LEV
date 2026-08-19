@@ -60,6 +60,7 @@ export function initHomeMotion() {
   let brandCycle: gsap.core.Timeline | undefined;
   let journeyTween: gsap.core.Tween | undefined;
   const pointerCleanups: Array<() => void> = [];
+  const cinematicIntentCleanups: Array<() => void> = [];
 
   const scheduleBrandCycle = (delay = 7.8) => {
     brandIdle?.kill();
@@ -198,6 +199,7 @@ export function initHomeMotion() {
   }
 
   const releaseCinematic = () => {
+    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     document.documentElement.classList.remove('is-cinematic-intro');
     cinematicNode?.remove();
     cinematicNode = undefined;
@@ -222,6 +224,7 @@ export function initHomeMotion() {
     cinematicNode.setAttribute('aria-hidden', 'true');
     cinematicNode.innerHTML = `
       <div class="cinematic-intro__backdrop" data-cinematic-backdrop></div>
+      <div class="cinematic-intro__iris" data-cinematic-iris></div>
       <div class="cinematic-intro__light-slit" data-cinematic-light-slit></div>
       <div class="cinematic-intro__brand-stage" data-cinematic-stage>
         <div class="cinematic-intro__assembly" data-cinematic-assembly aria-hidden="true">
@@ -245,6 +248,7 @@ export function initHomeMotion() {
 
     const backdrop = cinematicNode.querySelector<HTMLElement>('[data-cinematic-backdrop]');
     const lightSlit = cinematicNode.querySelector<HTMLElement>('[data-cinematic-light-slit]');
+    const iris = cinematicNode.querySelector<HTMLElement>('[data-cinematic-iris]');
     const wordmark = cinematicNode.querySelector<HTMLElement>('[data-cinematic-wordmark]');
     const introXoPair = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-pair]');
     const introXoX = cinematicNode.querySelector<HTMLElement>('[data-cinematic-xo-x]');
@@ -255,7 +259,7 @@ export function initHomeMotion() {
     const slices = cinematicNode.querySelectorAll<HTMLElement>('[data-cinematic-slice]');
     const compact = window.matchMedia('(max-width: 760px)').matches;
 
-    if (!backdrop || !lightSlit || !wordmark || !introXoPair || !introXoX || !introXoO || !introWeb || !introWebMask || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
+    if (!backdrop || !lightSlit || !iris || !wordmark || !introXoPair || !introXoX || !introXoO || !introWeb || !introWebMask || !descriptorWrap || slices.length !== 3 || !siteHeader || !siteBrand) {
       shell.setAttribute('data-home-intro', 'ready');
       markIntroReady();
       releaseCinematic();
@@ -291,6 +295,7 @@ export function initHomeMotion() {
     const centeredMonogramOffset = (introWebMask.getBoundingClientRect().width + Number.parseFloat(getComputedStyle(wordmark).columnGap || '0')) / 2;
     gsap.set(wordmark, { x: centeredMonogramOffset });
     gsap.set(lightSlit, { autoAlpha: 0, scaleX: 0.02, scaleY: 0.18 });
+    gsap.set(iris, { autoAlpha: 0, scale: 0.36 });
     gsap.set(topSlice, { autoAlpha: 0, x: compact ? -15 : -34, y: compact ? -1 : -2, filter: 'blur(2px)' });
     gsap.set(middleSlice, { autoAlpha: 0, x: compact ? 7 : 14, y: 0, filter: 'blur(1px)' });
     gsap.set(bottomSlice, { autoAlpha: 0, x: compact ? 17 : 38, y: compact ? 1 : 2, filter: 'blur(2px)' });
@@ -328,6 +333,7 @@ export function initHomeMotion() {
 
     introTimeline
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'assemble'; }, [], 0.06)
+      .to(iris, { autoAlpha: 0.72, scale: 1, duration: 1.1, ease: 'power3.out' }, 0.02)
       .to(lightSlit, { autoAlpha: 0.8, scaleX: 1, scaleY: 1, duration: 0.72, ease: 'power4.out' }, 0.02)
       .to(topSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.62, ease: 'power4.out' }, 0.12)
       .to(middleSlice, { autoAlpha: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 0.56, ease: 'power4.out' }, 0.18)
@@ -344,8 +350,9 @@ export function initHomeMotion() {
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'word-reveal'; }, [], 2.12)
       .to(wordmark, { x: 0, duration: 0.82, ease: 'power4.inOut' }, 2.14)
       .to(introWeb, { autoAlpha: 1, xPercent: 0, clipPath: 'inset(0 0% 0 0)', filter: 'blur(0px)', duration: 0.82, ease: 'power4.out' }, 2.14)
-      .call(syncDescriptorGeometry, [], 2.72)
-      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' }, 2.78)
+      .to(iris, { autoAlpha: 0.38, scale: 1.16, duration: 0.82, ease: 'power2.inOut' }, 2.14)
+      .call(syncDescriptorGeometry, [], 2.98)
+      .to(descriptorWrap, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.46, ease: 'power3.out' }, 3.0)
       .call(() => { if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'lockup'; }, [], 3.08)
       .to(wordmark, { scale: 1.018, duration: 0.18, yoyo: true, repeat: 1, ease: 'power2.inOut' }, 3.1)
       .call(syncDescriptorGeometry, [], 3.43)
@@ -367,6 +374,7 @@ export function initHomeMotion() {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'reveal';
       }, [], 4.1)
       .to(backdrop, { autoAlpha: 0, duration: 0.72, ease: 'power2.inOut' }, 4.1)
+      .to([iris, lightSlit], { autoAlpha: 0, duration: 0.48, ease: 'power2.inOut' }, 4.1)
       .call(() => {
         if (cinematicNode) cinematicNode.dataset.cinematicPhase = 'landed';
         gsap.set(wordmark, { autoAlpha: 0 });
@@ -374,6 +382,26 @@ export function initHomeMotion() {
       }, [], 4.42)
       .to(headerSecondary, { autoAlpha: 1, duration: 0.34, stagger: 0.04, ease: 'power2.out' }, 4.44)
       .to(cinematicNode, { autoAlpha: 0, duration: 0.24, ease: 'power1.out' }, 4.8);
+
+    const skipCinematic = () => {
+      if (!introTimeline || !cinematicNode) return;
+      introTimeline.kill();
+      markIntroSeen();
+      markIntroReady();
+      shell.setAttribute('data-home-intro', 'ready');
+      releaseCinematic();
+    };
+    const skipCinematicOnKey = (event: KeyboardEvent) => {
+      if (['ArrowDown', 'PageDown', ' ', 'Escape'].includes(event.key)) skipCinematic();
+    };
+    window.addEventListener('wheel', skipCinematic, { passive: true });
+    window.addEventListener('touchmove', skipCinematic, { passive: true });
+    window.addEventListener('keydown', skipCinematicOnKey);
+    cinematicIntentCleanups.push(
+      () => window.removeEventListener('wheel', skipCinematic),
+      () => window.removeEventListener('touchmove', skipCinematic),
+      () => window.removeEventListener('keydown', skipCinematicOnKey),
+    );
   };
 
   startCinematic();
@@ -518,22 +546,25 @@ export function initHomeMotion() {
       });
     });
 
-    const anti = gsap.timeline({
-      scrollTrigger: {
-        trigger: '[data-anti-sales]',
-        start: 'top top',
-        end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
-        scrub: 0.8,
-        pin: true,
-        anticipatePin: 1,
-      },
-    });
-    anti
-      .to({}, { duration: 0.25 })
-      .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
-      .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
-      .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
-      .to({}, { duration: 0.25 });
+    const antiSales = document.querySelector<HTMLElement>('[data-anti-sales]');
+    if (antiSales) {
+      const anti = gsap.timeline({
+        scrollTrigger: {
+          trigger: antiSales,
+          start: 'top top',
+          end: window.matchMedia('(max-width: 760px)').matches ? '+=135%' : '+=170%',
+          scrub: 0.8,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+      anti
+        .to({}, { duration: 0.25 })
+        .to('[data-anti-first]', { yPercent: -24, autoAlpha: 0, duration: 0.28, ease: 'none' })
+        .fromTo('[data-anti-second]', { yPercent: 24, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.34, ease: 'none' }, '<8%')
+        .fromTo('[data-anti-copy]', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.24, ease: 'none' }, '<35%')
+        .to({}, { duration: 0.25 });
+    }
 
     if (window.matchMedia('(pointer: fine)').matches) {
       document.querySelectorAll<HTMLElement>('[data-perspective-card]').forEach((card) => {
@@ -567,6 +598,7 @@ export function initHomeMotion() {
 
   return () => {
     introTimeline?.kill();
+    cinematicIntentCleanups.splice(0).forEach((cleanup) => cleanup());
     cinematicNode?.remove();
     document.documentElement.classList.remove('is-cinematic-intro');
     brandIdle?.kill();
